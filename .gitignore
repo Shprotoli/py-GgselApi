@@ -37,3 +37,6 @@ pytest_cache/
 
 # Python Files
 main.py
+
+# Git
+.gitignore
