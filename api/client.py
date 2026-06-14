@@ -29,7 +29,7 @@ class GClient:
         params = {**self.params, **kwargs.pop("params", {})}
 
         request_url = f"{self.base_url}/{route}"
-        response = requests.request(method, request_url, headers=headers, params=params)
+        response = requests.request(method, request_url, headers=headers, params=params, **kwargs)
 
         return response
 
