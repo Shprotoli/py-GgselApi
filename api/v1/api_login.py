@@ -1,6 +1,6 @@
+# A class file that handles requests from the `ApiLogin` category of the GGSell API
 from json import dumps
 
-from api.client import GClient
 from schemas.token_object import TokenObject
 from api.v1.category import Category
 
