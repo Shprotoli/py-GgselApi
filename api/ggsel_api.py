@@ -4,14 +4,36 @@ from api.v1.account import Account
 
 
 class GgselApiV1:
-    __slots__ = ["client", "ApiLogin", "Account"]
+    __objects_instance = ("_api_instance", "_account_instance")
+    __slots__ = ["_client", *__objects_instance]
 
     def __init__(self, token: str = "", client: GClient | None = None):
-        self.client = client or GClient()
-        self.client.set_token(token)
+        self._client = client or GClient()
+        self._client.set_token(token)
 
-        self.ApiLogin = ApiLogin(self.client)
-        self.Account = Account(self.client)
+    @property
+    def account(self):
+        if not hasattr(self, "_account_instance"):
+            self._account_instance = Account(self._client)
+        return self._account_instance
+
+    @property
+    def api_login(self):
+        if not hasattr(self, "_api_instance"):
+            self._api_instance = ApiLogin(self._client)
+        return self._api_instance
+
+    @property
+    def client(self):
+        return self._client
+
+    @client.setter
+    def client(self, value: GClient):
+        self._client = value
+
+        for obj_name in filter(lambda obj: hasattr(self, obj), self.__objects_instance):
+            obj_instance = getattr(self, obj_name)
+            obj_instance.client = self._client
 
     def set_token(self, token: str) -> None:
-        self.client.set_token(token)
+        self._client.set_token(token)
