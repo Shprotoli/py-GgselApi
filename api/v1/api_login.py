@@ -12,7 +12,7 @@ class ApiLogin(Category):
             "timestamp": str(timestamp),
             "sign": sign,
         })
-        
+
         response = self.client.post("apilogin", data=payload)
         data = response.json()
         return TokenObject(**data)
