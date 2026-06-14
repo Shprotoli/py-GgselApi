@@ -12,3 +12,6 @@ class GgselApiV1:
 
         self.ApiLogin = ApiLogin(self.client)
         self.Account = Account(self.client)
+
+    def set_token(self, token: str) -> None:
+        self.client.set_token(token)
