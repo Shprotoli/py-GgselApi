@@ -25,16 +25,19 @@ class GClient:
         return f"{self.protocol}://{self.domain}/{self._base_route}"
 
     def request(self, route: str, method: str, **kwargs) -> Response:
+        headers = {**self.headers, **kwargs.pop("headers", {})}
+        params = {**self.params, **kwargs.pop("params", {})}
+
         request_url = f"{self.base_url}/{route}"
-        response = requests.request(method, request_url, **kwargs)
+        response = requests.request(method, request_url, headers=headers, params=params)
 
         return response
 
     def get(self, route: str, **kwargs) -> Response:
-        return self.request(route, "get", headers=self.headers, params=self.params, **kwargs)
+        return self.request(route, "get", **kwargs)
 
     def post(self, route: str, **kwargs) -> Response:
-        return self.request(route, "post", headers=self.headers, params=self.params, **kwargs)
+        return self.request(route, "post", **kwargs)
 
     def put(self, route: str, **kwargs) -> Response:
-        return self.request(route, "put", headers=self.headers, params=self.params, **kwargs)
+        return self.request(route, "put", **kwargs)
