@@ -22,8 +22,8 @@ class Account(Category):
 
     def seller_receipts(
             self,
-            page: str,
-            count: int,
+            page: int = 1,
+            count: int = 100,
             currency: str = "",
             type: str = "",
             code_filter: str = "",
