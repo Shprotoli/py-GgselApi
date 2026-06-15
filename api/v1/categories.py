@@ -1,5 +1,5 @@
 # A class file that handles requests from the `Categories` category of the GGSell API
-from parameters.categories import Lang
+from parameters.globals import Lang
 from schemas.categories_object import CategoriesObject
 from api.v1.category import Category
 

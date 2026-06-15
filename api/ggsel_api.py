@@ -3,10 +3,17 @@ from api.v1.api_login import ApiLogin
 from api.v1.account import Account
 from api.v1.categories import Categories
 from api.v1.chats import Chats
+from api.v1.products import Products
 
 
 class GgselApiV1:
-    __objects_instance = ("_api_instance", "_account_instance", "_categories_instance", "_chats_instance")
+    __objects_instance = (
+        "_api_instance",
+        "_account_instance",
+        "_categories_instance",
+        "_chats_instance",
+        "_products_instance",
+    )
     __slots__ = ["_client", *__objects_instance]
 
     def __init__(self, token: str = "", client: GClient | None = None):
@@ -36,6 +43,12 @@ class GgselApiV1:
         if not hasattr(self, "_chats_instance"):
             self._chats_instance = Chats(self._client)
         return self._chats_instance
+
+    @property
+    def products(self):
+        if not hasattr(self, "_products_instance"):
+            self._products_instance = Products(self._client)
+        return self._products_instance
 
     @property
     def client(self):
