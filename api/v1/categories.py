@@ -1,4 +1,5 @@
 # A class file that handles requests from the `Categories` category of the GGSell API
+from parameters.categories import Lang
 from schemas.categories_object import CategoriesObject
 from api.v1.category import Category
 
@@ -9,7 +10,7 @@ class Categories(Category):
             page: int = 1,
             count: int = 10,
             category_id: str = "",
-            lang: str = "ru-RU"
+            lang: str | Lang = "ru-RU"
     ) -> CategoriesObject:
         """
         Source docs: https://seller.ggsel.com/docs/return-all-categories

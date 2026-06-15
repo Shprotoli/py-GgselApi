@@ -2,6 +2,7 @@
 from datetime import datetime
 
 from tools.formated import format_dt
+from parameters.account import Type, CodeFilter
 from api.v1.category import Category
 from schemas.balance_object import BalanceObject
 from schemas.receipts_object import ReceiptsObject
@@ -25,9 +26,9 @@ class Account(Category):
             page: int = 1,
             count: int = 100,
             currency: str = "",
-            type: str = "",
-            code_filter: str = "",
-            allow_type: str = "",
+            type: str | Type = "",
+            code_filter: str | CodeFilter = "",
+            allow_type: str | Type = "",
             start: str | datetime = "",
             finish: str | datetime = "",
     ) -> ReceiptsObject:
