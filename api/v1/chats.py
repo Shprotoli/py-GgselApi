@@ -1,3 +1,4 @@
+# A class file that handles requests from the `Chats` category of the GGSell API
 from requests import Response
 from json import dumps
 
