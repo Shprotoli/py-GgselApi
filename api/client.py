@@ -14,7 +14,10 @@ class GClient:
 
         self._base_route = base_route
 
-        self.headers = {"Content-Type": "application/json"}
+        self.headers = {
+            "Content-Type": "application/json",
+            'Accept': 'application/json',
+        }
         self.params: dict = {}
 
     def set_token(self, token: str) -> None:
