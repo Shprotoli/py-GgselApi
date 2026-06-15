@@ -9,6 +9,15 @@ class Type(StrEnum):
     PRICEPLUS = "priceplus"
 
 
+class OrderCol(StrEnum):
+    ORDER_COL = "order_col"
+
+
+class OrderDir(StrEnum):
+    ASC = "asc"
+    DESC = "desc"
+
+
 @dataclass
 class Variant:
     variant_id: int
