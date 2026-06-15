@@ -10,8 +10,9 @@ from api.v1.category import Category
 
 
 class Products(Category):
-    # This method does not work and returns incorrect answers
     """
+    IMPORTANT: THIS METHOD DOES NOT WORK AND RETURNS INCORRECT ANSWERS
+
     Source docs: https://seller.ggsel.com/docs/updates-prices-of-products-and-variants-in-bulk
     def product_edit_prices(
             self,
