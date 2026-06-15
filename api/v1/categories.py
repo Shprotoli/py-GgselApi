@@ -4,7 +4,7 @@ from api.v1.category import Category
 
 
 class Categories(Category):
-    def categories(
+    def all_categories(
             self,
             page: int = 1,
             count: int = 10,
