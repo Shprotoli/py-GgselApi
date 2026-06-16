@@ -2,13 +2,14 @@
 from requests import Response
 from json import dumps
 
+from tools.handlers import handler_response_api, ApiResult
 from schemas.messages_object import MessagesObject
 from schemas.chats_object import ChatsObject
 from api.v1.category import Category
 
 
 class Chats(Category):
-    def create_message_without_file(self, id_i: int, message: str) -> Response:
+    def create_message_without_file(self, id_i: int, message: str) -> ApiResult:
         """
         Source docs: https://seller.ggsel.com/docs/create-message-without-file
         This method sends a message to the order chat. Please note that `id_i` is the ID of the ORDER, not `chat_id`!
@@ -17,7 +18,7 @@ class Chats(Category):
         :param message: The message you want to send to the order chat
         :return: Returns a Response object whose main part is the status_code, which depends on the result of the request:
                     1) 200 - The message has been sent
-                    2) 400 /422 - Invalid argument (see .text or .json)
+                    2) 400/422 - Invalid argument (see .text or .json)
         """
         params = {
             "id_i": id_i,
@@ -27,7 +28,7 @@ class Chats(Category):
         })
         response = self.client.post("debates/v2", params=params, data=payload)
 
-        return response
+        return handler_response_api(None, data=response)
 
     def list_messages(
             self,
@@ -36,7 +37,7 @@ class Chats(Category):
             id_to: int = "",
             newer: int | bool = "",
             count: int = 10
-    ) -> MessagesObject:
+    ) -> ApiResult:
         """
         Source docs: https://seller.ggsel.com/docs/list-of-messages
         This method returns a list of messages for the specified order.
@@ -60,7 +61,7 @@ class Chats(Category):
         response = self.client.get("debates/v2", params=params)
         data = response.json()
 
-        return MessagesObject(data)
+        return handler_response_api(MessagesObject, data=data)
 
     def list_chats(
             self,
@@ -69,7 +70,7 @@ class Chats(Category):
             id_ds: str = "",
             pagesize: int = 20,
             page: int = 1,
-    ) -> ChatsObject:
+    ) -> ApiResult:
         """
         Source docs: https://seller.ggsel.com/docs/list-of-chats
         This method provides information about chats based on specified parameters
@@ -93,4 +94,4 @@ class Chats(Category):
         response = self.client.get("debates/v2/chats", params=params)
         data = response.json()
 
-        return ChatsObject(**data)
+        return handler_response_api(ChatsObject, data=data)

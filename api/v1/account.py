@@ -1,6 +1,7 @@
 # A class file that handles requests from the `Account` category of the GGSell API
 from datetime import datetime
 
+from tools.handlers import handler_response_api, ApiResult
 from tools.formated import format_dt
 from parameters.account import Type, CodeFilter
 from api.v1.category import Category
@@ -9,7 +10,7 @@ from schemas.receipts_object import ReceiptsObject
 
 
 class Account(Category):
-    def seller_balance_info(self) -> BalanceObject:
+    def seller_balance_info(self) -> ApiResult:
         """
         Source docs: https://seller.ggsel.com/docs/return-seller-balance-info
         This function makes a request to retrieve the user's balance.
@@ -19,7 +20,7 @@ class Account(Category):
         response = self.client.get("sellers/account/balance/info")
         data = response.json()
 
-        return BalanceObject(**data)
+        return handler_response_api(BalanceObject, data=data)
 
     def seller_receipts(
             self,
@@ -31,7 +32,7 @@ class Account(Category):
             allow_type: str | Type = "",
             start: str | datetime = "",
             finish: str | datetime = "",
-    ) -> ReceiptsObject:
+    ) -> ApiResult:
         """
         Source docs: https://seller.ggsel.com/docs/return-seller-receipts
         This function retrieves a list of financial transactions from the page `https://seller.ggsel.com/finance`
@@ -61,4 +62,4 @@ class Account(Category):
         response = self.client.get("sellers/account/receipts", params=params)
         data = response.json()
 
-        return ReceiptsObject(**data)
+        return handler_response_api(ReceiptsObject, data=data)

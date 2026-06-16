@@ -1,6 +1,7 @@
 # A class file that handles requests from the `Products` category of the GGSell API
 from json import dumps
 
+from tools.handlers import handler_response_api, ApiResult
 from parameters.products import Variant, OrderDir, OrderCol
 from parameters.globals import Lang, Currency
 from schemas.offer_list_object import OfferListObject
@@ -41,7 +42,7 @@ class Products(Category):
             count: int = 10,
             lang: str | Lang = Lang.RU,
             locale: str | Lang = Lang.RU,
-    ) -> OfferListObject:
+    ) -> ApiResult:
         """
         Source docs: https://seller.ggsel.com/docs/return-all-products
         The method gets a list of products based on the specified parameters
@@ -69,9 +70,9 @@ class Products(Category):
         response = self.client.get("products/list", params=params, headers=headers)
         data = response.json()
 
-        return OfferListObject(**data)
+        return handler_response_api(OfferListObject, data=data)
 
-    def product_info(self, product_id: str) -> OfferObject:
+    def product_info(self, product_id: str) -> ApiResult:
         """
         Source docs: https://seller.ggsel.com/docs/return-product-info
         This method receives information about the product, and you must be the creator of the product.
@@ -82,7 +83,7 @@ class Products(Category):
         response = self.client.get(f"products/{product_id}/data")
         data = response.json()
 
-        return OfferObject(**data)
+        return handler_response_api(OfferObject, data)
 
     def products_seller(
             self,
@@ -95,7 +96,7 @@ class Products(Category):
             lang: str | Lang = Lang.RU,
             show_hidden: int | bool = False,
             owner_id: int = 0,
-    ) -> SellerGoodsListObject:
+    ) -> ApiResult:
         """
         IMPORTANT: CURRENTLY, THIS ROUTE HAS A BUG AND RETURNS YOUR PRODUCTS INSTEAD OF THE USER WHOSE ID IS SPECIFIED IN `ID_SELLER`
 
@@ -132,4 +133,4 @@ class Products(Category):
         response = self.client.post(f"seller-goods", data=payload)
         data = response.json()
 
-        return SellerGoodsListObject(**data)
+        return handler_response_api(SellerGoodsListObject, data=data)
