@@ -59,21 +59,14 @@ class SyncGClient(GClient):
         super().__init__(protocol, domain, base_route)
 
     def request(self, route: str, method: str, **kwargs) -> Response:
-        headers = self._build_headers(kwargs)
-        params = self._build_params(kwargs)
-
-        request_url = f"{self.base_url}/{route}"
-
-        response = requests.request(
+        return requests.request(
             method,
-            request_url,
-            headers=headers,
-            params=params,
+            f"{self.base_url}/{route}",
+            headers=self._build_headers(kwargs),
+            params=self._build_params(kwargs),
+            data=kwargs.get("data"),
             timeout=10,
-            **kwargs
         )
-
-        return response
 
     def get(self, route: str, **kwargs) -> Response:
         return self.request(route, "get", **kwargs)
@@ -93,25 +86,20 @@ class AsyncGClient(GClient):
             base_route: str = "api_sellers/api",
     ):
         super().__init__(protocol, domain, base_route)
-        self._client = AsyncClient(
+        self._httpx_client = AsyncClient(
             base_url=self.base_url,
             headers=self.headers,
             timeout=10.0,
         )
 
     async def request(self, route: str, method: str, **kwargs) -> AsyncResponse:
-        headers = self._build_headers(kwargs)
-        params = self._build_params(kwargs)
-
-        response = await self._client.request(
+        return await self._httpx_client.request(
             method,
             route,
-            headers=headers,
-            params=params,
-            **kwargs,
+            headers=self._build_headers(kwargs),
+            params=self._build_params(kwargs),
+            data=kwargs.get("data"),
         )
-
-        return response
 
     async def get(self, route: str, **kwargs) -> AsyncResponse:
         return await self.request(route, "GET", **kwargs)
@@ -126,4 +114,4 @@ class AsyncGClient(GClient):
         return self
 
     async def __aexit__(self, exc_type, exc, tb):
-        await self._client.aclose()
+        await self._httpx_client.aclose()

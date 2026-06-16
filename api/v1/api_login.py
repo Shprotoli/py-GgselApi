@@ -1,4 +1,5 @@
 # A class file that handles requests from the `ApiLogin` category of the GGSell API
+from abc import abstractmethod
 from json import dumps
 from typing import Union
 
@@ -7,7 +8,8 @@ from schemas.token_object import TokenObject
 from api.v1.category import Category
 
 
-class ApiLogin(Category):
+class ApiLoginBase(Category):
+    @abstractmethod
     def api_login(self, seller_id: int, timestamp: Union[str | int], sign: str) -> ApiResult:
         """
         Source docs: https://seller.ggsel.com/docs/return-seller-token
@@ -59,13 +61,31 @@ class ApiLogin(Category):
                 ```
         :return: dataclass TokenObject containing a json response from the API
         """
-        payload = dumps({
+        pass
+
+    def _api_login(self, seller_id: int, timestamp: int, sign: str) -> dict[str, str]:
+        """
+        This method converts the input arguments into arguments for `request` and `httpx`
+        """
+        payload = {
             "seller_id": seller_id,
             "timestamp": str(timestamp),
             "sign": sign,
-        })
+        }
 
-        response = self.client.post("apilogin", data=payload)
-        data = response.json()
+        return {
+            "route": "apilogin",
+            "data": dumps(payload),
+        }
 
-        return handler_response_api(TokenObject, data=data)
+
+class ApiLogin(ApiLoginBase):
+    def api_login(self, seller_id, timestamp, sign) -> ApiResult:
+        response = self.client.post(**self._api_login(seller_id, timestamp, sign))
+        return handler_response_api(TokenObject, response.json())
+
+
+class AsyncApiLogin(ApiLoginBase):
+    async def api_login(self, seller_id: int, timestamp: Union[str | int], sign: str) -> ApiResult:
+        response = await self.client.post(**self._api_login(seller_id, timestamp, sign))
+        return handler_response_api(TokenObject, response.json())
