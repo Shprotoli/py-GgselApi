@@ -36,18 +36,6 @@ class GClient(ABC):
     def _build_params(self, kwargs):
         return {**self.params, **kwargs.pop("params", {})}
 
-    @abstractmethod
-    def get(self, route: str, **kwargs) -> Response:
-        pass
-
-    @abstractmethod
-    def post(self, route: str, **kwargs) -> Response:
-        pass
-
-    @abstractmethod
-    def put(self, route: str, **kwargs) -> Response:
-        pass
-
 
 class SyncGClient(GClient):
     def __init__(

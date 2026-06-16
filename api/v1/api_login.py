@@ -9,8 +9,24 @@ from api.v1.category import Category
 
 
 class ApiLoginBase(Category):
-    @abstractmethod
-    def api_login(self, seller_id: int, timestamp: Union[str | int], sign: str) -> ApiResult:
+    def _api_login(self, seller_id: int, timestamp: int, sign: str) -> dict[str, str]:
+        """
+        This method converts the input arguments into arguments for `request` and `httpx`
+        """
+        payload = {
+            "seller_id": seller_id,
+            "timestamp": str(timestamp),
+            "sign": sign,
+        }
+
+        return {
+            "route": "apilogin",
+            "data": dumps(payload),
+        }
+
+
+class ApiLogin(ApiLoginBase):
+    def api_login(self, seller_id, timestamp, sign) -> ApiResult:
         """
         Source docs: https://seller.ggsel.com/docs/return-seller-token
         This function allows you to generate a token using the API key that was obtained on the page `https://seller.ggsel.com/settings`.
@@ -61,31 +77,14 @@ class ApiLoginBase(Category):
                 ```
         :return: dataclass TokenObject containing a json response from the API
         """
-        pass
-
-    def _api_login(self, seller_id: int, timestamp: int, sign: str) -> dict[str, str]:
-        """
-        This method converts the input arguments into arguments for `request` and `httpx`
-        """
-        payload = {
-            "seller_id": seller_id,
-            "timestamp": str(timestamp),
-            "sign": sign,
-        }
-
-        return {
-            "route": "apilogin",
-            "data": dumps(payload),
-        }
-
-
-class ApiLogin(ApiLoginBase):
-    def api_login(self, seller_id, timestamp, sign) -> ApiResult:
         response = self.client.post(**self._api_login(seller_id, timestamp, sign))
         return handler_response_api(TokenObject, response.json())
 
 
 class AsyncApiLogin(ApiLoginBase):
     async def api_login(self, seller_id: int, timestamp: Union[str | int], sign: str) -> ApiResult:
+        """
+        See ApiLoginBase.api_login
+        """
         response = await self.client.post(**self._api_login(seller_id, timestamp, sign))
         return handler_response_api(TokenObject, response.json())
