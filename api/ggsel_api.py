@@ -22,7 +22,7 @@ class GgselApiV1:
     )
     __slots__ = ["_client", *__objects_instance]
 
-    def __init__(self, token: str = "", client: Optional[GClient | None] = None):
+    def __init__(self, token: str = "", client: Optional[GClient] = None):
         self._client = client or GClient()
         self._client.set_token(token)
 
