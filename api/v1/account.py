@@ -1,5 +1,6 @@
 # A class file that handles requests from the `Account` category of the GGSell API
 from datetime import datetime
+from typing import Union
 
 from tools.handlers import handler_response_api, ApiResult
 from tools.formated import format_dt
@@ -27,11 +28,11 @@ class Account(Category):
             page: int = 1,
             count: int = 100,
             currency: str = "",
-            type: str | Type = "",
-            code_filter: str | CodeFilter = "",
-            allow_type: str | Type = "",
-            start: str | datetime = "",
-            finish: str | datetime = "",
+            type: Union[str | Type] = "",
+            code_filter: Union[str | CodeFilter] = "",
+            allow_type: Union[str | Type] = "",
+            start: Union[str | datetime] = "",
+            finish: Union[str | datetime] = "",
     ) -> ApiResult:
         """
         Source docs: https://seller.ggsel.com/docs/return-seller-receipts

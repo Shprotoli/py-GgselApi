@@ -1,6 +1,6 @@
 # A class file that handles requests from the `Products` category of the GGSell API
 from json import dumps
-from typing import Any, Iterable
+from typing import Union, Iterable, List
 
 from tools.handlers import handler_response_api, ApiResult
 from parameters.products import Variant, OrderDir, OrderCol
@@ -38,11 +38,11 @@ class Products(Category):
 
     def products_list(
             self,
-            ids: Any[int, str, Iterable[int, str]],
+            ids: list[int | str],
             page: int = 1,
             count: int = 10,
-            lang: str | Lang = Lang.RU,
-            locale: str | Lang = Lang.RU,
+            lang: Union[str | Lang] = Lang.RU,
+            locale: Union[str | Lang] = Lang.RU,
     ) -> ApiResult:
         """
         Source docs: https://seller.ggsel.com/docs/return-all-products
@@ -89,13 +89,13 @@ class Products(Category):
     def products_seller(
             self,
             id_seller: int,
-            order_col: str | OrderCol = OrderCol.ORDER_COL,
-            order_dir: str | OrderDir = OrderDir.ASC,
+            order_col: Union[str | OrderCol] = OrderCol.ORDER_COL,
+            order_dir: Union[str | OrderDir] = OrderDir.ASC,
             rows: int = 100,
             page: int = 1,
-            currency: str | Currency = Currency.RUB,
-            lang: str | Lang = Lang.RU,
-            show_hidden: int | bool = False,
+            currency: Union[str | Currency] = Currency.RUB,
+            lang: Union[str | Lang] = Lang.RU,
+            show_hidden: Union[int | bool] = False,
             owner_id: int = 0,
     ) -> ApiResult:
         """

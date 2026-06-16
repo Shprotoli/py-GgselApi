@@ -1,5 +1,6 @@
 # A class file that handles requests from the `Chats` category of the GGSell API
 from json import dumps
+from typing import Union
 
 from tools.handlers import handler_response_api, ApiResult
 from schemas.messages_object import MessagesObject
@@ -32,9 +33,9 @@ class Chats(Category):
     def list_messages(
             self,
             id_i: int,
-            id_from: int | str = "",
-            id_to: int | str = "",
-            newer: int | bool = False,
+            id_from: Union[int | str] = "",
+            id_to: Union[int | str] = "",
+            newer: Union[int | bool] = False,
             count: int = 10
     ) -> ApiResult:
         """
@@ -64,7 +65,7 @@ class Chats(Category):
 
     def list_chats(
             self,
-            filter_new: int | bool = 0,
+            filter_new: Union[int | bool] = 0,
             email: str = "",
             id_ds: str = "",
             pagesize: int = 20,

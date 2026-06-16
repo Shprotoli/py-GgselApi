@@ -1,4 +1,6 @@
 # A class file that handles requests from the `Categories` category of the GGSell API
+from typing import Union
+
 from tools.handlers import handler_response_api, ApiResult
 from parameters.globals import Lang
 from schemas.categories_object import CategoriesObject
@@ -11,7 +13,7 @@ class Categories(Category):
             page: int = 1,
             count: int = 10,
             category_id: str = "",
-            lang: str | Lang = "ru-RU"
+            lang: Union[str | Lang] = "ru-RU"
     ) -> ApiResult:
         """
         Source docs: https://seller.ggsel.com/docs/return-all-categories

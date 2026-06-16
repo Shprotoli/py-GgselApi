@@ -1,3 +1,5 @@
+from typing import Union
+
 from tools.handlers import handler_response_api, ApiResult
 from parameters.globals import Lang
 from api.v1.category import Category
@@ -7,7 +9,13 @@ from schemas.unique_code_object import UniqueCodeObject
 
 
 class Orders(Category):
-    def last_sales(self, seller_id: int, group: bool = True, top: int = 10, locale: str | Lang = Lang.RU) -> ApiResult:
+    def last_sales(
+            self,
+            seller_id: int,
+            group: bool = True,
+            top: int = 10,
+            locale: Union[str | Lang] = Lang.RU
+    ) -> ApiResult:
         """
         Source docs: https://seller.ggsel.com/docs/return-last-sales
         This function gets a list of recent sales.
@@ -33,7 +41,7 @@ class Orders(Category):
 
         return handler_response_api(LastSalesObject, data=data)
 
-    def order_info(self, invoice_id: int, locale: str | Lang = Lang.RU) -> ApiResult:
+    def order_info(self, invoice_id: int, locale: Union[str | Lang] = Lang.RU) -> ApiResult:
         """
         Source docs: https://seller.ggsel.com/docs/get-order-info
         This method returns general information about the customer and what they have purchased.

@@ -1,4 +1,4 @@
-from typing import Union, Type, Any, List, Dict
+from typing import Union, Type, Any, List, Dict, Optional
 
 from requests import Response
 
