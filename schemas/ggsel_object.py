@@ -3,7 +3,8 @@ from dataclasses import dataclass
 
 
 class GgselGlobalObject(ABC):
-    pass
+    def __call__(self, *args, **kwargs):
+        pass
 
 
 @dataclass

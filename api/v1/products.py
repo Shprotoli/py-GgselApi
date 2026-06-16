@@ -1,5 +1,6 @@
 # A class file that handles requests from the `Products` category of the GGSell API
 from json import dumps
+from typing import Any, Iterable
 
 from tools.handlers import handler_response_api, ApiResult
 from parameters.products import Variant, OrderDir, OrderCol
@@ -37,7 +38,7 @@ class Products(Category):
 
     def products_list(
             self,
-            ids: str | int | list[str, int],
+            ids: Any[int, str, Iterable[int, str]],
             page: int = 1,
             count: int = 10,
             lang: str | Lang = Lang.RU,

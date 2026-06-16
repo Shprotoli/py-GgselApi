@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, Type, Any, List, Dict
 
 from requests import Response
 
@@ -8,7 +8,7 @@ from schemas.error_response_object import ErrorResponseObject
 ApiResult = Union[GgselGlobalObject, ErrorResponseObject, Response]
 
 
-def handler_response_api(type_wrapper: GgselGlobalObject | None, data: Response | dict | list
+def handler_response_api(type_wrapper: Any[Type[GgselGlobalObject], None], data: Any[Response, Dict, List]
                          ) -> ApiResult:
     """
     Universal API response handler.
@@ -64,6 +64,9 @@ def handler_response_api(type_wrapper: GgselGlobalObject | None, data: Response 
             case dict():
                 return type_wrapper(**data)
             case Response():
+                return data
+            case _:
+                # This is a temporary solution, ignore the identity with `Response()`
                 return data
     except TypeError:
         return ErrorResponseObject(**data)

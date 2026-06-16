@@ -1,5 +1,4 @@
 # A class file that handles requests from the `Chats` category of the GGSell API
-from requests import Response
 from json import dumps
 
 from tools.handlers import handler_response_api, ApiResult
@@ -33,9 +32,9 @@ class Chats(Category):
     def list_messages(
             self,
             id_i: int,
-            id_from: int = "",
-            id_to: int = "",
-            newer: int | bool = "",
+            id_from: int | str = "",
+            id_to: int | str = "",
+            newer: int | bool = False,
             count: int = 10
     ) -> ApiResult:
         """
