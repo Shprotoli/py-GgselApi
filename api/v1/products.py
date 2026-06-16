@@ -104,7 +104,7 @@ class Products(Category):
         Method for getting all user products without detailed information
         (if the product has additional price filters, they will NOT be displayed)
 
-        :param id_seller: Seller's ID
+        :param [NOW WORKING] id_seller: Seller's ID
         :param order_col: Which field to sort by
         :param order_dir: Sorting direction
                             Possible values:
