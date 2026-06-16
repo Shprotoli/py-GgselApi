@@ -5,6 +5,7 @@ from api.v1.categories import Categories
 from api.v1.chats import Chats
 from api.v1.products import Products
 from api.v1.orders import Orders
+from api.v1.reviews import Reviews
 
 
 class GgselApiV1:
@@ -15,6 +16,7 @@ class GgselApiV1:
         "_chats_instance",
         "_products_instance",
         "_orders_instance",
+        "_reviews_instance",
     )
     __slots__ = ["_client", *__objects_instance]
 
@@ -57,6 +59,12 @@ class GgselApiV1:
         if not hasattr(self, "_orders_instance"):
             self._orders_instance = Orders(self._client)
         return self._orders_instance
+
+    @property
+    def reviews(self):
+        if not hasattr(self, "_reviews_instance"):
+            self._reviews_instance = Reviews(self._client)
+        return self._reviews_instance
 
     @property
     def client(self):
