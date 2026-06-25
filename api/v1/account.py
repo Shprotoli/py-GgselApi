@@ -10,7 +10,41 @@ from schemas.balance_object import BalanceObject
 from schemas.receipts_object import ReceiptsObject
 
 
-class Account(Category):
+class AccountBase(Category):
+    def _seller_balance_info(self) -> dict:
+        return {
+            "route": "sellers/account/balance/info",
+        }
+
+    def _seller_receipts(
+            self,
+            page: int = 1,
+            count: int = 100,
+            currency: str = "",
+            type: Union[str | Type] = "",
+            code_filter: Union[str | CodeFilter] = "",
+            allow_type: Union[str | Type] = "",
+            start: Union[str | datetime] = "",
+            finish: Union[str | datetime] = "",
+    ) -> dict:
+        params = {
+            "page": page,
+            "count": count,
+            "currency": currency,
+            "type": type,
+            "code_filter": code_filter,
+            "allow_type": allow_type,
+            "start": format_dt(start),
+            "finish": format_dt(finish),
+        }
+
+        return {
+            "route": "sellers/account/receipts",
+            "params": params,
+        }
+
+
+class Account(AccountBase):
     def seller_balance_info(self) -> ApiResult:
         """
         Source docs: https://seller.ggsel.com/docs/return-seller-balance-info
@@ -18,7 +52,7 @@ class Account(Category):
 
         :return: dataclass BalanceObject containing a json response from the API
         """
-        response = self.client.get("sellers/account/balance/info")
+        response = self.client.get(**self._seller_balance_info())
         data = response.json()
 
         return handler_response_api(BalanceObject, data=data)
@@ -50,17 +84,57 @@ class Account(Category):
         :param finish: {Format date/time: ISO 8601} Operations no later than the specified set date
         :return: dataclass ReceiptsObject containing a json response from the API
         """
-        params = {
-            "page": page,
-            "count": count,
-            "currency": currency,
-            "type": type,
-            "code_filter": code_filter,
-            "allow_type": allow_type,
-            "start": format_dt(start),
-            "finish": format_dt(finish),
-        }
-        response = self.client.get("sellers/account/receipts", params=params)
+        response = self.client.get(
+            **self._seller_receipts(
+                page,
+                count,
+                currency,
+                type,
+                code_filter,
+                allow_type,
+                start,
+                finish
+            ))
+        data = response.json()
+
+        return handler_response_api(ReceiptsObject, data=data)
+
+
+class AsyncAccount(AccountBase):
+    async def seller_balance_info(self) -> ApiResult:
+        """
+        See Account.seller_balance_info
+        """
+        response = await self.client.get(**self._seller_balance_info())
+        data = response.json()
+
+        return handler_response_api(BalanceObject, data=data)
+
+    async def seller_receipts(
+            self,
+            page: int = 1,
+            count: int = 100,
+            currency: str = "",
+            type: Union[str | Type] = "",
+            code_filter: Union[str | CodeFilter] = "",
+            allow_type: Union[str | Type] = "",
+            start: Union[str | datetime] = "",
+            finish: Union[str | datetime] = "",
+    ) -> ApiResult:
+        """
+        See Account.seller_receipts
+        """
+        response = await self.client.get(
+            **self._seller_receipts(
+                page,
+                count,
+                currency,
+                type,
+                code_filter,
+                allow_type,
+                start,
+                finish
+            ))
         data = response.json()
 
         return handler_response_api(ReceiptsObject, data=data)

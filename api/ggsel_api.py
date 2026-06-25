@@ -2,7 +2,7 @@ from typing import Optional
 
 from api.client import GClient, SyncGClient, AsyncGClient
 from api.v1.api_login import ApiLogin, AsyncApiLogin
-from api.v1.account import Account
+from api.v1.account import Account, AsyncAccount
 from api.v1.categories import Categories
 from api.v1.chats import Chats
 from api.v1.products import Products
@@ -52,7 +52,8 @@ class GgselApiV1:
     @property
     def account(self):
         if not hasattr(self, "_account_instance"):
-            self._account_instance = Account(self._client)
+            AccountLoginCls = AsyncAccount if self.__async__ else Account
+            self._account_instance = AccountLoginCls(self._client)
         return self._account_instance
 
     @property
