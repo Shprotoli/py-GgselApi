@@ -110,15 +110,7 @@ class AsyncOrders(OrdersBase):
             locale: Union[str | Lang] = Lang.RU
     ) -> ApiResult:
         """
-        Source docs: https://seller.ggsel.com/docs/return-last-sales
-        This function gets a list of recent sales.
-        The information is similar to the information on the page: `https://seller.ggsel.com/orders`
-
-        :param seller_id: [NOW WORKING]
-        :param group: [NOW WORKING]
-        :param top: Number of entries
-        :param locale: Localization of the returned information
-        :return: dataclass LastSalesObject containing a json response from the API
+        See Orders.last_sales
         """
         response = await self.client.get(**self._last_sales(seller_id, group, top, locale))
         data = response.json()
@@ -127,12 +119,7 @@ class AsyncOrders(OrdersBase):
 
     async def order_info(self, invoice_id: int, locale: Union[str | Lang] = Lang.RU) -> ApiResult:
         """
-        Source docs: https://seller.ggsel.com/docs/get-order-info
-        This method returns general information about the customer and what they have purchased.
-
-        :param invoice_id: Unique order number
-        :param locale: locale: Localization of the returned information
-        :return: dataclass InfoOrderObject containing a json response from the API
+        See Orders.order_info
         """
         response = await self.client.get(**self._order_info(invoice_id, locale))
         data = response.json()
@@ -141,12 +128,7 @@ class AsyncOrders(OrdersBase):
 
     async def check_unique_code(self, unique_code: str) -> ApiResult:
         """
-        Source docs: https://seller.ggsel.com/docs/check-unique-code
-        Unlike `order_info`, this method returns more specific information about the product
-        that the customer purchased using the unique order code.
-
-        :param unique_code:
-        :return:
+        See Orders.check_unique_code
         """
         response = await self.client.get(**self._check_unique_code(unique_code))
         data = response.json()
