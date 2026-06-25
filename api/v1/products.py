@@ -1,9 +1,9 @@
 # A class file that handles requests from the `Products` category of the GGSell API
 from json import dumps
-from typing import Union, Iterable, List
+from typing import Union
 
 from tools.handlers import handler_response_api, ApiResult
-from parameters.products import Variant, OrderDir, OrderCol
+from parameters.products import OrderDir, OrderCol
 from parameters.globals import Lang, Currency
 from schemas.offer_list_object import OfferListObject
 from schemas.offer_object import OfferObject
@@ -11,7 +11,70 @@ from schemas.seller_goods_list_object import SellerGoodsListObject
 from api.v1.category import Category
 
 
-class Products(Category):
+class ProductsBase(Category):
+    def _products_list(
+            self,
+            ids: list[int | str],
+            page: int = 1,
+            count: int = 10,
+            lang: Union[str | Lang] = Lang.RU,
+            locale: Union[str | Lang] = Lang.RU,
+    ) -> dict:
+        if not isinstance(ids, (list, tuple)):
+            ids = [ids]
+
+        params = {
+            "ids": ",".join(map(str, ids)),
+            "page": page,
+            "count": count,
+        }
+        headers = {
+            "lang": lang,
+            "locale": locale,
+        }
+
+        return {
+            "route": "products/list",
+            "params": params,
+            "headers": headers,
+        }
+
+    def _product_info(self, product_id: str) -> dict:
+        return {
+            "route": f"products/{product_id}/data",
+        }
+
+    def _products_seller(
+            self,
+            id_seller: int,
+            order_col: Union[str | OrderCol] = OrderCol.ORDER_COL,
+            order_dir: Union[str | OrderDir] = OrderDir.ASC,
+            rows: int = 100,
+            page: int = 1,
+            currency: Union[str | Currency] = Currency.RUB,
+            lang: Union[str | Lang] = Lang.RU,
+            show_hidden: Union[int | bool] = False,
+            owner_id: int = 0,
+    ) -> dict:
+        payload = dumps({
+            "id_seller": id_seller,
+            "order_col": order_col,
+            "order_dir": order_dir,
+            "rows": rows,
+            "page": page,
+            "currency": currency,
+            "lang": lang,
+            "show_hidden": show_hidden,
+            "owner_id": owner_id,
+        })
+
+        return {
+            "route": "seller-goods",
+            "data": dumps(payload),
+        }
+
+
+class Products(ProductsBase):
     """
     IMPORTANT: THIS METHOD DOES NOT WORK AND RETURNS INCORRECT ANSWERS
 
@@ -55,20 +118,7 @@ class Products(Category):
         :param locale: Localization of goods
         :return: dataclass OfferListObject containing a json response from the API
         """
-        if not isinstance(ids, (list, tuple)):
-            ids = [ids]
-
-        params = {
-            "ids": ",".join(map(str, ids)),
-            "page": page,
-            "count": count,
-        }
-        headers = {
-            "lang": lang,
-            "locale": locale,
-        }
-
-        response = self.client.get("products/list", params=params, headers=headers)
+        response = self.client.get(**self._products_list(ids, page, count, lang, locale))
         data = response.json()
 
         return handler_response_api(OfferListObject, data=data)
@@ -81,7 +131,7 @@ class Products(Category):
         :param product_id: Your product ID
         :return: dataclass OfferObject containing a json response from the API
         """
-        response = self.client.get(f"products/{product_id}/data")
+        response = self.client.get(**self._product_info(product_id))
         data = response.json()
 
         return handler_response_api(OfferObject, data)
@@ -119,19 +169,74 @@ class Products(Category):
         :param owner_id: [OBSOLETE] Owner ID (may differ from the seller)
         :return:
         """
-        payload = dumps({
-            "id_seller": id_seller,
-            "order_col": order_col,
-            "order_dir": order_dir,
-            "rows": rows,
-            "page": page,
-            "currency": currency,
-            "lang": lang,
-            "show_hidden": show_hidden,
-            "owner_id": owner_id,
-        })
+        response = self.client.post(**self._products_seller(
+            id_seller,
+            order_col,
+            order_dir,
+            rows,
+            page,
+            currency,
+            lang,
+            show_hidden,
+            owner_id
+        ))
+        data = response.json()
 
-        response = self.client.post(f"seller-goods", data=payload)
+        return handler_response_api(SellerGoodsListObject, data=data)
+
+
+class AsyncProducts(ProductsBase):
+    async def products_list(
+            self,
+            ids: list[int | str],
+            page: int = 1,
+            count: int = 10,
+            lang: Union[str | Lang] = Lang.RU,
+            locale: Union[str | Lang] = Lang.RU,
+    ) -> ApiResult:
+        """
+        See Products.products_list
+        """
+        response = await self.client.get(**self._products_list(ids, page, count, lang, locale))
+        data = response.json()
+
+        return handler_response_api(OfferListObject, data=data)
+
+    async def product_info(self, product_id: str) -> ApiResult:
+        """
+        See Products.product_info
+        """
+        response = await self.client.get(**self._product_info(product_id))
+        data = response.json()
+
+        return handler_response_api(OfferObject, data)
+
+    async def products_seller(
+            self,
+            id_seller: int,
+            order_col: Union[str | OrderCol] = OrderCol.ORDER_COL,
+            order_dir: Union[str | OrderDir] = OrderDir.ASC,
+            rows: int = 100,
+            page: int = 1,
+            currency: Union[str | Currency] = Currency.RUB,
+            lang: Union[str | Lang] = Lang.RU,
+            show_hidden: Union[int | bool] = False,
+            owner_id: int = 0,
+    ) -> ApiResult:
+        """
+        See Products.products_seller
+        """
+        response = await self.client.post(**self._products_seller(
+            id_seller,
+            order_col,
+            order_dir,
+            rows,
+            page,
+            currency,
+            lang,
+            show_hidden,
+            owner_id
+        ))
         data = response.json()
 
         return handler_response_api(SellerGoodsListObject, data=data)
