@@ -21,6 +21,12 @@ SYNC_API_MAP = {
 
 ASYNC_API_MAP = {
     "_api_login_instance": AsyncApiLogin,
+    "_account_instance": AsyncAccount,
+    "_categories_instance": AsyncCategories,
+    "_chats_instance": AsyncChats,
+    "_products_instance": AsyncProducts,
+    "_orders_instance": AsyncOrders,
+    "_reviews_instance": AsyncReviews,
 }
 
 
