@@ -6,7 +6,7 @@ from api.v1.account import Account, AsyncAccount
 from api.v1.categories import Categories, AsyncCategories
 from api.v1.chats import Chats, AsyncChats
 from api.v1.products import Products, AsyncProducts
-from api.v1.orders import Orders
+from api.v1.orders import Orders, AsyncOrders
 from api.v1.reviews import Reviews
 
 SYNC_API_MAP = {
@@ -52,35 +52,36 @@ class GgselApiV1:
     @property
     def account(self):
         if not hasattr(self, "_account_instance"):
-            AccountLoginCls = AsyncAccount if self.__async__ else Account
-            self._account_instance = AccountLoginCls(self._client)
+            AccountCls = AsyncAccount if self.__async__ else Account
+            self._account_instance = AccountCls(self._client)
         return self._account_instance
 
     @property
     def categories(self):
         if not hasattr(self, "_categories_instance"):
-            CategoriesLoginCls = AsyncCategories if self.__async__ else Categories
-            self._categories_instance = CategoriesLoginCls(self._client)
+            CategoriesCls = AsyncCategories if self.__async__ else Categories
+            self._categories_instance = CategoriesCls(self._client)
         return self._categories_instance
 
     @property
     def chats(self):
         if not hasattr(self, "_chats_instance"):
-            ChatsLoginCls = AsyncChats if self.__async__ else Chats
-            self._chats_instance = ChatsLoginCls(self._client)
+            ChatsCls = AsyncChats if self.__async__ else Chats
+            self._chats_instance = ChatsCls(self._client)
         return self._chats_instance
 
     @property
     def products(self):
         if not hasattr(self, "_products_instance"):
-            ProductsLoginCls = AsyncProducts if self.__async__ else Products
-            self._products_instance = ProductsLoginCls(self._client)
+            ProductsCls = AsyncProducts if self.__async__ else Products
+            self._products_instance = ProductsCls(self._client)
         return self._products_instance
 
     @property
     def orders(self):
         if not hasattr(self, "_orders_instance"):
-            self._orders_instance = Orders(self._client)
+            OrdersCls = AsyncOrders if self.__async__ else Orders
+            self._orders_instance = OrdersCls(self._client)
         return self._orders_instance
 
     @property
