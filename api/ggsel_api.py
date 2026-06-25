@@ -4,7 +4,7 @@ from api.client import GClient, SyncGClient, AsyncGClient
 from api.v1.api_login import ApiLogin, AsyncApiLogin
 from api.v1.account import Account, AsyncAccount
 from api.v1.categories import Categories, AsyncCategories
-from api.v1.chats import Chats
+from api.v1.chats import Chats, AsyncChats
 from api.v1.products import Products
 from api.v1.orders import Orders
 from api.v1.reviews import Reviews
@@ -66,7 +66,8 @@ class GgselApiV1:
     @property
     def chats(self):
         if not hasattr(self, "_chats_instance"):
-            self._chats_instance = Chats(self._client)
+            ChatsLoginCls = AsyncChats if self.__async__ else Chats
+            self._chats_instance = ChatsLoginCls(self._client)
         return self._chats_instance
 
     @property
