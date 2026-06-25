@@ -72,12 +72,13 @@ class AsyncGClient(GClient):
             protocol: str = "https",
             domain: str = "seller.ggsel.com",
             base_route: str = "api_sellers/api",
+            timeout: float = 15.0,
     ):
         super().__init__(protocol, domain, base_route)
         self._httpx_client = AsyncClient(
             base_url=self.base_url,
             headers=self.headers,
-            timeout=10.0,
+            timeout=timeout,
         )
 
     async def request(self, route: str, method: str, **kwargs) -> AsyncResponse:
