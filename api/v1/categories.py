@@ -7,7 +7,31 @@ from schemas.categories_object import CategoriesObject
 from api.v1.category import Category
 
 
-class Categories(Category):
+class CategoriesBase(Category):
+    def _all_categories(
+            self,
+            page: int = 1,
+            count: int = 10,
+            category_id: str = "",
+            lang: Union[str | Lang] = "ru-RU"
+    ) -> dict:
+        params = {
+            "page": page,
+            "count": count,
+            "category_id": category_id,
+        }
+        headers = {
+            "lang": lang,
+        }
+
+        return {
+            "route": "categories",
+            "params": params,
+            "headers": headers,
+        }
+
+
+class Categories(CategoriesBase):
     def all_categories(
             self,
             page: int = 1,
@@ -26,16 +50,23 @@ class Categories(Category):
         :param lang: The language in which the categories will be returned
         :return: dataclass CategoriesObject containing a json response from the API
         """
-        params = {
-            "page": page,
-            "count": count,
-            "category_id": category_id,
-        }
-        headers = {
-            "lang": lang,
-        }
+        response = self.client.get(**self._all_categories(page, count, category_id, lang))
+        data = response.json()
 
-        response = self.client.get("categories", params=params, headers=headers)
+        return handler_response_api(CategoriesObject, data=data)
+
+class AsyncCategories(CategoriesBase):
+    async def all_categories(
+            self,
+            page: int = 1,
+            count: int = 10,
+            category_id: str = "",
+            lang: Union[str | Lang] = "ru-RU"
+    ) -> ApiResult:
+        """
+        See Categories.all_categories
+        """
+        response = await self.client.get(**self._all_categories(page, count, category_id, lang))
         data = response.json()
 
         return handler_response_api(CategoriesObject, data=data)
