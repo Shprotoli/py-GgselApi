@@ -7,7 +7,7 @@ from api.v1.categories import Categories, AsyncCategories
 from api.v1.chats import Chats, AsyncChats
 from api.v1.products import Products, AsyncProducts
 from api.v1.orders import Orders, AsyncOrders
-from api.v1.reviews import Reviews
+from api.v1.reviews import Reviews, AsyncReviews
 
 SYNC_API_MAP = {
     "_api_login_instance": ApiLogin,
@@ -87,7 +87,8 @@ class GgselApiV1:
     @property
     def reviews(self):
         if not hasattr(self, "_reviews_instance"):
-            self._reviews_instance = Reviews(self._client)
+            ReviewsCls = AsyncReviews if self.__async__ else Reviews
+            self._reviews_instance = ReviewsCls(self._client)
         return self._reviews_instance
 
     @property

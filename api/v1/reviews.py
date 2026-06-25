@@ -5,7 +5,33 @@ from schemas.reviews_object import ReviewsObject
 from api.v1.category import Category
 
 
-class Reviews(Category):
+class ReviewsBase(Category):
+    def _user_reviews(
+            self,
+            product_id: int,
+            type: str | TypeReview = TypeReview.ALL,
+            page: int = 1,
+            count: int = 10,
+            locale: str | Lang = Lang.RU
+    ) -> dict:
+        params = {
+            "product_id": product_id,
+            "page": page,
+            "count": count,
+            "type": type,
+        }
+        headers = {
+            "locale": str(locale),
+        }
+
+        return {
+            "route": "reviews",
+            "params": params,
+            "headers": headers,
+        }
+
+
+class Reviews(ReviewsBase):
     def user_reviews(
             self,
             product_id: int,
@@ -25,18 +51,25 @@ class Reviews(Category):
         :param locale: API Response Language
         :return:
         """
-        params = {
-            "product_id": product_id,
-            "page": page,
-            "count": count,
-            "type": type,
-        }
-        headers = {
-            "locale": locale,
-        }
-
-        response = self.client.get("reviews", params=params, headers=headers)
+        response = self.client.get(**self._user_reviews(product_id, type, page, count, locale))
         data = response.json()
 
         return handler_response_api(ReviewsObject, data=data)
 
+
+class AsyncReviews(ReviewsBase):
+    async def user_reviews(
+            self,
+            product_id: int,
+            type: str | TypeReview = TypeReview.ALL,
+            page: int = 1,
+            count: int = 10,
+            locale: str | Lang = Lang.RU
+    ) -> ApiResult:
+        """
+        See Reviews.user_reviews
+        """
+        response = await self.client.get(**self._user_reviews(product_id, type, page, count, locale))
+        data = response.json()
+
+        return handler_response_api(ReviewsObject, data=data)
