@@ -56,7 +56,7 @@ class ProductsBase(Category):
             show_hidden: Union[int | bool] = False,
             owner_id: int = 0,
     ) -> dict:
-        payload = dumps({
+        payload = {
             "id_seller": id_seller,
             "order_col": order_col,
             "order_dir": order_dir,
@@ -66,7 +66,7 @@ class ProductsBase(Category):
             "lang": lang,
             "show_hidden": show_hidden,
             "owner_id": owner_id,
-        })
+        }
 
         return {
             "route": "seller-goods",
