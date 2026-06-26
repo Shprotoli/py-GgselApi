@@ -11,6 +11,7 @@ class GClient(ABC):
             protocol: str = "https",
             domain: str = "seller.ggsel.com",
             base_route: str = "api_sellers/api",
+            **kwargs,
     ):
         self.protocol = protocol.lower()
         self.domain = domain
@@ -19,9 +20,9 @@ class GClient(ABC):
         self.headers = {
             "Content-Type": "application/json",
             "Accept": "application/json",
+            **kwargs.pop("headers", {})
         }
-
-        self.params: dict = {}
+        self.params: dict = {**kwargs.pop("params", {})}
 
     def set_token(self, token: str) -> None:
         self.params["token"] = token
@@ -43,8 +44,9 @@ class SyncGClient(GClient):
             protocol: str = "https",
             domain: str = "seller.ggsel.com",
             base_route: str = "api_sellers/api",
+            **kwargs,
     ):
-        super().__init__(protocol, domain, base_route)
+        super().__init__(protocol, domain, base_route, **kwargs)
 
     def request(self, route: str, method: str, **kwargs) -> Response:
         return requests.request(
@@ -73,8 +75,9 @@ class AsyncGClient(GClient):
             domain: str = "seller.ggsel.com",
             base_route: str = "api_sellers/api",
             timeout: float = 15.0,
+            **kwargs,
     ):
-        super().__init__(protocol, domain, base_route)
+        super().__init__(protocol, domain, base_route, **kwargs)
         self._httpx_client = AsyncClient(
             base_url=self.base_url,
             headers=self.headers,
