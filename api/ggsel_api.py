@@ -1,5 +1,3 @@
-from typing import Optional
-
 from api.client import GClient, SyncGClient, AsyncGClient
 from api.v1.api_login import ApiLogin, AsyncApiLogin
 from api.v1.account import Account, AsyncAccount
@@ -8,8 +6,9 @@ from api.v1.chats import Chats, AsyncChats
 from api.v1.products import Products, AsyncProducts
 from api.v1.orders import Orders, AsyncOrders
 from api.v1.reviews import Reviews, AsyncReviews
+from api.v1.category import Category
 
-API_OBJECTS = {
+API_OBJECTS: dict[str, tuple[type[Category], type[Category]]] = {
     "_api_login_instance": (ApiLogin, AsyncApiLogin),
     "_account_instance": (Account, AsyncAccount),
     "_categories_instance": (Categories, AsyncCategories),
@@ -21,22 +20,22 @@ API_OBJECTS = {
 
 
 class GgselApi:
-    _objects_instance: tuple
+    _objects_instance: tuple[str, ...]
 
-    def __init__(self, api_key: str = "", token: str = "", client: Optional[GClient] = None):
+    def __init__(self, api_key: str = "", token: str = "", client: GClient | None = None):
         self._client = client or SyncGClient(
-            headers={'Authorization': api_key}
+            headers={"Authorization": api_key}
         )
         self._client.set_token(token)
 
         self.__async__ = self.check_client_async()
 
     @property
-    def client(self):
+    def client(self) -> GClient:
         return self._client
 
     @client.setter
-    def client(self, new_client: GClient):
+    def client(self, new_client: GClient) -> None:
         token = getattr(self._client, "token", None)
 
         self._client = new_client
@@ -65,7 +64,7 @@ class GgselApi:
         """
         return isinstance(self._client, AsyncGClient)
 
-    def _update_client_instance(self):
+    def _update_client_instance(self) -> None:
         """
         This method replaces the `client` object in all instances with the client object in `GgselApiV1`
         """
@@ -83,7 +82,7 @@ class GgselApi:
             instance_type = async_cls if self.__async__ else sync_cls
             setattr(self, obj_name, instance_type(self._client))
 
-    def _get_api_instance(self, instance_name: str):
+    def _get_api_instance(self, instance_name: str) -> Category:
         """
         This method receives an API category instance
         and lazily initializes the instance if it has not been created yet
@@ -111,53 +110,52 @@ class GgselApiV1(GgselApi):
     )
     __slots__ = ["_client", "__async__", *_objects_instance]
 
-    def __init__(self, token: str = "", client: Optional[GClient] = None):
+    def __init__(self, token: str = "", client: GClient | None = None):
         super().__init__(token=token, client=client)
 
     @property
-    def api_login(self):
+    def api_login(self) -> ApiLogin | AsyncApiLogin:
         return self._get_api_instance("_api_login_instance")
 
     @property
-    def account(self):
+    def account(self) -> Account | AsyncAccount:
         return self._get_api_instance("_account_instance")
 
     @property
-    def categories(self):
+    def categories(self) -> Categories | AsyncCategories:
         return self._get_api_instance("_categories_instance")
 
     @property
-    def chats(self):
+    def chats(self) -> Chats | AsyncChats:
         return self._get_api_instance("_chats_instance")
 
     @property
-    def products(self):
+    def products(self) -> Products | AsyncProducts:
         return self._get_api_instance("_products_instance")
 
     @property
-    def orders(self):
+    def orders(self) -> Orders | AsyncOrders:
         return self._get_api_instance("_orders_instance")
 
     @property
-    def reviews(self):
+    def reviews(self) -> Reviews | AsyncReviews:
         return self._get_api_instance("_reviews_instance")
 
 
 class GgselApiV2(GgselApi):
-    _objects_instance = (
-    )
+    _objects_instance: tuple[str, ...] = ()
     __slots__ = ["_client", "__async__", "__obj_api_v1", *_objects_instance]
 
-    def __init__(self, api_key: str = "", token: str = "", client: Optional[GClient] = None):
+    def __init__(self, api_key: str = "", token: str = "", client: GClient | None = None):
         super().__init__(api_key, token, client)
 
         self.__obj_api_v1 = GgselApiV1(token, self._client)
 
     @property
-    def api_v1(self):
+    def api_v1(self) -> GgselApiV1:
         return self.__obj_api_v1
 
     @GgselApi.client.setter
-    def client(self, new_client: GClient):
+    def client(self, new_client: GClient) -> None:
         GgselApi.client.fset(self, new_client)
         self.__obj_api_v1.client = new_client

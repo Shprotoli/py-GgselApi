@@ -1,6 +1,6 @@
 # A class file that handles requests from the `Account` category of the GGSell API
 from datetime import datetime
-from typing import Union
+from typing import Any
 
 from tools.handlers import handler_response_api, ApiResult
 from tools.formated import format_dt
@@ -11,7 +11,7 @@ from schemas.receipts_object import ReceiptsObject
 
 
 class AccountBase(Category):
-    def _seller_balance_info(self) -> dict:
+    def _seller_balance_info(self) -> dict[str, Any]:
         return {
             "route": "sellers/account/balance/info",
         }
@@ -21,12 +21,12 @@ class AccountBase(Category):
             page: int = 1,
             count: int = 100,
             currency: str = "",
-            type: Union[str | Type] = "",
-            code_filter: Union[str | CodeFilter] = "",
-            allow_type: Union[str | Type] = "",
-            start: Union[str | datetime] = "",
-            finish: Union[str | datetime] = "",
-    ) -> dict:
+            type: str | Type = "",
+            code_filter: str | CodeFilter = "",
+            allow_type: str | Type = "",
+            start: str | datetime = "",
+            finish: str | datetime = "",
+    ) -> dict[str, Any]:
         params = {
             "page": page,
             "count": count,
@@ -62,11 +62,11 @@ class Account(AccountBase):
             page: int = 1,
             count: int = 100,
             currency: str = "",
-            type: Union[str | Type] = "",
-            code_filter: Union[str | CodeFilter] = "",
-            allow_type: Union[str | Type] = "",
-            start: Union[str | datetime] = "",
-            finish: Union[str | datetime] = "",
+            type: str | Type = "",
+            code_filter: str | CodeFilter = "",
+            allow_type: str | Type = "",
+            start: str | datetime = "",
+            finish: str | datetime = "",
     ) -> ApiResult:
         """
         Source docs: https://seller.ggsel.com/docs/return-seller-receipts
@@ -115,11 +115,11 @@ class AsyncAccount(AccountBase):
             page: int = 1,
             count: int = 100,
             currency: str = "",
-            type: Union[str | Type] = "",
-            code_filter: Union[str | CodeFilter] = "",
-            allow_type: Union[str | Type] = "",
-            start: Union[str | datetime] = "",
-            finish: Union[str | datetime] = "",
+            type: str | Type = "",
+            code_filter: str | CodeFilter = "",
+            allow_type: str | Type = "",
+            start: str | datetime = "",
+            finish: str | datetime = "",
     ) -> ApiResult:
         """
         See Account.seller_receipts

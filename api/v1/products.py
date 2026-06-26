@@ -1,6 +1,6 @@
 # A class file that handles requests from the `Products` category of the GGSell API
 from json import dumps
-from typing import Union
+from typing import Any
 
 from tools.handlers import handler_response_api, ApiResult
 from parameters.products import OrderDir, OrderCol
@@ -17,9 +17,9 @@ class ProductsBase(Category):
             ids: list[int | str],
             page: int = 1,
             count: int = 10,
-            lang: Union[str | Lang] = Lang.RU,
-            locale: Union[str | Lang] = Lang.RU,
-    ) -> dict:
+            lang: str | Lang = Lang.RU,
+            locale: str | Lang = Lang.RU,
+    ) -> dict[str, Any]:
         if not isinstance(ids, (list, tuple)):
             ids = [ids]
 
@@ -39,7 +39,7 @@ class ProductsBase(Category):
             "headers": headers,
         }
 
-    def _product_info(self, product_id: str) -> dict:
+    def _product_info(self, product_id: str) -> dict[str, Any]:
         return {
             "route": f"products/{product_id}/data",
         }
@@ -47,15 +47,15 @@ class ProductsBase(Category):
     def _products_seller(
             self,
             id_seller: int,
-            order_col: Union[str | OrderCol] = OrderCol.ORDER_COL,
-            order_dir: Union[str | OrderDir] = OrderDir.ASC,
+            order_col: str | OrderCol = OrderCol.ORDER_COL,
+            order_dir: str | OrderDir = OrderDir.ASC,
             rows: int = 100,
             page: int = 1,
-            currency: Union[str | Currency] = Currency.RUB,
-            lang: Union[str | Lang] = Lang.RU,
-            show_hidden: Union[int | bool] = False,
+            currency: str | Currency = Currency.RUB,
+            lang: str | Lang = Lang.RU,
+            show_hidden: int | bool = False,
             owner_id: int = 0,
-    ) -> dict:
+    ) -> dict[str, Any]:
         payload = {
             "id_seller": id_seller,
             "order_col": order_col,
@@ -104,8 +104,8 @@ class Products(ProductsBase):
             ids: list[int | str],
             page: int = 1,
             count: int = 10,
-            lang: Union[str | Lang] = Lang.RU,
-            locale: Union[str | Lang] = Lang.RU,
+            lang: str | Lang = Lang.RU,
+            locale: str | Lang = Lang.RU,
     ) -> ApiResult:
         """
         Source docs: https://seller.ggsel.com/docs/return-all-products
@@ -139,13 +139,13 @@ class Products(ProductsBase):
     def products_seller(
             self,
             id_seller: int,
-            order_col: Union[str | OrderCol] = OrderCol.ORDER_COL,
-            order_dir: Union[str | OrderDir] = OrderDir.ASC,
+            order_col: str | OrderCol = OrderCol.ORDER_COL,
+            order_dir: str | OrderDir = OrderDir.ASC,
             rows: int = 100,
             page: int = 1,
-            currency: Union[str | Currency] = Currency.RUB,
-            lang: Union[str | Lang] = Lang.RU,
-            show_hidden: Union[int | bool] = False,
+            currency: str | Currency = Currency.RUB,
+            lang: str | Lang = Lang.RU,
+            show_hidden: int | bool = False,
             owner_id: int = 0,
     ) -> ApiResult:
         """
@@ -191,8 +191,8 @@ class AsyncProducts(ProductsBase):
             ids: list[int | str],
             page: int = 1,
             count: int = 10,
-            lang: Union[str | Lang] = Lang.RU,
-            locale: Union[str | Lang] = Lang.RU,
+            lang: str | Lang = Lang.RU,
+            locale: str | Lang = Lang.RU,
     ) -> ApiResult:
         """
         See Products.products_list
@@ -214,13 +214,13 @@ class AsyncProducts(ProductsBase):
     async def products_seller(
             self,
             id_seller: int,
-            order_col: Union[str | OrderCol] = OrderCol.ORDER_COL,
-            order_dir: Union[str | OrderDir] = OrderDir.ASC,
+            order_col: str | OrderCol = OrderCol.ORDER_COL,
+            order_dir: str | OrderDir = OrderDir.ASC,
             rows: int = 100,
             page: int = 1,
-            currency: Union[str | Currency] = Currency.RUB,
-            lang: Union[str | Lang] = Lang.RU,
-            show_hidden: Union[int | bool] = False,
+            currency: str | Currency = Currency.RUB,
+            lang: str | Lang = Lang.RU,
+            show_hidden: int | bool = False,
             owner_id: int = 0,
     ) -> ApiResult:
         """

@@ -1,7 +1,5 @@
 # A class file that handles requests from the `ApiLogin` category of the GGSell API
-from abc import abstractmethod
 from json import dumps
-from typing import Union
 
 from tools.handlers import handler_response_api, ApiResult
 from schemas.token_object import TokenObject
@@ -26,7 +24,7 @@ class ApiLoginBase(Category):
 
 
 class ApiLogin(ApiLoginBase):
-    def api_login(self, seller_id, timestamp, sign) -> ApiResult:
+    def api_login(self, seller_id: int, timestamp: int, sign: str) -> ApiResult:
         """
         Source docs: https://seller.ggsel.com/docs/return-seller-token
         This function allows you to generate a token using the API key that was obtained on the page `https://seller.ggsel.com/settings`.
@@ -82,7 +80,7 @@ class ApiLogin(ApiLoginBase):
 
 
 class AsyncApiLogin(ApiLoginBase):
-    async def api_login(self, seller_id: int, timestamp: Union[str | int], sign: str) -> ApiResult:
+    async def api_login(self, seller_id: int, timestamp: str | int, sign: str) -> ApiResult:
         """
         See ApiLoginBase.api_login
         """

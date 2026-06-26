@@ -1,6 +1,6 @@
 # A class file that handles requests from the `Chats` category of the GGSell API
 from json import dumps
-from typing import Union
+from typing import Any
 
 from tools.handlers import handler_response_api, ApiResult
 from schemas.messages_object import MessagesObject
@@ -9,7 +9,7 @@ from api.v1.category import Category
 
 
 class ChatsBase(Category):
-    def _create_message_without_file(self, id_i: int, message: str) -> dict:
+    def _create_message_without_file(self, id_i: int, message: str) -> dict[str, Any]:
         params = {
             "id_i": id_i,
         }
@@ -26,11 +26,11 @@ class ChatsBase(Category):
     def _list_messages(
             self,
             id_i: int,
-            id_from: Union[int | str] = "",
-            id_to: Union[int | str] = "",
-            newer: Union[int | bool] = False,
+            id_from: int | str = "",
+            id_to: int | str = "",
+            newer: int | bool = False,
             count: int = 10
-    ) -> dict:
+    ) -> dict[str, Any]:
         params = {
             "id_i": id_i,
             "id_from": id_from,
@@ -46,12 +46,12 @@ class ChatsBase(Category):
 
     def _list_chats(
             self,
-            filter_new: Union[int | bool] = 0,
+            filter_new: int | bool = 0,
             email: str = "",
             id_ds: str = "",
             pagesize: int = 20,
             page: int = 1,
-    ) -> dict:
+    ) -> dict[str, Any]:
         params = {
             "filter_new": filter_new,
             "email": email,
@@ -85,9 +85,9 @@ class Chats(ChatsBase):
     def list_messages(
             self,
             id_i: int,
-            id_from: Union[int | str] = "",
-            id_to: Union[int | str] = "",
-            newer: Union[int | bool] = False,
+            id_from: int | str = "",
+            id_to: int | str = "",
+            newer: int | bool = False,
             count: int = 10
     ) -> ApiResult:
         """
@@ -110,7 +110,7 @@ class Chats(ChatsBase):
 
     def list_chats(
             self,
-            filter_new: Union[int | bool] = 0,
+            filter_new: int | bool = 0,
             email: str = "",
             id_ds: str = "",
             pagesize: int = 20,
@@ -147,9 +147,9 @@ class AsyncChats(ChatsBase):
     async def list_messages(
             self,
             id_i: int,
-            id_from: Union[int | str] = "",
-            id_to: Union[int | str] = "",
-            newer: Union[int | bool] = False,
+            id_from: int | str = "",
+            id_to: int | str = "",
+            newer: int | bool = False,
             count: int = 10
     ) -> ApiResult:
         """
@@ -162,7 +162,7 @@ class AsyncChats(ChatsBase):
 
     async def list_chats(
             self,
-            filter_new: Union[int | bool] = 0,
+            filter_new: int | bool = 0,
             email: str = "",
             id_ds: str = "",
             pagesize: int = 20,

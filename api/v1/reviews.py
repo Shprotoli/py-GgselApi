@@ -1,3 +1,5 @@
+from typing import Any
+
 from tools.handlers import handler_response_api, ApiResult
 from parameters.reviews import TypeReview
 from parameters.globals import Lang
@@ -13,7 +15,7 @@ class ReviewsBase(Category):
             page: int = 1,
             count: int = 10,
             locale: str | Lang = Lang.RU
-    ) -> dict:
+    ) -> dict[str, Any]:
         params = {
             "product_id": product_id,
             "page": page,

@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Any
 
 from tools.handlers import handler_response_api, ApiResult
 from parameters.globals import Lang
@@ -14,8 +14,8 @@ class OrdersBase(Category):
             seller_id: int,
             group: bool = True,
             top: int = 10,
-            locale: Union[str | Lang] = Lang.RU
-    ) -> dict:
+            locale: str | Lang = Lang.RU,
+    ) -> dict[str, Any]:
         params = {
             "seller_id": seller_id,
             "group": group,
@@ -31,7 +31,7 @@ class OrdersBase(Category):
             "headers": headers
         }
 
-    def _order_info(self, invoice_id: int, locale: Union[str | Lang] = Lang.RU) -> dict:
+    def _order_info(self, invoice_id: int, locale: str | Lang = Lang.RU) -> dict[str, Any]:
         headers = {
             "locale": locale,
         }
@@ -41,7 +41,7 @@ class OrdersBase(Category):
             "headers": headers,
         }
 
-    def _check_unique_code(self, unique_code: str) -> dict:
+    def _check_unique_code(self, unique_code: str) -> dict[str, Any]:
         return {
             "route": f"purchases/unique-code/{unique_code}",
         }
@@ -54,7 +54,7 @@ class Orders(OrdersBase):
             seller_id: int,
             group: bool = True,
             top: int = 10,
-            locale: Union[str | Lang] = Lang.RU
+            locale: str | Lang = Lang.RU,
     ) -> ApiResult:
         """
         Source docs: https://seller.ggsel.com/docs/return-last-sales
@@ -72,7 +72,7 @@ class Orders(OrdersBase):
 
         return handler_response_api(LastSalesObject, data=data)
 
-    def order_info(self, invoice_id: int, locale: Union[str | Lang] = Lang.RU) -> ApiResult:
+    def order_info(self, invoice_id: int, locale: str | Lang = Lang.RU) -> ApiResult:
         """
         Source docs: https://seller.ggsel.com/docs/get-order-info
         This method returns general information about the customer and what they have purchased.
@@ -107,7 +107,7 @@ class AsyncOrders(OrdersBase):
             seller_id: int,
             group: bool = True,
             top: int = 10,
-            locale: Union[str | Lang] = Lang.RU
+            locale: str | Lang = Lang.RU,
     ) -> ApiResult:
         """
         See Orders.last_sales
@@ -117,7 +117,7 @@ class AsyncOrders(OrdersBase):
 
         return handler_response_api(LastSalesObject, data=data)
 
-    async def order_info(self, invoice_id: int, locale: Union[str | Lang] = Lang.RU) -> ApiResult:
+    async def order_info(self, invoice_id: int, locale: str | Lang = Lang.RU) -> ApiResult:
         """
         See Orders.order_info
         """

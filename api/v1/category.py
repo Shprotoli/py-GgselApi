@@ -1,9 +1,8 @@
-from typing import Union
 from abc import ABC
 
 from api.client import SyncGClient, AsyncGClient
 
-GClientType = Union[SyncGClient, AsyncGClient]
+GClientType = SyncGClient | AsyncGClient
 
 
 class Category(ABC):

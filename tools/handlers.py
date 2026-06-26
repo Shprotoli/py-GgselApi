@@ -1,72 +1,65 @@
-from typing import Union, Type, Any, List, Dict, Optional
+from collections.abc import Callable
+from typing import Any, Protocol, TypeAlias, TypeVar, overload, runtime_checkable
 
-from requests import Response
-
-from schemas.ggsel_object import GgselGlobalObject
 from schemas.error_response_object import ErrorResponseObject
+from schemas.ggsel_object import GgselGlobalObject
 
-ApiResult = Union[GgselGlobalObject, ErrorResponseObject, Response]
+T = TypeVar("T")
 
 
-def handler_response_api(type_wrapper: Any[Type[GgselGlobalObject], None], data: Any[Response, Dict, List]
-                         ) -> ApiResult:
+@runtime_checkable
+class ResponseLike(Protocol):
+    def json(self) -> Any: ...
+
+
+ApiResult: TypeAlias = GgselGlobalObject | ErrorResponseObject | ResponseLike
+
+
+@overload
+def handler_response_api(
+    type_wrapper: None,
+    data: ResponseLike,
+) -> ResponseLike: ...
+
+
+@overload
+def handler_response_api(
+    type_wrapper: Callable[..., T],
+    data: list[Any],
+) -> T: ...
+
+
+@overload
+def handler_response_api(
+    type_wrapper: Callable[..., T],
+    data: dict[str, Any],
+) -> T | ErrorResponseObject: ...
+
+
+def handler_response_api(
+    type_wrapper: Callable[..., T] | None,
+    data: ResponseLike | dict[str, Any] | list[Any],
+) -> Any:
     """
     Universal API response handler.
 
-    This function processes data returned from the API (Response, dict, or list)
-    and attempts to wrap it into a domain object (`ggsel_object`) using the provided
-    `type_wrapper`.
-
-    If wrapping is not possible, the function returns the raw `Response` object.
-
-    If a TypeError occurs during object construction, an `ErrorResponseObject`
-    is returned instead.
-
-    Behavior:
-        - list     → type_wrapper(data)
-        - dict     → type_wrapper(**data)
-        - Response → returned unchanged
-        - TypeError → ErrorResponseObject(**data)
-
-    :param type_wrapper:
-        A domain model class used to deserialize API response data.
-        If None, no wrapping should be performed.
-
-    :param data:
-        Raw API response data. Possible types:
-        - Response: raw HTTP response object
-        - dict: parsed JSON object
-        - list: parsed JSON array
-
-    :return:
-        - Instance of `type_wrapper` if deserialization succeeds
-        - `ErrorResponseObject` if an error occurs during deserialization
-        - `Response` if the input is already a raw HTTP response
+    The function accepts already-parsed payloads and maps them into the
+    requested domain object when possible.
     """
+    if type_wrapper is None:
+        return data
+
     try:
-        """
-        Pattern-based dispatch of API response data.
-
-        This block determines how raw API response data should be interpreted
-        and converted into a domain model.
-
-        Matching rules:
-            - list     → passed as a positional constructor argument
-            - dict     → unpacked as keyword arguments (**data)
-            - Response → returned as-is (raw HTTP response, no wrapping)
-
-        This logic assumes that `type_wrapper` is a callable model class
-        that can deserialize structured API data into a domain object.
-        """
         match data:
             case list():
                 return type_wrapper(data)
             case dict():
                 return type_wrapper(**data)
-            case Response():
+            case _ if isinstance(data, ResponseLike):
                 return data
             case _:
-                # This is a temporary solution, ignore the identity with `Response()`
                 return data
     except TypeError:
-        return ErrorResponseObject(**data)
+        if isinstance(data, dict):
+            return ErrorResponseObject(**data)
+        return data

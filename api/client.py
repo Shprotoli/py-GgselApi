@@ -1,4 +1,5 @@
-from abc import ABC, abstractmethod
+from abc import ABC
+from typing import Any
 
 from httpx import Response as AsyncResponse, AsyncClient
 import requests
@@ -17,12 +18,12 @@ class GClient(ABC):
         self.domain = domain
         self._base_route = base_route
 
-        self.headers = {
+        self.headers: dict[str, Any] = {
             "Content-Type": "application/json",
             "Accept": "application/json",
             **kwargs.pop("headers", {})
         }
-        self.params: dict = {**kwargs.pop("params", {})}
+        self.params: dict[str, Any] = {**kwargs.pop("params", {})}
 
     def set_token(self, token: str) -> None:
         self.params["token"] = token
@@ -31,10 +32,10 @@ class GClient(ABC):
     def base_url(self) -> str:
         return f"{self.protocol}://{self.domain}/{self._base_route}"
 
-    def _build_headers(self, kwargs):
+    def _build_headers(self, kwargs: dict[str, Any]) -> dict[str, Any]:
         return {**self.headers, **kwargs.pop("headers", {})}
 
-    def _build_params(self, kwargs):
+    def _build_params(self, kwargs: dict[str, Any]) -> dict[str, Any]:
         return {**self.params, **kwargs.pop("params", {})}
 
 
@@ -48,7 +49,7 @@ class SyncGClient(GClient):
     ):
         super().__init__(protocol, domain, base_route, **kwargs)
 
-    def request(self, route: str, method: str, **kwargs) -> Response:
+    def request(self, route: str, method: str, **kwargs: Any) -> Response:
         return requests.request(
             method,
             f"{self.base_url}/{route}",
@@ -58,13 +59,13 @@ class SyncGClient(GClient):
             timeout=10,
         )
 
-    def get(self, route: str, **kwargs) -> Response:
+    def get(self, route: str, **kwargs: Any) -> Response:
         return self.request(route, "get", **kwargs)
 
-    def post(self, route: str, **kwargs) -> Response:
+    def post(self, route: str, **kwargs: Any) -> Response:
         return self.request(route, "post", **kwargs)
 
-    def put(self, route: str, **kwargs) -> Response:
+    def put(self, route: str, **kwargs: Any) -> Response:
         return self.request(route, "put", **kwargs)
 
 
@@ -84,7 +85,7 @@ class AsyncGClient(GClient):
             timeout=timeout,
         )
 
-    async def request(self, route: str, method: str, **kwargs) -> AsyncResponse:
+    async def request(self, route: str, method: str, **kwargs: Any) -> AsyncResponse:
         return await self._httpx_client.request(
             method,
             route,
@@ -93,13 +94,13 @@ class AsyncGClient(GClient):
             data=kwargs.get("data"),
         )
 
-    async def get(self, route: str, **kwargs) -> AsyncResponse:
+    async def get(self, route: str, **kwargs: Any) -> AsyncResponse:
         return await self.request(route, "GET", **kwargs)
 
-    async def post(self, route: str, **kwargs) -> AsyncResponse:
+    async def post(self, route: str, **kwargs: Any) -> AsyncResponse:
         return await self.request(route, "POST", **kwargs)
 
-    async def put(self, route: str, **kwargs) -> AsyncResponse:
+    async def put(self, route: str, **kwargs: Any) -> AsyncResponse:
         return await self.request(route, "PUT", **kwargs)
 
     async def __aenter__(self):

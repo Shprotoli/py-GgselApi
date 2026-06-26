@@ -1,5 +1,5 @@
 # A class file that handles requests from the `Categories` category of the GGSell API
-from typing import Union
+from typing import Any
 
 from tools.handlers import handler_response_api, ApiResult
 from parameters.globals import Lang
@@ -13,8 +13,8 @@ class CategoriesBase(Category):
             page: int = 1,
             count: int = 10,
             category_id: str = "",
-            lang: Union[str | Lang] = "ru-RU"
-    ) -> dict:
+            lang: str | Lang = "ru-RU",
+    ) -> dict[str, Any]:
         params = {
             "page": page,
             "count": count,
@@ -37,7 +37,7 @@ class Categories(CategoriesBase):
             page: int = 1,
             count: int = 10,
             category_id: str = "",
-            lang: Union[str | Lang] = "ru-RU"
+            lang: str | Lang = "ru-RU",
     ) -> ApiResult:
         """
         Source docs: https://seller.ggsel.com/docs/return-all-categories
@@ -61,7 +61,7 @@ class AsyncCategories(CategoriesBase):
             page: int = 1,
             count: int = 10,
             category_id: str = "",
-            lang: Union[str | Lang] = "ru-RU"
+            lang: str | Lang = "ru-RU",
     ) -> ApiResult:
         """
         See Categories.all_categories
