@@ -99,7 +99,7 @@ class GgselApi:
 
 
 class GgselApiV1(GgselApi):
-    _objects_instance = (
+    _objects_instance: tuple[str, ...] = (
         "_api_login_instance",
         "_account_instance",
         "_categories_instance",
