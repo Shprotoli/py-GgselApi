@@ -143,7 +143,9 @@ class GgselApiV1(GgselApi):
 
 
 class GgselApiV2(GgselApi):
-    _objects_instance: tuple[str, ...] = ()
+    _objects_instance: tuple[str, ...] = (
+        
+    )
     __slots__ = ["_client", "__async__", "__obj_api_v1", *_objects_instance]
 
     def __init__(self, api_key: str = "", token: str = "", client: GClient | None = None):
