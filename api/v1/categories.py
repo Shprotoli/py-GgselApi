@@ -4,7 +4,7 @@ from typing import Any
 from tools.handlers import handler_response_api, ApiResult
 from parameters.globals import Lang
 from schemas.categories_object import CategoriesObject
-from api.v1.category import Category
+from api.category import Category
 
 
 class CategoriesBase(Category):

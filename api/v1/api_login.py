@@ -3,7 +3,7 @@ from json import dumps
 
 from tools.handlers import handler_response_api, ApiResult
 from schemas.token_object import TokenObject
-from api.v1.category import Category
+from api.category import Category
 
 
 class ApiLoginBase(Category):

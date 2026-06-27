@@ -2,7 +2,7 @@ from typing import Any
 
 from tools.handlers import handler_response_api, ApiResult
 from parameters.globals import Lang
-from api.v1.category import Category
+from api.category import Category
 from schemas.last_sales_object import LastSalesObject
 from schemas.info_order_object import InfoOrderObject
 from schemas.unique_code_object import UniqueCodeObject

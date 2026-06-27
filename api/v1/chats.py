@@ -5,7 +5,7 @@ from typing import Any
 from tools.handlers import handler_response_api, ApiResult
 from schemas.messages_object import MessagesObject
 from schemas.chats_object import ChatsObject
-from api.v1.category import Category
+from api.category import Category
 
 
 class ChatsBase(Category):

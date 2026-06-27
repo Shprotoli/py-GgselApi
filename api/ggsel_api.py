@@ -6,7 +6,7 @@ from api.v1.chats import Chats, AsyncChats
 from api.v1.products import Products, AsyncProducts
 from api.v1.orders import Orders, AsyncOrders
 from api.v1.reviews import Reviews, AsyncReviews
-from api.v1.category import Category
+from api.category import Category
 
 API_OBJECTS: dict[str, tuple[type[Category], type[Category]]] = {
     "_api_login_instance": (ApiLogin, AsyncApiLogin),

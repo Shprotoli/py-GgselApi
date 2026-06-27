@@ -4,7 +4,7 @@ from tools.handlers import handler_response_api, ApiResult
 from parameters.reviews import TypeReview
 from parameters.globals import Lang
 from schemas.reviews_object import ReviewsObject
-from api.v1.category import Category
+from api.category import Category
 
 
 class ReviewsBase(Category):

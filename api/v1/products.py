@@ -8,7 +8,7 @@ from parameters.globals import Lang, Currency
 from schemas.offer_list_object import OfferListObject
 from schemas.offer_object import OfferObject
 from schemas.seller_goods_list_object import SellerGoodsListObject
-from api.v1.category import Category
+from api.category import Category
 
 
 class ProductsBase(Category):
