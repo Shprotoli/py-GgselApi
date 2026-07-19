@@ -13,6 +13,14 @@ class Categories(CategoriesBaseV2):
             limit: int,
             locale: Locale = "ru"
     ) -> ApiResult:
+        """
+
+        :param parent_id:
+        :param page:
+        :param limit:
+        :param locale:
+        :return:
+        """
         response = self.client.get(**self._list_of_categories(parent_id, page, limit, locale))
         data = response.json()
 
