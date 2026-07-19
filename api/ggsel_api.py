@@ -8,15 +8,53 @@ from api.v1.orders import Orders, AsyncOrders
 from api.v1.reviews import Reviews, AsyncReviews
 from api.category import Category
 
-API_OBJECTS: dict[str, tuple[type[Category], type[Category]]] = {
-    "_api_login_instance": (ApiLogin, AsyncApiLogin),
-    "_account_instance": (Account, AsyncAccount),
-    "_categories_instance": (Categories, AsyncCategories),
-    "_chats_instance": (Chats, AsyncChats),
-    "_products_instance": (Products, AsyncProducts),
-    "_orders_instance": (Orders, AsyncOrders),
-    "_reviews_instance": (Reviews, AsyncReviews),
+API_V1_OBJECTS = {
+    "_v1_api_login_instance": (ApiLogin, AsyncApiLogin),
+    "_v1_account_instance": (Account, AsyncAccount),
+    "_v1_categories_instance": (Categories, AsyncCategories),
+    "_v1_chats_instance": (Chats, AsyncChats),
+    "_v1_products_instance": (Products, AsyncProducts),
+    "_v1_orders_instance": (Orders, AsyncOrders),
+    "_v1_reviews_instance": (Reviews, AsyncReviews),
 }
+
+API_OBJECTS: dict[str, tuple[type[Category], type[Category]]] = {
+    **API_V1_OBJECTS,
+}
+
+
+class CategoriesApiV1:
+    @property
+    def api_login(self) -> ApiLogin | AsyncApiLogin:
+        return self._get_api_instance("_v1_api_login_instance")
+
+    @property
+    def account(self) -> Account | AsyncAccount:
+        return self._get_api_instance("_v1_account_instance")
+
+    @property
+    def categories(self) -> Categories | AsyncCategories:
+        return self._get_api_instance("_v1_categories_instance")
+
+    @property
+    def chats(self) -> Chats | AsyncChats:
+        return self._get_api_instance("_v1_chats_instance")
+
+    @property
+    def products(self) -> Products | AsyncProducts:
+        return self._get_api_instance("_v1_products_instance")
+
+    @property
+    def orders(self) -> Orders | AsyncOrders:
+        return self._get_api_instance("_v1_orders_instance")
+
+    @property
+    def reviews(self) -> Reviews | AsyncReviews:
+        return self._get_api_instance("_v1_reviews_instance")
+
+
+class CategoriesApiV2(CategoriesApiV1):
+    pass
 
 
 class GgselApi:
@@ -24,11 +62,13 @@ class GgselApi:
 
     def __init__(self, api_key: str = "", token: str = "", client: GClient | None = None):
         self._client = client or SyncGClient(
-            headers={"Authorization": api_key}
+            headers={
+                "Authorization": api_key
+            },
         )
         self._client.set_token(token)
 
-        self.__async__ = self.check_client_async()
+        self.__async__ = self.is_async()
 
     @property
     def client(self) -> GClient:
@@ -47,7 +87,7 @@ class GgselApi:
         and if it has, we change the instance types to the corresponding ones
         """
         pred_async_flag = self.__async__
-        self.__async__ = self.check_client_async()
+        self.__async__ = self.is_async()
         if pred_async_flag != self.__async__:
             self._update_mode_instance()
         else:
@@ -56,7 +96,7 @@ class GgselApi:
     def set_token(self, token: str) -> None:
         self._client.set_token(token)
 
-    def check_client_async(self) -> bool:
+    def is_async(self) -> bool:
         """
         This method checks and tells you whether the current `client` object is asynchronous
 
@@ -98,53 +138,17 @@ class GgselApi:
         return getattr(self, instance_name)
 
 
-class GgselApiV1(GgselApi):
-    _objects_instance: tuple[str, ...] = (
-        "_api_login_instance",
-        "_account_instance",
-        "_categories_instance",
-        "_chats_instance",
-        "_products_instance",
-        "_orders_instance",
-        "_reviews_instance",
-    )
+class GgselApiV1(GgselApi, CategoriesApiV1):
+    _objects_instance: tuple[str, ...] = tuple(API_V1_OBJECTS.keys())
     __slots__ = ["_client", "__async__", *_objects_instance]
 
     def __init__(self, token: str = "", client: GClient | None = None):
         super().__init__(token=token, client=client)
 
-    @property
-    def api_login(self) -> ApiLogin | AsyncApiLogin:
-        return self._get_api_instance("_api_login_instance")
 
-    @property
-    def account(self) -> Account | AsyncAccount:
-        return self._get_api_instance("_account_instance")
-
-    @property
-    def categories(self) -> Categories | AsyncCategories:
-        return self._get_api_instance("_categories_instance")
-
-    @property
-    def chats(self) -> Chats | AsyncChats:
-        return self._get_api_instance("_chats_instance")
-
-    @property
-    def products(self) -> Products | AsyncProducts:
-        return self._get_api_instance("_products_instance")
-
-    @property
-    def orders(self) -> Orders | AsyncOrders:
-        return self._get_api_instance("_orders_instance")
-
-    @property
-    def reviews(self) -> Reviews | AsyncReviews:
-        return self._get_api_instance("_reviews_instance")
-
-
-class GgselApiV2(GgselApi):
+class GgselApiV2(GgselApi, CategoriesApiV2):
     _objects_instance: tuple[str, ...] = (
-        
+
     )
     __slots__ = ["_client", "__async__", "__obj_api_v1", *_objects_instance]
 
