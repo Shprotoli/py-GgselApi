@@ -13,7 +13,7 @@ def test_sync_client_request_merges_headers_and_params():
 
     with patch("api.client.requests.request", return_value=response) as request_mock:
         result = client.get(
-            "categories",
+            "api/categories",
             headers={"lang": "en-US"},
             params={"page": 2},
             data={"hello": "world"},
@@ -50,7 +50,7 @@ def test_async_client_request_and_close():
 
     async def run():
         result = await client.post(
-            "products/list",
+            "api/products/list",
             headers={"lang": "en-US"},
             params={"page": 2},
             data={"hello": "world"},
@@ -63,7 +63,7 @@ def test_async_client_request_and_close():
     assert result is response
     client._httpx_client.request.assert_awaited_once_with(
         "POST",
-        "products/list",
+        "api/products/list",
         headers={
             "Content-Type": "application/json",
             "Accept": "application/json",
