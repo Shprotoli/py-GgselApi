@@ -1,7 +1,8 @@
 from collections.abc import Callable
 from typing import Any, Protocol, TypeAlias, TypeVar, overload, runtime_checkable
 
-from schemas.error_response_object import ErrorResponseObject
+from schemas.v1.error_response_object import ErrorResponseObject
+from schemas.v2.error_with_entity_object import ErrorWithEntityObject
 from schemas.ggsel_object import GgselGlobalObject
 
 T = TypeVar("T")
@@ -17,28 +18,28 @@ ApiResult: TypeAlias = GgselGlobalObject | ErrorResponseObject | ResponseLike
 
 @overload
 def handler_response_api(
-    type_wrapper: None,
-    data: ResponseLike,
+        type_wrapper: None,
+        data: ResponseLike,
 ) -> ResponseLike: ...
 
 
 @overload
 def handler_response_api(
-    type_wrapper: Callable[..., T],
-    data: list[Any],
+        type_wrapper: Callable[..., T],
+        data: list[Any],
 ) -> T: ...
 
 
 @overload
 def handler_response_api(
-    type_wrapper: Callable[..., T],
-    data: dict[str, Any],
+        type_wrapper: Callable[..., T],
+        data: dict[str, Any],
 ) -> T | ErrorResponseObject: ...
 
 
 def handler_response_api(
-    type_wrapper: Callable[..., T] | None,
-    data: ResponseLike | dict[str, Any] | list[Any],
+        type_wrapper: Callable[..., T] | None,
+        data: ResponseLike | dict[str, Any] | list[Any],
 ) -> Any:
     """
     Universal API response handler.
@@ -60,6 +61,13 @@ def handler_response_api(
             case _:
                 return data
     except TypeError:
-        if isinstance(data, dict):
-            return ErrorResponseObject(**data)
+        version_api = "V1" if not hasattr(type_wrapper, "VERSION_API") else getattr(type_wrapper, "VERSION_API")
+
+        match version_api:
+            case "V1":
+                if isinstance(data, dict):
+                    return ErrorResponseObject(**data)
+            case "V2":
+                if isinstance(data, dict):
+                    return ErrorWithEntityObject(**data)
         return data

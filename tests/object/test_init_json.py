@@ -1,19 +1,19 @@
 import unittest
 
-from schemas.balance_object import BalanceObject
-from schemas.categories_object import CategoriesObject
-from schemas.chats_object import ChatsObject
-from schemas.info_order_object import InfoOrderObject
-from schemas.last_sales_object import LastSalesObject
-from schemas.messages_object import MessagesObject
-from schemas.offer_list_object import OfferListObject
-from schemas.offer_object import OfferObject
-from schemas.offer_search_object import OfferSearchObject
-from schemas.receipts_object import ReceiptsObject
-from schemas.reviews_object import ReviewsObject
-from schemas.seller_goods_list_object import SellerGoodsListObject
-from schemas.token_object import TokenObject
-from schemas.unique_code_object import UniqueCodeObject
+from schemas.v1.balance_object import BalanceObject
+from schemas.v1.categories_object import CategoriesObject
+from schemas.v1.chats_object import ChatsObject
+from schemas.v1.info_order_object import InfoOrderObject
+from schemas.v1.last_sales_object import LastSalesObject
+from schemas.v1.messages_object import MessagesObject
+from schemas.v1.offer_list_object import OfferListObject
+from schemas.v1.offer_object import OfferObject
+from schemas.v1.offer_search_object import OfferSearchObject
+from schemas.v1.receipts_object import ReceiptsObject
+from schemas.v1.reviews_object import ReviewsObject
+from schemas.v1.seller_goods_list_object import SellerGoodsListObject
+from schemas.v1.token_object import TokenObject
+from schemas.v1.unique_code_object import UniqueCodeObject
 
 
 class TestTokenObject(unittest.TestCase):

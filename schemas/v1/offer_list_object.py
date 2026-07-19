@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from datetime import datetime
 
 from schemas.ggsel_object import GgselObject
 

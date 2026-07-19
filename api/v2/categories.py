@@ -1,7 +1,8 @@
-from parameters.globals import Lang
+from parameters.globals import Locale
 
 from tools.handlers import handler_response_api, ApiResult
 from api.base.categories import CategoriesBaseV2
+from schemas.v2.list_of import ListOfCategories
 
 
 class Categories(CategoriesBaseV2):
@@ -10,9 +11,12 @@ class Categories(CategoriesBaseV2):
             parent_id: int,
             page: int,
             limit: int,
-            locale: Lang = "ru-RU"
+            locale: Locale = "ru"
     ) -> ApiResult:
-        pass
+        response = self.client.get(**self._list_of_categories(parent_id, page, limit, locale))
+        data = response.json()
+
+        return handler_response_api(ListOfCategories, data=data)
 
 
 class AsyncCategories(CategoriesBaseV2):
@@ -21,6 +25,6 @@ class AsyncCategories(CategoriesBaseV2):
             parent_id: int,
             page: int,
             limit: int,
-            locale: Lang = "ru-RU"
+            locale: Locale = "ru"
     ) -> ApiResult:
         pass

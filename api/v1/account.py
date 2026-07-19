@@ -6,8 +6,8 @@ from tools.handlers import handler_response_api, ApiResult
 from tools.formated import format_dt
 from parameters.account import Type, CodeFilter
 from api.category import Category
-from schemas.balance_object import BalanceObject
-from schemas.receipts_object import ReceiptsObject
+from schemas.v1.balance_object import BalanceObject
+from schemas.v1.receipts_object import ReceiptsObject
 
 
 class AccountBase(Category):

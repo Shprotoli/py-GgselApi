@@ -1,7 +1,7 @@
 from requests import Response
 
-from schemas.balance_object import BalanceObject
-from schemas.error_response_object import ErrorResponseObject
+from schemas.v1.balance_object import BalanceObject
+from schemas.v1.error_response_object import ErrorResponseObject
 from tools.handlers import handler_response_api
 
 

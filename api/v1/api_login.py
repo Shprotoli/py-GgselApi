@@ -2,7 +2,7 @@
 from json import dumps
 
 from tools.handlers import handler_response_api, ApiResult
-from schemas.token_object import TokenObject
+from schemas.v1.token_object import TokenObject
 from api.category import Category
 
 

@@ -3,7 +3,7 @@ from typing import Any
 from tools.handlers import handler_response_api, ApiResult
 from parameters.reviews import TypeReview
 from parameters.globals import Lang
-from schemas.reviews_object import ReviewsObject
+from schemas.v1.reviews_object import ReviewsObject
 from api.category import Category
 
 

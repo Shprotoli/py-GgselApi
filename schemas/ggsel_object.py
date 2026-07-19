@@ -13,5 +13,11 @@ class GgselObject(GgselGlobalObject):
 
 
 @dataclass
+class GgselObjectApiV2(GgselGlobalObject):
+    VERSION_API: str = "V2"
+    data: list | None = None
+
+
+@dataclass
 class GgselChatObject(GgselGlobalObject):
     pass

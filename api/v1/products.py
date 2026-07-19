@@ -5,9 +5,9 @@ from typing import Any
 from tools.handlers import handler_response_api, ApiResult
 from parameters.products import OrderDir, OrderCol
 from parameters.globals import Lang, Currency
-from schemas.offer_list_object import OfferListObject
-from schemas.offer_object import OfferObject
-from schemas.seller_goods_list_object import SellerGoodsListObject
+from schemas.v1.offer_list_object import OfferListObject
+from schemas.v1.offer_object import OfferObject
+from schemas.v1.seller_goods_list_object import SellerGoodsListObject
 from api.category import Category
 
 

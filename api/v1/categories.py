@@ -1,7 +1,7 @@
 # A class file that handles requests from the `Categories` category of the GGSell API
 from tools.handlers import handler_response_api, ApiResult
 from parameters.globals import Lang
-from schemas.categories_object import CategoriesObject
+from schemas.v1.categories_object import CategoriesObject
 from api.base.categories import CategoriesBaseV1 as CategoriesBase
 
 

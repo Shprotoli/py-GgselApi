@@ -10,3 +10,8 @@ class Currency(StrEnum):
     USD = "USD"
     EUR = "EUR"
     RUB = "RUB"
+
+
+class Locale(StrEnum):
+    RU = "ru"
+    EU = "eu"
