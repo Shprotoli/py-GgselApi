@@ -1,34 +1,8 @@
 # A class file that handles requests from the `Categories` category of the GGSell API
-from typing import Any
-
 from tools.handlers import handler_response_api, ApiResult
 from parameters.globals import Lang
 from schemas.categories_object import CategoriesObject
-from api.category import Category
-
-
-class CategoriesBase(Category):
-    def _all_categories(
-            self,
-            page: int = 1,
-            count: int = 10,
-            category_id: str = "",
-            lang: str | Lang = "ru-RU",
-    ) -> dict[str, Any]:
-        params = {
-            "page": page,
-            "count": count,
-            "category_id": category_id,
-        }
-        headers = {
-            "lang": lang,
-        }
-
-        return {
-            "route": "categories",
-            "params": params,
-            "headers": headers,
-        }
+from api.base.categories import CategoriesBaseV1 as CategoriesBase
 
 
 class Categories(CategoriesBase):
@@ -54,6 +28,7 @@ class Categories(CategoriesBase):
         data = response.json()
 
         return handler_response_api(CategoriesObject, data=data)
+
 
 class AsyncCategories(CategoriesBase):
     async def all_categories(
