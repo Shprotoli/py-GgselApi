@@ -1,12 +1,10 @@
 from typing import Any
 
 from parameters.globals import Lang
-from api.category import Category
+from api.category import Category, RouteApiV1, RouteApiV2
 
 
-class CategoriesBaseV1(Category):
-    ROUTE = "api_sellers/api"
-
+class CategoriesBaseV1(Category, RouteApiV1):
     def _all_categories(
             self,
             page: int = 1,
@@ -30,5 +28,5 @@ class CategoriesBaseV1(Category):
         }
 
 
-class CategoriesBaseV2(Category):
-    ROUTE = "api_sellers/v2"
+class CategoriesBaseV2(Category, RouteApiV2):
+    pass
