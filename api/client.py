@@ -80,12 +80,12 @@ class AsyncGClient(GClient):
     ):
         super().__init__(protocol, domain, base_route, **kwargs)
         self._httpx_client = AsyncClient(
-            base_url=self.base_url,
             headers=self.headers,
             timeout=timeout,
         )
 
     async def request(self, route: str, method: str, **kwargs: Any) -> AsyncResponse:
+        self._httpx_client.base_url = self.base_url
         return await self._httpx_client.request(
             method,
             route,
