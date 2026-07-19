@@ -44,7 +44,7 @@ class SyncGClient(GClient):
             self,
             protocol: str = "https",
             domain: str = "seller.ggsel.com",
-            base_route: str = "api_sellers/api",
+            base_route: str = "api_sellers",
             **kwargs,
     ):
         super().__init__(protocol, domain, base_route, **kwargs)
@@ -74,7 +74,7 @@ class AsyncGClient(GClient):
             self,
             protocol: str = "https",
             domain: str = "seller.ggsel.com",
-            base_route: str = "api_sellers/api",
+            base_route: str = "api_sellers",
             timeout: float = 15.0,
             **kwargs,
     ):
