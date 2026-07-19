@@ -9,9 +9,9 @@ from requests import Response
 class GClient(ABC):
     def __init__(
             self,
-            protocol: str = "https",
-            domain: str = "seller.ggsel.com",
-            base_route: str = "api_sellers/api",
+            protocol: str,
+            domain: str,
+            base_route: str,
             **kwargs,
     ):
         self.protocol = protocol.lower()
