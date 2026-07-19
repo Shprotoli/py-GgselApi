@@ -34,12 +34,34 @@ class CategoriesBaseV2(Category, RouteApiV2):
             parent_id: int,
             page: int,
             limit: int,
-            locale: str | Locale = "ru",
+            locale: str | Locale,
     ) -> dict[str, Any]:
         params = {
             "parent_id": parent_id,
             "page": page,
             "limit": limit,
+        }
+        headers = {
+            "locale": locale,
+        }
+
+        return {
+            "route": "categories",
+            "params": params,
+            "headers": headers,
+        }
+
+    def _search_categories(
+            self,
+            page: int,
+            limit: int,
+            q: str,
+            locale: str | Locale,
+    ) -> dict[str, Any]:
+        params = {
+            "page": page,
+            "limit": limit,
+            "q": q,
         }
         headers = {
             "locale": locale,
