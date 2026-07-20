@@ -1,50 +1,14 @@
 # A class file that handles requests from the `Account` category of the GGSell API
 from datetime import datetime
-from typing import Any
 
 from tools.handlers import handler_api, async_handler_api, EnumMethodHandle, ApiResult
-from tools.formated import format_dt
 from parameters.account import Type, CodeFilter
-from api.category import Category
 from schemas.v1.balance_object import BalanceObject
 from schemas.v1.receipts_object import ReceiptsObject
+from api.base.account import AccountBaseV1
 
 
-class AccountBase(Category):
-    def _seller_balance_info(self) -> dict[str, Any]:
-        return {
-            "route": "sellers/account/balance/info",
-        }
-
-    def _seller_receipts(
-            self,
-            page: int = 1,
-            count: int = 100,
-            currency: str = "",
-            type: str | Type = "",
-            code_filter: str | CodeFilter = "",
-            allow_type: str | Type = "",
-            start: str | datetime = "",
-            finish: str | datetime = "",
-    ) -> dict[str, Any]:
-        params = {
-            "page": page,
-            "count": count,
-            "currency": currency,
-            "type": type,
-            "code_filter": code_filter,
-            "allow_type": allow_type,
-            "start": format_dt(start),
-            "finish": format_dt(finish),
-        }
-
-        return {
-            "route": "sellers/account/receipts",
-            "params": params,
-        }
-
-
-class Account(AccountBase):
+class Account(AccountBaseV1):
     def seller_balance_info(self) -> ApiResult:
         """
         Source docs: https://seller.ggsel.com/docs/return-seller-balance-info
@@ -102,7 +66,7 @@ class Account(AccountBase):
         )
 
 
-class AsyncAccount(AccountBase):
+class AsyncAccount(AccountBaseV1):
     async def seller_balance_info(self) -> ApiResult:
         """
         See Account.seller_balance_info

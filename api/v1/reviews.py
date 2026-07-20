@@ -1,39 +1,11 @@
-from typing import Any
-
 from tools.handlers import handler_api, async_handler_api, EnumMethodHandle, ApiResult
 from parameters.reviews import TypeReview
 from parameters.globals import Lang
 from schemas.v1.reviews_object import ReviewsObject
-from api.category import Category
+from api.base.reviews import ReviewsBaseV1
 
 
-class ReviewsBase(Category):
-    def _user_reviews(
-            self,
-            product_id: int,
-            type: str | TypeReview = TypeReview.ALL,
-            page: int = 1,
-            count: int = 10,
-            locale: str | Lang = Lang.RU
-    ) -> dict[str, Any]:
-        params = {
-            "product_id": product_id,
-            "page": page,
-            "count": count,
-            "type": type,
-        }
-        headers = {
-            "locale": str(locale),
-        }
-
-        return {
-            "route": "reviews",
-            "params": params,
-            "headers": headers,
-        }
-
-
-class Reviews(ReviewsBase):
+class Reviews(ReviewsBaseV1):
     def user_reviews(
             self,
             product_id: int,
@@ -66,7 +38,7 @@ class Reviews(ReviewsBase):
         )
 
 
-class AsyncReviews(ReviewsBase):
+class AsyncReviews(ReviewsBaseV1):
     async def user_reviews(
             self,
             product_id: int,

@@ -1,29 +1,10 @@
 # A class file that handles requests from the `ApiLogin` category of the GGSell API
-from json import dumps
-
 from tools.handlers import handler_api, async_handler_api, EnumMethodHandle, ApiResult
 from schemas.v1.token_object import TokenObject
-from api.category import Category
+from api.base.api_login import ApiLoginBaseV1
 
 
-class ApiLoginBase(Category):
-    def _api_login(self, seller_id: int, timestamp: int, sign: str) -> dict[str, str]:
-        """
-        This method converts the input arguments into arguments for `request` and `httpx`
-        """
-        payload = {
-            "seller_id": seller_id,
-            "timestamp": str(timestamp),
-            "sign": sign,
-        }
-
-        return {
-            "route": "apilogin",
-            "data": dumps(payload),
-        }
-
-
-class ApiLogin(ApiLoginBase):
+class ApiLogin(ApiLoginBaseV1):
     def api_login(self, seller_id: int, timestamp: int, sign: str) -> ApiResult:
         """
         Source docs: https://seller.ggsel.com/docs/return-seller-token
@@ -86,7 +67,7 @@ class ApiLogin(ApiLoginBase):
         )
 
 
-class AsyncApiLogin(ApiLoginBase):
+class AsyncApiLogin(ApiLoginBaseV1):
     async def api_login(self, seller_id: int, timestamp: str | int, sign: str) -> ApiResult:
         """
         See ApiLoginBase.api_login
