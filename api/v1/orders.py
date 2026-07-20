@@ -1,6 +1,6 @@
 from typing import Any
 
-from tools.handlers import handler_response_api, ApiResult
+from tools.handlers import handler_api, async_handler_api, EnumMethodHandle, ApiResult
 from parameters.globals import Lang
 from api.category import Category
 from schemas.v1.last_sales_object import LastSalesObject
@@ -67,10 +67,16 @@ class Orders(OrdersBase):
         :param locale: Localization of the returned information
         :return: dataclass LastSalesObject containing a json response from the API
         """
-        response = self.client.get(**self._last_sales(seller_id, group, top, locale))
-        data = response.json()
-
-        return handler_response_api(LastSalesObject, data=data)
+        return handler_api(
+            EnumMethodHandle.GET,
+            self.client,
+            self._last_sales,
+            LastSalesObject,
+            seller_id=seller_id,
+            group=group,
+            top=top,
+            locale=locale
+        )
 
     def order_info(self, invoice_id: int, locale: str | Lang = Lang.RU) -> ApiResult:
         """
@@ -81,10 +87,14 @@ class Orders(OrdersBase):
         :param locale: locale: Localization of the returned information
         :return: dataclass InfoOrderObject containing a json response from the API
         """
-        response = self.client.get(**self._order_info(invoice_id, locale))
-        data = response.json()
-
-        return handler_response_api(InfoOrderObject, data=data)
+        return handler_api(
+            EnumMethodHandle.GET,
+            self.client,
+            self._order_info,
+            InfoOrderObject,
+            invoice_id=invoice_id,
+            locale=locale
+        )
 
     def check_unique_code(self, unique_code: str) -> ApiResult:
         """
@@ -95,10 +105,13 @@ class Orders(OrdersBase):
         :param unique_code:
         :return:
         """
-        response = self.client.get(**self._check_unique_code(unique_code))
-        data = response.json()
-
-        return handler_response_api(UniqueCodeObject, data=data)
+        return handler_api(
+            EnumMethodHandle.GET,
+            self.client,
+            self._check_unique_code,
+            UniqueCodeObject,
+            unique_code=unique_code
+        )
 
 
 class AsyncOrders(OrdersBase):
@@ -112,26 +125,38 @@ class AsyncOrders(OrdersBase):
         """
         See Orders.last_sales
         """
-        response = await self.client.get(**self._last_sales(seller_id, group, top, locale))
-        data = response.json()
-
-        return handler_response_api(LastSalesObject, data=data)
+        return await async_handler_api(
+            EnumMethodHandle.GET,
+            self.client,
+            self._last_sales,
+            LastSalesObject,
+            seller_id=seller_id,
+            group=group,
+            top=top,
+            locale=locale
+        )
 
     async def order_info(self, invoice_id: int, locale: str | Lang = Lang.RU) -> ApiResult:
         """
         See Orders.order_info
         """
-        response = await self.client.get(**self._order_info(invoice_id, locale))
-        data = response.json()
-
-        return handler_response_api(InfoOrderObject, data=data)
+        return await async_handler_api(
+            EnumMethodHandle.GET,
+            self.client,
+            self._order_info,
+            InfoOrderObject,
+            invoice_id=invoice_id,
+            locale=locale
+        )
 
     async def check_unique_code(self, unique_code: str) -> ApiResult:
         """
         See Orders.check_unique_code
         """
-        response = await self.client.get(**self._check_unique_code(unique_code))
-        data = response.json()
-
-        return handler_response_api(UniqueCodeObject, data=data)
-
+        return await async_handler_api(
+            EnumMethodHandle.GET,
+            self.client,
+            self._check_unique_code,
+            UniqueCodeObject,
+            unique_code=unique_code
+        )

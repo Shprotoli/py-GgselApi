@@ -1,6 +1,6 @@
 from typing import Any
 
-from tools.handlers import handler_response_api, ApiResult
+from tools.handlers import handler_api, async_handler_api, EnumMethodHandle, ApiResult
 from parameters.reviews import TypeReview
 from parameters.globals import Lang
 from schemas.v1.reviews_object import ReviewsObject
@@ -53,10 +53,17 @@ class Reviews(ReviewsBase):
         :param locale: API Response Language
         :return:
         """
-        response = self.client.get(**self._user_reviews(product_id, type, page, count, locale))
-        data = response.json()
-
-        return handler_response_api(ReviewsObject, data=data)
+        return handler_api(
+            EnumMethodHandle.GET,
+            self.client,
+            self._user_reviews,
+            ReviewsObject,
+            product_id=product_id,
+            type=type,
+            page=page,
+            count=count,
+            locale=locale
+        )
 
 
 class AsyncReviews(ReviewsBase):
@@ -71,7 +78,14 @@ class AsyncReviews(ReviewsBase):
         """
         See Reviews.user_reviews
         """
-        response = await self.client.get(**self._user_reviews(product_id, type, page, count, locale))
-        data = response.json()
-
-        return handler_response_api(ReviewsObject, data=data)
+        return await async_handler_api(
+            EnumMethodHandle.GET,
+            self.client,
+            self._user_reviews,
+            ReviewsObject,
+            product_id=product_id,
+            type=type,
+            page=page,
+            count=count,
+            locale=locale
+        )

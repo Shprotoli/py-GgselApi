@@ -20,3 +20,6 @@ class GgselObjectApiV2(GgselGlobalObject):
 @dataclass
 class GgselChatObject(GgselGlobalObject):
     pass
+
+
+GgselObjectApi = GgselObject | GgselObjectApiV2

@@ -1,6 +1,5 @@
 from parameters.globals import Locale
-
-from tools.handlers import handler_response_api, ApiResult
+from tools.handlers import async_handler_api, handler_api, EnumMethodHandle, ApiResult
 from api.base.categories import CategoriesBaseV2
 from schemas.v2.list_of import ListOfCategories
 
@@ -23,10 +22,16 @@ class Categories(CategoriesBaseV2):
         :param limit: Count category
         :param locale: Localization response information
         """
-        response = self.client.get(**self._list_of_categories(parent_id, page, limit, locale))
-        data = response.json()
-
-        return handler_response_api(ListOfCategories, data=data)
+        return handler_api(
+            EnumMethodHandle.GET,
+            self.client,
+            self._list_of_categories,
+            ListOfCategories,
+            parent_id=parent_id,
+            page=page,
+            limit=limit,
+            locale=locale
+        )
 
     def search_categories(
             self,
@@ -44,10 +49,16 @@ class Categories(CategoriesBaseV2):
         :param limit: Count category
         :param locale: Localization response information
         """
-        response = self.client.get(**self._search_categories(page, limit, q, locale))
-        data = response.json()
-
-        return handler_response_api(ListOfCategories, data=data)
+        return handler_api(
+            EnumMethodHandle.GET,
+            self.client,
+            self._search_categories,
+            ListOfCategories,
+            page=page,
+            limit=limit,
+            q=q,
+            locale=locale
+        )
 
 
 class AsyncCategories(CategoriesBaseV2):
@@ -61,10 +72,16 @@ class AsyncCategories(CategoriesBaseV2):
         """
         See v2.Categories.list_of_categories
         """
-        response = await self.client.get(**self._list_of_categories(parent_id, page, limit, locale))
-        data = response.json()
-
-        return handler_response_api(ListOfCategories, data=data)
+        return await async_handler_api(
+            EnumMethodHandle.GET,
+            self.client,
+            self._list_of_categories,
+            ListOfCategories,
+            parent_id=parent_id,
+            page=page,
+            limit=limit,
+            locale=locale
+        )
 
     async def search_categories(
             self,
@@ -76,7 +93,13 @@ class AsyncCategories(CategoriesBaseV2):
         """
         See v2.Categories.search_categories
         """
-        response = await self.client.get(**self._search_categories(page, limit, q, locale))
-        data = response.json()
-
-        return handler_response_api(ListOfCategories, data=data)
+        return await async_handler_api(
+            EnumMethodHandle.GET,
+            self.client,
+            self._search_categories,
+            ListOfCategories,
+            page=page,
+            limit=limit,
+            q=q,
+            locale=locale
+        )

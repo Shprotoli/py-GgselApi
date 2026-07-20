@@ -2,7 +2,7 @@
 from datetime import datetime
 from typing import Any
 
-from tools.handlers import handler_response_api, ApiResult
+from tools.handlers import handler_api, async_handler_api, EnumMethodHandle, ApiResult
 from tools.formated import format_dt
 from parameters.account import Type, CodeFilter
 from api.category import Category
@@ -52,10 +52,12 @@ class Account(AccountBase):
 
         :return: dataclass BalanceObject containing a json response from the API
         """
-        response = self.client.get(**self._seller_balance_info())
-        data = response.json()
-
-        return handler_response_api(BalanceObject, data=data)
+        return handler_api(
+            EnumMethodHandle.GET,
+            self.client,
+            self._seller_balance_info,
+            BalanceObject
+        )
 
     def seller_receipts(
             self,
@@ -84,20 +86,20 @@ class Account(AccountBase):
         :param finish: {Format date/time: ISO 8601} Operations no later than the specified set date
         :return: dataclass ReceiptsObject containing a json response from the API
         """
-        response = self.client.get(
-            **self._seller_receipts(
-                page,
-                count,
-                currency,
-                type,
-                code_filter,
-                allow_type,
-                start,
-                finish
-            ))
-        data = response.json()
-
-        return handler_response_api(ReceiptsObject, data=data)
+        return handler_api(
+            EnumMethodHandle.GET,
+            self.client,
+            self._seller_receipts,
+            ReceiptsObject,
+            page=page,
+            count=count,
+            currency=currency,
+            type=type,
+            code_filter=code_filter,
+            allow_type=allow_type,
+            start=start,
+            finish=finish
+        )
 
 
 class AsyncAccount(AccountBase):
@@ -105,10 +107,12 @@ class AsyncAccount(AccountBase):
         """
         See Account.seller_balance_info
         """
-        response = await self.client.get(**self._seller_balance_info())
-        data = response.json()
-
-        return handler_response_api(BalanceObject, data=data)
+        return await async_handler_api(
+            EnumMethodHandle.GET,
+            self.client,
+            self._seller_balance_info,
+            BalanceObject
+        )
 
     async def seller_receipts(
             self,
@@ -124,17 +128,17 @@ class AsyncAccount(AccountBase):
         """
         See Account.seller_receipts
         """
-        response = await self.client.get(
-            **self._seller_receipts(
-                page,
-                count,
-                currency,
-                type,
-                code_filter,
-                allow_type,
-                start,
-                finish
-            ))
-        data = response.json()
-
-        return handler_response_api(ReceiptsObject, data=data)
+        return await async_handler_api(
+            EnumMethodHandle.GET,
+            self.client,
+            self._seller_receipts,
+            ReceiptsObject,
+            page=page,
+            count=count,
+            currency=currency,
+            type=type,
+            code_filter=code_filter,
+            allow_type=allow_type,
+            start=start,
+            finish=finish
+        )

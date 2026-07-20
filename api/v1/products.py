@@ -2,7 +2,7 @@
 from json import dumps
 from typing import Any
 
-from tools.handlers import handler_response_api, ApiResult
+from tools.handlers import handler_api, async_handler_api, EnumMethodHandle, ApiResult
 from parameters.products import OrderDir, OrderCol
 from parameters.globals import Lang, Currency
 from schemas.v1.offer_list_object import OfferListObject
@@ -118,10 +118,17 @@ class Products(ProductsBase):
         :param locale: Localization of goods
         :return: dataclass OfferListObject containing a json response from the API
         """
-        response = self.client.get(**self._products_list(ids, page, count, lang, locale))
-        data = response.json()
-
-        return handler_response_api(OfferListObject, data=data)
+        return handler_api(
+            EnumMethodHandle.GET,
+            self.client,
+            self._products_list,
+            OfferListObject,
+            ids=ids,
+            page=page,
+            count=count,
+            lang=lang,
+            locale=locale
+        )
 
     def product_info(self, product_id: str) -> ApiResult:
         """
@@ -131,10 +138,13 @@ class Products(ProductsBase):
         :param product_id: Your product ID
         :return: dataclass OfferObject containing a json response from the API
         """
-        response = self.client.get(**self._product_info(product_id))
-        data = response.json()
-
-        return handler_response_api(OfferObject, data)
+        return handler_api(
+            EnumMethodHandle.GET,
+            self.client,
+            self._product_info,
+            OfferObject,
+            product_id=product_id
+        )
 
     def products_seller(
             self,
@@ -169,20 +179,21 @@ class Products(ProductsBase):
         :param owner_id: [OBSOLETE] Owner ID (may differ from the seller)
         :return:
         """
-        response = self.client.post(**self._products_seller(
-            id_seller,
-            order_col,
-            order_dir,
-            rows,
-            page,
-            currency,
-            lang,
-            show_hidden,
-            owner_id
-        ))
-        data = response.json()
-
-        return handler_response_api(SellerGoodsListObject, data=data)
+        return handler_api(
+            EnumMethodHandle.POST,
+            self.client,
+            self._products_seller,
+            SellerGoodsListObject,
+            id_seller=id_seller,
+            order_col=order_col,
+            order_dir=order_dir,
+            rows=rows,
+            page=page,
+            currency=currency,
+            lang=lang,
+            show_hidden=show_hidden,
+            owner_id=owner_id
+        )
 
 
 class AsyncProducts(ProductsBase):
@@ -197,19 +208,29 @@ class AsyncProducts(ProductsBase):
         """
         See Products.products_list
         """
-        response = await self.client.get(**self._products_list(ids, page, count, lang, locale))
-        data = response.json()
-
-        return handler_response_api(OfferListObject, data=data)
+        return await async_handler_api(
+            EnumMethodHandle.GET,
+            self.client,
+            self._products_list,
+            OfferListObject,
+            ids=ids,
+            page=page,
+            count=count,
+            lang=lang,
+            locale=locale
+        )
 
     async def product_info(self, product_id: str) -> ApiResult:
         """
         See Products.product_info
         """
-        response = await self.client.get(**self._product_info(product_id))
-        data = response.json()
-
-        return handler_response_api(OfferObject, data)
+        return await async_handler_api(
+            EnumMethodHandle.GET,
+            self.client,
+            self._product_info,
+            OfferObject,
+            product_id=product_id
+        )
 
     async def products_seller(
             self,
@@ -226,17 +247,18 @@ class AsyncProducts(ProductsBase):
         """
         See Products.products_seller
         """
-        response = await self.client.post(**self._products_seller(
-            id_seller,
-            order_col,
-            order_dir,
-            rows,
-            page,
-            currency,
-            lang,
-            show_hidden,
-            owner_id
-        ))
-        data = response.json()
-
-        return handler_response_api(SellerGoodsListObject, data=data)
+        return await async_handler_api(
+            EnumMethodHandle.POST,
+            self.client,
+            self._products_seller,
+            SellerGoodsListObject,
+            id_seller=id_seller,
+            order_col=order_col,
+            order_dir=order_dir,
+            rows=rows,
+            page=page,
+            currency=currency,
+            lang=lang,
+            show_hidden=show_hidden,
+            owner_id=owner_id
+        )

@@ -2,7 +2,7 @@
 from json import dumps
 from typing import Any
 
-from tools.handlers import handler_response_api, ApiResult
+from tools.handlers import handler_api, async_handler_api, EnumMethodHandle, ApiResult
 from schemas.v1.messages_object import MessagesObject
 from schemas.v1.chats_object import ChatsObject
 from api.category import Category
@@ -78,9 +78,14 @@ class Chats(ChatsBase):
                     1) 200 - The message has been sent
                     2) 400/422 - Invalid argument (see .text or .json)
         """
-        response = self.client.post(**self._create_message_without_file(id_i, message))
-
-        return handler_response_api(None, data=response)
+        return handler_api(
+            EnumMethodHandle.POST,
+            self.client,
+            self._create_message_without_file,
+            None,
+            id_i=id_i,
+            message=message
+        )
 
     def list_messages(
             self,
@@ -103,10 +108,17 @@ class Chats(ChatsBase):
         :param count: {count <= 100} Number of messages
         :return: dataclass MessagesObject containing a json response from the API
         """
-        response = self.client.get(**self._list_messages(id_i, id_from, id_to, newer, count))
-        data = response.json()
-
-        return handler_response_api(MessagesObject, data=data)
+        return handler_api(
+            EnumMethodHandle.GET,
+            self.client,
+            self._list_messages,
+            MessagesObject,
+            id_i=id_i,
+            id_from=id_from,
+            id_to=id_to,
+            newer=newer,
+            count=count
+        )
 
     def list_chats(
             self,
@@ -129,10 +141,17 @@ class Chats(ChatsBase):
         :param page: Chats page
         :return:
         """
-        response = self.client.get(**self._list_chats(filter_new, email, id_ds, pagesize, page))
-        data = response.json()
-
-        return handler_response_api(ChatsObject, data=data)
+        return handler_api(
+            EnumMethodHandle.GET,
+            self.client,
+            self._list_chats,
+            ChatsObject,
+            filter_new=filter_new,
+            email=email,
+            id_ds=id_ds,
+            pagesize=pagesize,
+            page=page
+        )
 
 
 class AsyncChats(ChatsBase):
@@ -140,9 +159,14 @@ class AsyncChats(ChatsBase):
         """
         See Chats.create_message_without_file
         """
-        response = await self.client.post(**self._create_message_without_file(id_i, message))
-
-        return handler_response_api(None, data=response)
+        return await async_handler_api(
+            EnumMethodHandle.POST,
+            self.client,
+            self._create_message_without_file,
+            None,
+            id_i=id_i,
+            message=message
+        )
 
     async def list_messages(
             self,
@@ -155,10 +179,17 @@ class AsyncChats(ChatsBase):
         """
         See Chats.list_messages
         """
-        response = await self.client.get(**self._list_messages(id_i, id_from, id_to, newer, count))
-        data = response.json()
-
-        return handler_response_api(MessagesObject, data=data)
+        return await async_handler_api(
+            EnumMethodHandle.GET,
+            self.client,
+            self._list_messages,
+            MessagesObject,
+            id_i=id_i,
+            id_from=id_from,
+            id_to=id_to,
+            newer=newer,
+            count=count
+        )
 
     async def list_chats(
             self,
@@ -171,7 +202,14 @@ class AsyncChats(ChatsBase):
         """
         See Chats.list_chats
         """
-        response = await self.client.get(**self._list_chats(filter_new, email, id_ds, pagesize, page))
-        data = response.json()
-
-        return handler_response_api(ChatsObject, data=data)
+        return await async_handler_api(
+            EnumMethodHandle.GET,
+            self.client,
+            self._list_chats,
+            ChatsObject,
+            filter_new=filter_new,
+            email=email,
+            id_ds=id_ds,
+            pagesize=pagesize,
+            page=page
+        )

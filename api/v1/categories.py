@@ -1,5 +1,5 @@
 # A class file that handles requests from the `Categories` category of the GGSell API
-from tools.handlers import handler_response_api, ApiResult
+from tools.handlers import handler_api, async_handler_api, EnumMethodHandle, ApiResult
 from parameters.globals import Lang
 from schemas.v1.categories_object import CategoriesObject
 from api.base.categories import CategoriesBaseV1 as CategoriesBase
@@ -24,10 +24,16 @@ class Categories(CategoriesBase):
         :param lang: The language in which the categories will be returned
         :return: dataclass CategoriesObject containing a json response from the API
         """
-        response = self.client.get(**self._all_categories(page, count, category_id, lang))
-        data = response.json()
-
-        return handler_response_api(CategoriesObject, data=data)
+        return handler_api(
+            EnumMethodHandle.GET,
+            self.client,
+            self._all_categories,
+            CategoriesObject,
+            page=page,
+            count=count,
+            category_id=category_id,
+            lang=lang
+        )
 
 
 class AsyncCategories(CategoriesBase):
@@ -41,7 +47,13 @@ class AsyncCategories(CategoriesBase):
         """
         See Categories.all_categories
         """
-        response = await self.client.get(**self._all_categories(page, count, category_id, lang))
-        data = response.json()
-
-        return handler_response_api(CategoriesObject, data=data)
+        return await async_handler_api(
+            EnumMethodHandle.GET,
+            self.client,
+            self._all_categories,
+            CategoriesObject,
+            page=page,
+            count=count,
+            category_id=category_id,
+            lang=lang
+        )
