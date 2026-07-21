@@ -18,4 +18,4 @@ class ErrorsInformation(ErrorEntity):
 
 @dataclass
 class ErrorWithEntityObject(GgselObjectApiV2):
-    errors: list[ErrorsInformation] = None
+    errors: list[ErrorsInformation] | None = None

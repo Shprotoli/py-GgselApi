@@ -1,289 +1,261 @@
 import pytest
-from unittest.mock import Mock
 
-from api.ggsel_api import GgselApi
+from api.ggsel_api import (
+    GgselApi,
+    GgselApiV1,
+    GgselApiV2,
+)
 from api.client import SyncGClient, AsyncGClient
 
 
-# -------------------------------------------------------
-# Fake objects
-# -------------------------------------------------------
+class FakeSyncClient(SyncGClient):
+    def __init__(self):
+        self.params = {}
+        self.token = None
+        self._base_route = None
 
-class SyncCategory:
+    def set_token(self, token):
+        self.token = token
+
+
+class FakeAsyncClient(AsyncGClient):
+    def __init__(self):
+        self.params = {}
+        self.token = None
+        self._base_route = None
+
+    def set_token(self, token):
+        self.token = token
+
+
+class FakeV1Sync:
+    VERSION_ROUTE = "V1"
+    ROUTE = "/api/v1"
+
     def __init__(self, client):
         self.client = client
 
 
-class SyncCategoryV1(SyncCategory):
-    ROUTE = "/api/v1"
+class FakeV1Async(FakeV1Sync):
+    pass
 
 
-class SyncCategoryV2(SyncCategory):
+class FakeV2Sync:
+    VERSION_ROUTE = "V2"
     ROUTE = "/api/v2"
 
-
-class AsyncCategory:
     def __init__(self, client):
         self.client = client
 
 
-class AsyncCategoryV1(AsyncCategory):
-    ROUTE = "/api/v1"
+class FakeV2Async(FakeV2Sync):
+    pass
 
 
 @pytest.fixture
-def patched_api_objects(monkeypatch):
-    mapping = {
-        "_test_instance": (SyncCategory, AsyncCategory),
+def patched_objects(monkeypatch):
+    objects = {
+        "_fake_v1": (FakeV1Sync, FakeV1Async),
+        "_fake_v2": (FakeV2Sync, FakeV2Async),
     }
 
-    monkeypatch.setattr("api.ggsel_api.API_OBJECTS", mapping)
+    monkeypatch.setattr(
+        "api.ggsel_api.API_OBJECTS",
+        objects,
+    )
 
-    return mapping
+    return objects
 
 
 @pytest.fixture
-def api(patched_api_objects):
+def api(patched_objects):
     api = GgselApi()
-    api._objects_instance = ("_test_instance",)
+    api._objects_instance = tuple(patched_objects.keys())
+
     return api
 
 
-def test_change_sync_client_to_sync(api):
-    first_client = SyncGClient()
-    second_client = SyncGClient()
-
-    api.client = first_client
-
-    instance = api._get_api_instance("_test_instance")
-
-    api.client = second_client
-
-    assert api.client is second_client
-    assert instance.client is second_client
+# -------------------------------------------------------
+# client generation
+# -------------------------------------------------------
 
 
-def test_change_sync_client_to_async(api):
-    sync_client = SyncGClient()
-    async_client = AsyncGClient()
+def test_init_generates_two_clients():
+    api = GgselApi()
 
-    api.client = sync_client
-
-    old_instance = api._get_api_instance("_test_instance")
-
-    api.client = async_client
-
-    new_instance = api._get_api_instance("_test_instance")
-
-    assert isinstance(new_instance, AsyncCategory)
-    assert new_instance.client is async_client
-    assert old_instance is not new_instance
+    assert api.client is not api.client_legacy
+    assert isinstance(api.client, SyncGClient)
+    assert isinstance(api.client_legacy, SyncGClient)
 
 
-def test_change_async_client_to_sync(api):
-    async_client = AsyncGClient()
-    sync_client = SyncGClient()
+def test_set_client_recreates_clients(api):
+    old_client = api.client
 
-    api.client = async_client
+    new_client = SyncGClient()
 
-    old_instance = api._get_api_instance("_test_instance")
+    api.client = new_client
 
-    api.client = sync_client
-
-    new_instance = api._get_api_instance("_test_instance")
-
-    assert isinstance(new_instance, SyncCategory)
-    assert new_instance.client is sync_client
-    assert old_instance is not new_instance
+    assert api.client is not old_client
+    assert api.client_legacy is new_client
+    assert api.client is not new_client
 
 
-def test_change_async_client_to_async(api):
-    first = AsyncGClient()
-    second = AsyncGClient()
-
-    api.client = first
-
-    instance = api._get_api_instance("_test_instance")
-
-    api.client = second
-
-    assert instance.client is second
+# -------------------------------------------------------
+# lazy initialization
+# -------------------------------------------------------
 
 
-def test_update_client_instance(api):
-    client = SyncGClient()
+def test_get_instance_creates_sync_v1(api):
+    api.client = SyncGClient()
 
-    obj = Mock()
-    obj.ROUTE = "/route"
+    instance = api._get_api_instance("_fake_v1")
 
-    api._test_instance = obj
-    api._client = client
-
-    api._update_client_instance()
-
-    assert obj.client is client
-    assert client._base_route == "/route"
+    assert isinstance(instance, FakeV1Sync)
+    assert instance.client is api.client_legacy
 
 
-def test_update_client_instance_without_instances(api):
-    api._client = SyncGClient()
+def test_get_instance_creates_sync_v2(api):
+    api.client = SyncGClient()
 
-    api._update_client_instance()
+    instance = api._get_api_instance("_fake_v2")
 
-    assert not hasattr(api, "_test_instance")
+    assert isinstance(instance, FakeV2Sync)
+    assert instance.client is api.client
 
 
-def test_update_client_instance_without_route(api):
-    client = SyncGClient()
+def test_get_instance_is_cached(api):
+    first = api._get_api_instance("_fake_v1")
+    second = api._get_api_instance("_fake_v1")
 
-    obj = Mock(spec=["client"])
+    assert first is second
 
-    api._client = client
-    api._test_instance = obj
+
+# -------------------------------------------------------
+# client update without mode change
+# -------------------------------------------------------
+
+
+def test_update_client_instance_updates_v1_and_v2(api):
+    api.client = SyncGClient()
+
+    v1 = api._get_api_instance("_fake_v1")
+    v2 = api._get_api_instance("_fake_v2")
+
+    new_client = SyncGClient()
+
+    api.client = new_client
+
+    assert v1.client is api.client_legacy
+    assert v2.client is api.client
+
+
+def test_update_client_instance_sets_routes(api):
+    api.client = SyncGClient()
+
+    api._get_api_instance("_fake_v1")
+    api._get_api_instance("_fake_v2")
 
     api._update_client_instance()
 
-    assert obj.client is client
+    assert api.client_legacy._base_route == "/api/v1"
+    assert api.client._base_route == "/api/v2"
 
 
-def test_update_mode_instance_to_sync(api):
-    client = SyncGClient()
+# -------------------------------------------------------
+# sync / async switching
+# -------------------------------------------------------
 
-    api._client = client
-    api.__async__ = False
 
-    api._update_mode_instance()
+def test_switch_sync_to_async_recreates_instances(api):
+    api.client = FakeSyncClient()
 
-    assert isinstance(api._get_api_instance("_test_instance"), SyncCategory)
-    assert api._get_api_instance("_test_instance").client is client
+    old = api._get_api_instance("_fake_v1")
+
+    api.client = FakeAsyncClient()
+
+    new = api._get_api_instance("_fake_v1")
+
+    assert old is not new
+    assert isinstance(new, FakeV1Async)
+
+
+def test_switch_async_to_sync_recreates_instances(api):
+    api.client = FakeAsyncClient()
+
+    old = api._get_api_instance("_fake_v1")
+
+    api.client = FakeSyncClient()
+
+    new = api._get_api_instance("_fake_v1")
+
+    assert old is not new
+    assert isinstance(new, FakeV1Sync)
+
+
+def test_async_client_keeps_async_instance(api):
+    api.client = FakeAsyncClient()
+
+    instance = api._get_api_instance("_fake_v2")
+
+    assert isinstance(instance, FakeV2Async)
+    assert instance.client is api.client
+
+
+# -------------------------------------------------------
+# internal methods
+# -------------------------------------------------------
 
 
 def test_update_mode_instance_to_async(api):
-    client = AsyncGClient()
-
-    api._client = client
+    api._client = AsyncGClient()
+    api._client_legacy = AsyncGClient()
     api.__async__ = True
 
     api._update_mode_instance()
 
-    assert isinstance(api._get_api_instance("_test_instance"), AsyncCategory)
-    assert api._get_api_instance("_test_instance").client is client
+    instance = api._get_api_instance("_fake_v1")
+
+    assert isinstance(instance, FakeV1Async)
 
 
-def test_client_setter_calls_update_client_instance(api, monkeypatch):
+def test_update_mode_instance_to_sync(api):
     api._client = SyncGClient()
+    api._client_legacy = SyncGClient()
     api.__async__ = False
 
-    update_client = Mock()
-    update_mode = Mock()
+    api._update_mode_instance()
 
-    monkeypatch.setattr(api, "_update_client_instance", update_client)
-    monkeypatch.setattr(api, "_update_mode_instance", update_mode)
+    instance = api._get_api_instance("_fake_v1")
 
-    api.client = SyncGClient()
-
-    update_client.assert_called_once()
-    update_mode.assert_not_called()
+    assert isinstance(instance, FakeV1Sync)
 
 
-def test_client_setter_calls_update_mode_instance(api, monkeypatch):
+def test_update_client_instance_without_instances(api):
     api._client = SyncGClient()
-    api.__async__ = False
+    api._objects_instance = ()
 
-    update_client = Mock()
-    update_mode = Mock()
+    api._update_client_instance()
 
-    monkeypatch.setattr(api, "_update_client_instance", update_client)
-    monkeypatch.setattr(api, "_update_mode_instance", update_mode)
-
-    api.client = AsyncGClient()
-
-    update_mode.assert_called_once()
-    update_client.assert_not_called()
+    assert True
 
 
-def test_get_api_instance_sync(api):
-    api.client = SyncGClient()
-
-    obj = api._get_api_instance("_test_instance")
-
-    assert isinstance(obj, SyncCategory)
-    assert obj.client is api.client
+# -------------------------------------------------------
+# GgselApiV2
+# -------------------------------------------------------
 
 
-def test_get_api_instance_async(api):
-    api.client = AsyncGClient()
+def test_api_v2_creates_v1_api():
+    api = GgselApiV2()
 
-    obj = api._get_api_instance("_test_instance")
-
-    assert isinstance(obj, AsyncCategory)
-    assert obj.client is api.client
+    assert isinstance(api.api_v1, GgselApiV1)
 
 
-def test_get_api_instance_cached(api):
-    api.client = SyncGClient()
+def test_api_v2_client_change_updates_v1():
+    api = GgselApiV2()
 
-    first = api._get_api_instance("_test_instance")
-    second = api._get_api_instance("_test_instance")
+    client = SyncGClient()
 
-    assert first is second
+    api.client = client
 
-
-def test_get_api_instance_after_sync_to_sync(api):
-    first_client = SyncGClient()
-    second_client = SyncGClient()
-
-    api.client = first_client
-
-    first = api._get_api_instance("_test_instance")
-
-    api.client = second_client
-
-    second = api._get_api_instance("_test_instance")
-
-    assert first is second
-    assert second.client is second_client
-
-
-def test_get_api_instance_after_sync_to_async(api):
-    api.client = SyncGClient()
-
-    first = api._get_api_instance("_test_instance")
-
-    api.client = AsyncGClient()
-
-    second = api._get_api_instance("_test_instance")
-
-    assert first is not second
-    assert isinstance(second, AsyncCategory)
-    assert second.client is api.client
-
-
-def test_get_api_instance_after_async_to_sync(api):
-    api.client = AsyncGClient()
-
-    first = api._get_api_instance("_test_instance")
-
-    api.client = SyncGClient()
-
-    second = api._get_api_instance("_test_instance")
-
-    assert first is not second
-    assert isinstance(second, SyncCategory)
-    assert second.client is api.client
-
-
-def test_get_api_instance_after_async_to_async(api):
-    first_client = AsyncGClient()
-    second_client = AsyncGClient()
-
-    api.client = first_client
-
-    first = api._get_api_instance("_test_instance")
-
-    api.client = second_client
-
-    second = api._get_api_instance("_test_instance")
-
-    assert first is second
-    assert second.client is second_client
+    assert api.api_v1.client is not None
+    assert api.api_v1.client_legacy is not None

@@ -10,10 +10,12 @@ class Route(ABC):
 
 
 class RouteApiV1:
+    VERSION_ROUTE = "V1"
     ROUTE = "api_sellers/api"
 
 
 class RouteApiV2:
+    VERSION_ROUTE = "V2"
     ROUTE = "api_sellers/v2"
 
 

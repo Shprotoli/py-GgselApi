@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 from api.client import GClient, SyncGClient, AsyncGClient
 # API V1 Category
 from api.v1.api_login import (
@@ -34,6 +36,10 @@ from api.v2.categories import (
     Categories as CategoriesV2,
     AsyncCategories as AsyncCategoriesV2,
 )
+from api.v2.option import (
+    Option as OptionV2,
+    AsyncOption as AsyncOptionV2,
+)
 
 API_V1_OBJECTS = {
     "_v1_api_login_instance": (ApiLoginV1, AsyncApiLoginV1),
@@ -47,6 +53,7 @@ API_V1_OBJECTS = {
 
 API_V2_OBJECTS = {
     "_v2_categories_instance": (CategoriesV2, AsyncCategoriesV2),
+    "_v2_option_instance": (OptionV2, AsyncOptionV2),
 }
 
 API_OBJECTS: dict[str, tuple[type[Category], type[Category]]] = {
@@ -90,19 +97,49 @@ class CategoriesApiV2(CategoriesApiV1):
     def categories(self) -> CategoriesV2 | AsyncCategoriesV2:
         return self._get_api_instance("_v2_categories_instance")
 
+    @property
+    def option(self) -> OptionV2 | AsyncOptionV2:
+        return self._get_api_instance("_v2_option_instance")
+
 
 class GgselApi:
     _objects_instance: tuple[str, ...]
 
-    def __init__(self, api_key: str = "", token: str = "", client: GClient | None = None):
-        self._client = client or SyncGClient(
+    def __init__(
+            self,
+            api_key: str = "",
+            token: str = "",
+            client: GClient | None = None,
+    ):
+        client_base_ = client or SyncGClient(
             headers={
                 "Authorization": api_key
             },
         )
-        self._client.set_token(token)
+        client_base_.set_token(token)
+
+        self._client_legacy, self._client = self._generate_clients(client_base_)
 
         self.__async__ = self.is_async()
+
+    def _generate_clients(self, client: GClient) -> tuple[GClient, GClient]:
+        client_legacy = client
+
+        client_ = deepcopy(client)
+
+        if hasattr(client_, "client"):
+            client_.client = type(client_.client)(
+                headers=client_.client.headers
+            )
+
+        if "token" in client_.params:
+            client_.params.pop("token")
+
+        return client_legacy, client_
+
+    @property
+    def client_legacy(self) -> GClient:
+        return self._client_legacy
 
     @property
     def client(self) -> GClient:
@@ -112,7 +149,7 @@ class GgselApi:
     def client(self, new_client: GClient) -> None:
         token = getattr(self._client, "token", None)
 
-        self._client = new_client
+        self._client_legacy, self._client = self._generate_clients(new_client)
         if token:
             self._client.set_token(token)
 
@@ -144,7 +181,11 @@ class GgselApi:
         """
         for obj_name in filter(lambda obj: hasattr(self, obj), self._objects_instance):
             obj_instance = getattr(self, obj_name)
-            obj_instance.client = self._client
+            match obj_instance.VERSION_ROUTE:
+                case "V1":
+                    obj_instance.client = self._client_legacy
+                case _:
+                    obj_instance.client = self._client
 
             if hasattr(obj_instance, "ROUTE"):
                 obj_instance.client._base_route = obj_instance.ROUTE
@@ -158,9 +199,15 @@ class GgselApi:
             sync_cls, async_cls = API_OBJECTS[obj_name]
             instance_type = async_cls if self.__async__ else sync_cls
 
-            client = self._client
+            match instance_type.VERSION_ROUTE:
+                case "V1":
+                    client = self._client_legacy
+                case _:
+                    client = self._client
+
             if hasattr(instance_type, "ROUTE"):
                 client._base_route = instance_type.ROUTE
+
             setattr(self, obj_name, instance_type(client))
 
     def _get_api_instance(self, instance_name: str) -> Category:
@@ -175,9 +222,15 @@ class GgselApi:
             sync_cls, async_cls = API_OBJECTS[instance_name]
             instance_type = async_cls if self.__async__ else sync_cls
 
-            client = self._client
+            match instance_type.VERSION_ROUTE:
+                case "V1":
+                    client = self._client_legacy
+                case _:
+                    client = self._client
+
             if hasattr(instance_type, "ROUTE"):
                 client._base_route = instance_type.ROUTE
+
             setattr(self, instance_name, instance_type(client))
         return getattr(self, instance_name)
 
@@ -197,7 +250,7 @@ class GgselApiV2(GgselApi, CategoriesApiV2):
     def __init__(self, api_key: str = "", token: str = "", client: GClient | None = None):
         super().__init__(api_key, token, client)
 
-        self.__obj_api_v1 = GgselApiV1(token, self._client)
+        self.__obj_api_v1 = GgselApiV1(token, self._client_legacy)
 
     @property
     def api_v1(self) -> GgselApiV1:

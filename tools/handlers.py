@@ -2,10 +2,15 @@ from collections.abc import Callable as CallableABC
 from typing import Callable
 from typing import Any, Protocol, TypeAlias, TypeVar, overload, runtime_checkable
 
+from requests import Response
+from requests.exceptions import JSONDecodeError
+
 from api.client import GClient
 from schemas.ggsel_object import GgselObjectApi
 from schemas.v1.error_response_object import ErrorResponseObject
 from schemas.v2.error_with_entity_object import ErrorWithEntityObject
+from schemas.general_objects import UndetectedObject
+from schemas.errors.response_object import ResponseJSONErrorObject
 from schemas.ggsel_object import GgselGlobalObject
 
 T = TypeVar("T")
@@ -66,14 +71,31 @@ def handler_response_api(
     except TypeError:
         version_api = "V1" if not hasattr(type_wrapper, "VERSION_API") else getattr(type_wrapper, "VERSION_API")
 
-        match version_api:
-            case "V1":
-                if isinstance(data, dict):
-                    return ErrorResponseObject(**data)
-            case "V2":
-                if isinstance(data, dict):
-                    return ErrorWithEntityObject(**data)
-        return data
+        try:
+            match version_api:
+                case "V1":
+                    if isinstance(data, dict):
+                        return ErrorResponseObject(**data)
+                case "V2":
+                    if isinstance(data, dict):
+                        return ErrorWithEntityObject(**data)
+        except TypeError:
+            return UndetectedObject(data=data)
+        return UndetectedObject(data=data)
+
+
+def handler_response(response: Response):
+    try:
+        data = response.json()
+    except JSONDecodeError:
+        return ResponseJSONErrorObject(
+            status_code=response.status_code,
+            text=response.text,
+            headers=dict(response.headers),
+            url=response.url,
+            method=response.request.method if response.request else None
+        )
+    return data
 
 
 def handler_api(
@@ -96,7 +118,7 @@ def handler_api(
     :return:
     """
     response = client.request(**func_api(**params))
-    data = response.json()
+    data = handler_response(response)
 
     return handler_response_api(schedule_object, data=data)
 
@@ -121,6 +143,6 @@ async def async_handler_api(
     :return:
     """
     response = await client.request(**func_api(**params))
-    data = response.json()
+    data = handler_response(response)
 
     return handler_response_api(schedule_object, data=data)
