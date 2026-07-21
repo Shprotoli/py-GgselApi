@@ -1,6 +1,8 @@
 import asyncio
+from unittest.mock import AsyncMock
 
 from api.v1.categories import Categories, AsyncCategories
+from parameters.api import EnumCrudMethod
 
 
 def test_categories_helper_builds_route(sync_client):
@@ -9,6 +11,7 @@ def test_categories_helper_builds_route(sync_client):
     payload = api._all_categories(page=2, count=25, category_id="12", lang="en-US")
 
     assert payload == {
+        "method": EnumCrudMethod.GET,
         "route": "categories",
         "params": {
             "page": 2,
@@ -31,12 +34,13 @@ def test_categories_sync(sync_client, response_factory):
             ],
         }
     )
-    sync_client.get.return_value = response
+    sync_client.request.return_value = response
 
     api = Categories(sync_client)
     result = api.all_categories(page=2, count=25, category_id="12", lang="en-US")
 
-    sync_client.get.assert_called_once_with(
+    sync_client.request.assert_called_once_with(
+        method=EnumCrudMethod.GET,
         route="categories",
         params={
             "page": 2,
@@ -59,12 +63,13 @@ def test_categories_async(async_client, response_factory):
             ],
         }
     )
-    async_client.get.return_value = response
+    async_client.request = AsyncMock(return_value=response)
 
     api = AsyncCategories(async_client)
     result = asyncio.run(api.all_categories(page=3, count=10, category_id="", lang="ru-RU"))
 
-    async_client.get.assert_awaited_once_with(
+    async_client.request.assert_awaited_once_with(
+        method=EnumCrudMethod.GET,
         route="categories",
         params={
             "page": 3,

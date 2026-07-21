@@ -1,7 +1,9 @@
 import asyncio
+from unittest.mock import AsyncMock
 import json
 
 from api.v1.chats import Chats, AsyncChats
+from parameters.api import EnumCrudMethod
 
 
 def test_chats_create_message_helper(sync_client):
@@ -16,12 +18,13 @@ def test_chats_create_message_helper(sync_client):
 
 def test_chats_create_message_without_file_sync(sync_client, response_factory):
     response = response_factory({"status_code": 200})
-    sync_client.post.return_value = response
+    sync_client.request.return_value = response
 
     api = Chats(sync_client)
     result = api.create_message_without_file(777, "hello")
 
-    sync_client.post.assert_called_once_with(
+    sync_client.request.assert_called_once_with(
+        method=EnumCrudMethod.POST,
         route="debates/v2",
         params={"id_i": 777},
         data=json.dumps({"message": "hello"}),
@@ -50,12 +53,13 @@ def test_chats_list_messages_sync(sync_client, response_factory):
             ]
         }
     )
-    sync_client.get.return_value = response
+    sync_client.request.return_value = response
 
     api = Chats(sync_client)
     result = api.list_messages(777, id_from=1, id_to=9, newer=True, count=150)
 
-    sync_client.get.assert_called_once_with(
+    sync_client.request.assert_called_once_with(
+        method=EnumCrudMethod.GET,
         route="debates/v2",
         params={
             "id_i": 777,
@@ -84,12 +88,13 @@ def test_chats_list_chats_sync(sync_client, response_factory):
             ],
         }
     )
-    sync_client.get.return_value = response
+    sync_client.request.return_value = response
 
     api = Chats(sync_client)
     result = api.list_chats(filter_new=True, email="buyer@example.com", id_ds="ds-1", pagesize=30, page=2)
 
-    sync_client.get.assert_called_once_with(
+    sync_client.request.assert_called_once_with(
+        method=EnumCrudMethod.GET,
         route="debates/v2/chats",
         params={
             "filter_new": True,
@@ -140,8 +145,13 @@ def test_chats_async(async_client, response_factory):
         }
     )
     create_response = response_factory({"status_code": 200})
-    async_client.get.side_effect = [messages_response, chats_response]
-    async_client.post.return_value = create_response
+    async_client.request = AsyncMock(
+        side_effect=[
+            create_response,
+            messages_response,
+            chats_response,
+        ]
+    )
 
     api = AsyncChats(async_client)
 
@@ -152,5 +162,4 @@ def test_chats_async(async_client, response_factory):
     assert created == {"status_code": 200}
     assert messages.messages[0]["message"] == "hello"
     assert chats.items[0]["email"] == "buyer@example.com"
-    assert async_client.post.await_count == 1
-    assert async_client.get.await_count == 2
+    assert async_client.request.await_count == 3

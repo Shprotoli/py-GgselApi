@@ -3,6 +3,7 @@ from typing import Any
 
 from api.category import Category, RouteApiV1
 from parameters.globals import Lang, Currency
+from parameters.api import EnumCrudMethod
 from parameters.products import OrderDir, OrderCol
 
 
@@ -29,6 +30,7 @@ class ProductsBaseV1(Category, RouteApiV1):
         }
 
         return {
+            "method": EnumCrudMethod.GET,
             "route": "products/list",
             "params": params,
             "headers": headers,
@@ -36,6 +38,7 @@ class ProductsBaseV1(Category, RouteApiV1):
 
     def _product_info(self, product_id: str) -> dict[str, Any]:
         return {
+            "method": EnumCrudMethod.GET,
             "route": f"products/{product_id}/data",
         }
 
@@ -64,6 +67,7 @@ class ProductsBaseV1(Category, RouteApiV1):
         }
 
         return {
+            "method": EnumCrudMethod.POST,
             "route": "seller-goods",
             "data": dumps(payload),
         }

@@ -1,5 +1,5 @@
 # A class file that handles requests from the `ApiLogin` category of the GGSell API
-from tools.handlers import handler_api, async_handler_api, EnumMethodHandle, ApiResult
+from tools.handlers import handler_api, async_handler_api, ApiResult
 from schemas.v1.token_object import TokenObject
 from api.base.api_login import ApiLoginBaseV1
 
@@ -57,7 +57,6 @@ class ApiLogin(ApiLoginBaseV1):
         :return: dataclass TokenObject containing a json response from the API
         """
         return handler_api(
-            EnumMethodHandle.POST,
             self.client,
             self._api_login,
             TokenObject,
@@ -73,7 +72,6 @@ class AsyncApiLogin(ApiLoginBaseV1):
         See ApiLoginBase.api_login
         """
         return await async_handler_api(
-            EnumMethodHandle.POST,
             self.client,
             self._api_login,
             TokenObject,

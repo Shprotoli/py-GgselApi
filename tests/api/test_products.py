@@ -1,7 +1,9 @@
 import asyncio
+from unittest.mock import AsyncMock
 import json
 
 from api.v1.products import Products, AsyncProducts
+from parameters.api import EnumCrudMethod
 from parameters.products import OrderCol, OrderDir
 
 
@@ -12,6 +14,7 @@ def test_products_list_helper_handles_scalar_and_sequence(sync_client):
     list_payload = api._products_list([1, "2"], page=4, count=5, lang="en-US", locale="ru-RU")
 
     assert scalar_payload == {
+        "method": EnumCrudMethod.GET,
         "route": "products/list",
         "params": {
             "ids": "15",
@@ -75,8 +78,11 @@ def test_products_sync(sync_client, response_factory):
         }
     )
 
-    sync_client.get.side_effect = [list_response, info_response]
-    sync_client.post.return_value = seller_response
+    sync_client.request.side_effect = [
+        list_response,
+        info_response,
+        seller_response,
+    ]
 
     api = Products(sync_client)
     product_list = api.products_list([1, 2], page=1, count=10, lang="en-US", locale="ru-RU")
@@ -98,16 +104,18 @@ def test_products_sync(sync_client, response_factory):
     assert seller_goods.id_seller == 99
     assert seller_goods.rows[0]["name_goods"] == "Product 1"
 
-    assert sync_client.get.call_args_list[0].kwargs == {
+    assert sync_client.request.call_args_list[0].kwargs == {
+        "method": EnumCrudMethod.GET,
         "route": "products/list",
         "params": {"ids": "1,2", "page": 1, "count": 10},
         "headers": {"lang": "en-US", "locale": "ru-RU"},
     }
-    assert sync_client.get.call_args_list[1].kwargs == {
+    assert sync_client.request.call_args_list[1].kwargs == {
+        "method": EnumCrudMethod.GET,
         "route": "products/product-1/data",
     }
 
-    seller_kwargs = sync_client.post.call_args.kwargs
+    seller_kwargs = sync_client.request.call_args.kwargs
     assert seller_kwargs["route"] == "seller-goods"
     assert json.loads(seller_kwargs["data"]) == {
         "id_seller": 99,
@@ -171,8 +179,13 @@ def test_products_async(async_client, response_factory):
         }
     )
 
-    async_client.get.side_effect = [list_response, info_response]
-    async_client.post.return_value = seller_response
+    async_client.request = AsyncMock(
+        side_effect=[
+            list_response,
+            info_response,
+            seller_response,
+        ]
+    )
 
     api = AsyncProducts(async_client)
     product_list = asyncio.run(api.products_list([1, 2], page=1, count=10, lang="en-US", locale="ru-RU"))
@@ -196,16 +209,18 @@ def test_products_async(async_client, response_factory):
     assert seller_goods.id_seller == 99
     assert seller_goods.rows[0]["name_goods"] == "Product 1"
 
-    assert async_client.get.call_args_list[0].kwargs == {
+    assert async_client.request.call_args_list[0].kwargs == {
+        "method": EnumCrudMethod.GET,
         "route": "products/list",
         "params": {"ids": "1,2", "page": 1, "count": 10},
         "headers": {"lang": "en-US", "locale": "ru-RU"},
     }
-    assert async_client.get.call_args_list[1].kwargs == {
+    assert async_client.request.call_args_list[1].kwargs == {
+        "method": EnumCrudMethod.GET,
         "route": "products/product-1/data",
     }
 
-    seller_kwargs = async_client.post.call_args.kwargs
+    seller_kwargs = async_client.request.call_args.kwargs
     assert seller_kwargs["route"] == "seller-goods"
     assert json.loads(seller_kwargs["data"]) == {
         "id_seller": 99,

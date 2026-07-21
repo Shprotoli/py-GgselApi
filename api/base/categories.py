@@ -1,6 +1,7 @@
 from typing import Any
 
 from parameters.globals import Lang, Locale
+from parameters.api import EnumCrudMethod
 from api.category import Category, RouteApiV1, RouteApiV2
 
 
@@ -22,6 +23,7 @@ class CategoriesBaseV1(Category, RouteApiV1):
         }
 
         return {
+            "method": EnumCrudMethod.GET,
             "route": "categories",
             "params": params,
             "headers": headers,
@@ -46,6 +48,7 @@ class CategoriesBaseV2(Category, RouteApiV2):
         }
 
         return {
+            "method": EnumCrudMethod.GET,
             "route": "categories",
             "params": params,
             "headers": headers,
@@ -68,6 +71,7 @@ class CategoriesBaseV2(Category, RouteApiV2):
         }
 
         return {
+            "method": EnumCrudMethod.GET,
             "route": "categories",
             "params": params,
             "headers": headers,

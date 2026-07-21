@@ -1,11 +1,11 @@
 # A class file that handles requests from the `Categories` category of the GGSell API
-from tools.handlers import handler_api, async_handler_api, EnumMethodHandle, ApiResult
+from tools.handlers import handler_api, async_handler_api, ApiResult
 from parameters.globals import Lang
 from schemas.v1.categories_object import CategoriesObject
-from api.base.categories import CategoriesBaseV1 as CategoriesBase
+from api.base.categories import CategoriesBaseV1
 
 
-class Categories(CategoriesBase):
+class Categories(CategoriesBaseV1):
     def all_categories(
             self,
             page: int = 1,
@@ -25,7 +25,6 @@ class Categories(CategoriesBase):
         :return: dataclass CategoriesObject containing a json response from the API
         """
         return handler_api(
-            EnumMethodHandle.GET,
             self.client,
             self._all_categories,
             CategoriesObject,
@@ -36,7 +35,7 @@ class Categories(CategoriesBase):
         )
 
 
-class AsyncCategories(CategoriesBase):
+class AsyncCategories(CategoriesBaseV1):
     async def all_categories(
             self,
             page: int = 1,
@@ -48,7 +47,6 @@ class AsyncCategories(CategoriesBase):
         See Categories.all_categories
         """
         return await async_handler_api(
-            EnumMethodHandle.GET,
             self.client,
             self._all_categories,
             CategoriesObject,

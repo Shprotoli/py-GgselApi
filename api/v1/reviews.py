@@ -1,4 +1,4 @@
-from tools.handlers import handler_api, async_handler_api, EnumMethodHandle, ApiResult
+from tools.handlers import handler_api, async_handler_api, ApiResult
 from parameters.reviews import TypeReview
 from parameters.globals import Lang
 from schemas.v1.reviews_object import ReviewsObject
@@ -26,7 +26,6 @@ class Reviews(ReviewsBaseV1):
         :return:
         """
         return handler_api(
-            EnumMethodHandle.GET,
             self.client,
             self._user_reviews,
             ReviewsObject,
@@ -51,7 +50,6 @@ class AsyncReviews(ReviewsBaseV1):
         See Reviews.user_reviews
         """
         return await async_handler_api(
-            EnumMethodHandle.GET,
             self.client,
             self._user_reviews,
             ReviewsObject,

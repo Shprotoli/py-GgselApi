@@ -1,5 +1,5 @@
 from parameters.globals import Locale
-from tools.handlers import async_handler_api, handler_api, EnumMethodHandle, ApiResult
+from tools.handlers import async_handler_api, handler_api, ApiResult
 from api.base.categories import CategoriesBaseV2
 from schemas.v2.list_of import ListOfCategories
 
@@ -23,7 +23,6 @@ class Categories(CategoriesBaseV2):
         :param locale: Localization response information
         """
         return handler_api(
-            EnumMethodHandle.GET,
             self.client,
             self._list_of_categories,
             ListOfCategories,
@@ -50,7 +49,6 @@ class Categories(CategoriesBaseV2):
         :param locale: Localization response information
         """
         return handler_api(
-            EnumMethodHandle.GET,
             self.client,
             self._search_categories,
             ListOfCategories,
@@ -73,7 +71,6 @@ class AsyncCategories(CategoriesBaseV2):
         See v2.Categories.list_of_categories
         """
         return await async_handler_api(
-            EnumMethodHandle.GET,
             self.client,
             self._list_of_categories,
             ListOfCategories,
@@ -94,7 +91,6 @@ class AsyncCategories(CategoriesBaseV2):
         See v2.Categories.search_categories
         """
         return await async_handler_api(
-            EnumMethodHandle.GET,
             self.client,
             self._search_categories,
             ListOfCategories,

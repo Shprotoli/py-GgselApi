@@ -1,5 +1,5 @@
 # A class file that handles requests from the `Chats` category of the GGSell API
-from tools.handlers import handler_api, async_handler_api, EnumMethodHandle, ApiResult
+from tools.handlers import handler_api, async_handler_api, ApiResult
 from schemas.v1.messages_object import MessagesObject
 from schemas.v1.chats_object import ChatsObject
 from api.base.chats import ChatsBaseV1
@@ -18,7 +18,6 @@ class Chats(ChatsBaseV1):
                     2) 400/422 - Invalid argument (see .text or .json)
         """
         return handler_api(
-            EnumMethodHandle.POST,
             self.client,
             self._create_message_without_file,
             None,
@@ -48,7 +47,6 @@ class Chats(ChatsBaseV1):
         :return: dataclass MessagesObject containing a json response from the API
         """
         return handler_api(
-            EnumMethodHandle.GET,
             self.client,
             self._list_messages,
             MessagesObject,
@@ -81,7 +79,6 @@ class Chats(ChatsBaseV1):
         :return:
         """
         return handler_api(
-            EnumMethodHandle.GET,
             self.client,
             self._list_chats,
             ChatsObject,
@@ -99,7 +96,6 @@ class AsyncChats(ChatsBaseV1):
         See Chats.create_message_without_file
         """
         return await async_handler_api(
-            EnumMethodHandle.POST,
             self.client,
             self._create_message_without_file,
             None,
@@ -119,7 +115,6 @@ class AsyncChats(ChatsBaseV1):
         See Chats.list_messages
         """
         return await async_handler_api(
-            EnumMethodHandle.GET,
             self.client,
             self._list_messages,
             MessagesObject,
@@ -142,7 +137,6 @@ class AsyncChats(ChatsBaseV1):
         See Chats.list_chats
         """
         return await async_handler_api(
-            EnumMethodHandle.GET,
             self.client,
             self._list_chats,
             ChatsObject,

@@ -1,6 +1,7 @@
 from typing import Any
 
 from parameters.globals import Lang
+from parameters.api import EnumCrudMethod
 from api.category import Category, RouteApiV1
 
 
@@ -22,6 +23,7 @@ class OrdersBaseV1(Category, RouteApiV1):
         }
 
         return {
+            "method": EnumCrudMethod.GET,
             "route": "seller-last-sales",
             "params": params,
             "headers": headers
@@ -33,11 +35,13 @@ class OrdersBaseV1(Category, RouteApiV1):
         }
 
         return {
+            "method": EnumCrudMethod.GET,
             "route": f"purchase/info/{invoice_id}",
             "headers": headers,
         }
 
     def _check_unique_code(self, unique_code: str) -> dict[str, Any]:
         return {
+            "method": EnumCrudMethod.GET,
             "route": f"purchases/unique-code/{unique_code}",
         }

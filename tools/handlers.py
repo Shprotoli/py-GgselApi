@@ -1,6 +1,5 @@
 from collections.abc import Callable as CallableABC
 from typing import Callable
-from enum import StrEnum
 from typing import Any, Protocol, TypeAlias, TypeVar, overload, runtime_checkable
 
 from api.client import GClient
@@ -77,13 +76,7 @@ def handler_response_api(
         return data
 
 
-class EnumMethodHandle(StrEnum):
-    GET = "get"
-    POST = "post"
-
-
 def handler_api(
-        method: str | EnumMethodHandle,
         client: GClient,
         func_api: Callable[..., dict],
         schedule_object: GgselObjectApi,
@@ -102,16 +95,13 @@ def handler_api(
     :param params: Arguments required by the `func_api` method
     :return:
     """
-    crud_method_ = getattr(client, method)
-
-    response = crud_method_(**func_api(**params))
+    response = client.request(**func_api(**params))
     data = response.json()
 
     return handler_response_api(schedule_object, data=data)
 
 
 async def async_handler_api(
-        method: str | EnumMethodHandle,
         client: GClient,
         func_api: Callable[..., dict],
         schedule_object: GgselObjectApi,
@@ -130,9 +120,7 @@ async def async_handler_api(
     :param params: Arguments required by the `func_api` method
     :return:
     """
-    crud_method_ = getattr(client, method)
-
-    response = await crud_method_(**func_api(**params))
+    response = await client.request(**func_api(**params))
     data = response.json()
 
     return handler_response_api(schedule_object, data=data)

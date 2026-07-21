@@ -1,7 +1,7 @@
 # A class file that handles requests from the `Account` category of the GGSell API
 from datetime import datetime
 
-from tools.handlers import handler_api, async_handler_api, EnumMethodHandle, ApiResult
+from tools.handlers import handler_api, async_handler_api, ApiResult
 from parameters.account import Type, CodeFilter
 from schemas.v1.balance_object import BalanceObject
 from schemas.v1.receipts_object import ReceiptsObject
@@ -17,7 +17,6 @@ class Account(AccountBaseV1):
         :return: dataclass BalanceObject containing a json response from the API
         """
         return handler_api(
-            EnumMethodHandle.GET,
             self.client,
             self._seller_balance_info,
             BalanceObject
@@ -51,7 +50,6 @@ class Account(AccountBaseV1):
         :return: dataclass ReceiptsObject containing a json response from the API
         """
         return handler_api(
-            EnumMethodHandle.GET,
             self.client,
             self._seller_receipts,
             ReceiptsObject,
@@ -72,7 +70,6 @@ class AsyncAccount(AccountBaseV1):
         See Account.seller_balance_info
         """
         return await async_handler_api(
-            EnumMethodHandle.GET,
             self.client,
             self._seller_balance_info,
             BalanceObject
@@ -93,7 +90,6 @@ class AsyncAccount(AccountBaseV1):
         See Account.seller_receipts
         """
         return await async_handler_api(
-            EnumMethodHandle.GET,
             self.client,
             self._seller_receipts,
             ReceiptsObject,

@@ -1,4 +1,5 @@
 import asyncio
+from unittest.mock import AsyncMock
 import json
 
 from api.v1.api_login import ApiLogin, AsyncApiLogin
@@ -27,13 +28,13 @@ def test_api_login_sync(sync_client, response_factory):
             "valid_thru": "2030-01-01T00:00:00",
         }
     )
-    sync_client.post.return_value = response
+    sync_client.request.return_value = response
 
     api = ApiLogin(sync_client)
     result = api.api_login(42, 1234567890, "sign-value")
 
-    sync_client.post.assert_called_once()
-    call_kwargs = sync_client.post.call_args.kwargs
+    sync_client.request.assert_called_once()
+    call_kwargs = sync_client.request.call_args.kwargs
     assert call_kwargs["route"] == "apilogin"
     assert json.loads(call_kwargs["data"]) == {
         "seller_id": 42,
@@ -54,13 +55,13 @@ def test_api_login_async(async_client, response_factory):
             "valid_thru": "2030-01-01T00:00:00",
         }
     )
-    async_client.post.return_value = response
+    async_client.request = AsyncMock(return_value=response)
 
     api = AsyncApiLogin(async_client)
     result = asyncio.run(api.api_login(99, "1234567890", "sign-value"))
 
-    async_client.post.assert_awaited_once()
-    call_kwargs = async_client.post.call_args.kwargs
+    async_client.request.assert_awaited_once()
+    call_kwargs = async_client.request.call_args.kwargs
     assert call_kwargs["route"] == "apilogin"
     assert json.loads(call_kwargs["data"]) == {
         "seller_id": 99,

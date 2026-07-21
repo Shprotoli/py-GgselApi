@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import Any, Type
 
 from parameters.account import CodeFilter
+from parameters.api import EnumCrudMethod
 from tools.formated import format_dt
 from api.category import Category, RouteApiV1
 
@@ -9,6 +10,7 @@ from api.category import Category, RouteApiV1
 class AccountBaseV1(Category, RouteApiV1):
     def _seller_balance_info(self) -> dict[str, Any]:
         return {
+            "method": EnumCrudMethod.GET,
             "route": "sellers/account/balance/info",
         }
 
@@ -35,6 +37,7 @@ class AccountBaseV1(Category, RouteApiV1):
         }
 
         return {
+            "method": EnumCrudMethod.GET,
             "route": "sellers/account/receipts",
             "params": params,
         }

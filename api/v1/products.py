@@ -1,5 +1,5 @@
 # A class file that handles requests from the `Products` category of the GGSell API
-from tools.handlers import handler_api, async_handler_api, EnumMethodHandle, ApiResult
+from tools.handlers import handler_api, async_handler_api, ApiResult
 from parameters.products import OrderDir, OrderCol
 from parameters.globals import Lang, Currency
 from schemas.v1.offer_list_object import OfferListObject
@@ -53,7 +53,6 @@ class Products(ProductsBaseV1):
         :return: dataclass OfferListObject containing a json response from the API
         """
         return handler_api(
-            EnumMethodHandle.GET,
             self.client,
             self._products_list,
             OfferListObject,
@@ -73,7 +72,6 @@ class Products(ProductsBaseV1):
         :return: dataclass OfferObject containing a json response from the API
         """
         return handler_api(
-            EnumMethodHandle.GET,
             self.client,
             self._product_info,
             OfferObject,
@@ -114,7 +112,6 @@ class Products(ProductsBaseV1):
         :return:
         """
         return handler_api(
-            EnumMethodHandle.POST,
             self.client,
             self._products_seller,
             SellerGoodsListObject,
@@ -143,7 +140,6 @@ class AsyncProducts(ProductsBaseV1):
         See Products.products_list
         """
         return await async_handler_api(
-            EnumMethodHandle.GET,
             self.client,
             self._products_list,
             OfferListObject,
@@ -159,7 +155,6 @@ class AsyncProducts(ProductsBaseV1):
         See Products.product_info
         """
         return await async_handler_api(
-            EnumMethodHandle.GET,
             self.client,
             self._product_info,
             OfferObject,
@@ -182,7 +177,6 @@ class AsyncProducts(ProductsBaseV1):
         See Products.products_seller
         """
         return await async_handler_api(
-            EnumMethodHandle.POST,
             self.client,
             self._products_seller,
             SellerGoodsListObject,

@@ -1,6 +1,8 @@
 import asyncio
+from unittest.mock import AsyncMock
 
 from api.v1.orders import Orders, AsyncOrders
+from parameters.api import EnumCrudMethod
 
 
 def test_orders_last_sales_helper(sync_client):
@@ -9,6 +11,7 @@ def test_orders_last_sales_helper(sync_client):
     payload = api._last_sales(123, group=False, top=5, locale="en-US")
 
     assert payload == {
+        "method": EnumCrudMethod.GET,
         "route": "seller-last-sales",
         "params": {
             "seller_id": 123,
@@ -122,7 +125,7 @@ def test_orders_sync(sync_client, response_factory):
         }
     )
 
-    sync_client.get.side_effect = [last_sales_response, order_info_response, unique_code_response]
+    sync_client.request.side_effect = [last_sales_response, order_info_response, unique_code_response]
 
     api = Orders(sync_client)
     last_sales = api.last_sales(123, group=False, top=5, locale="en-US")
@@ -133,16 +136,19 @@ def test_orders_sync(sync_client, response_factory):
     assert order_info.content["buyer_info"]["email"] == "buyer@example.com"
     assert unique_code.inv == 11
 
-    assert sync_client.get.call_args_list[0].kwargs == {
+    assert sync_client.request.call_args_list[0].kwargs == {
+        "method": EnumCrudMethod.GET,
         "route": "seller-last-sales",
         "params": {"seller_id": 123, "group": False, "top": 5},
         "headers": {"locale": "en-US"},
     }
-    assert sync_client.get.call_args_list[1].kwargs == {
+    assert sync_client.request.call_args_list[1].kwargs == {
+        "method": EnumCrudMethod.GET,
         "route": "purchase/info/555",
         "headers": {"locale": "en-US"},
     }
-    assert sync_client.get.call_args_list[2].kwargs == {
+    assert sync_client.request.call_args_list[2].kwargs == {
+        "method": EnumCrudMethod.GET,
         "route": "purchases/unique-code/UC-1",
     }
 
@@ -248,7 +254,7 @@ def test_orders_async(async_client, response_factory):
         }
     )
 
-    async_client.get.side_effect = [last_sales_response, order_info_response, unique_code_response]
+    async_client.request = AsyncMock(side_effect=[last_sales_response, order_info_response, unique_code_response])
 
     api = AsyncOrders(async_client)
     last_sales = asyncio.run(api.last_sales(123, group=False, top=5, locale="en-US"))
@@ -259,15 +265,18 @@ def test_orders_async(async_client, response_factory):
     assert order_info.content["buyer_info"]["email"] == "buyer@example.com"
     assert unique_code.inv == 11
 
-    assert async_client.get.call_args_list[0].kwargs == {
+    assert async_client.request.call_args_list[0].kwargs == {
+        "method": EnumCrudMethod.GET,
         "route": "seller-last-sales",
         "params": {"seller_id": 123, "group": False, "top": 5},
         "headers": {"locale": "en-US"},
     }
-    assert async_client.get.call_args_list[1].kwargs == {
+    assert async_client.request.call_args_list[1].kwargs == {
+        "method": EnumCrudMethod.GET,
         "route": "purchase/info/555",
         "headers": {"locale": "en-US"},
     }
-    assert async_client.get.call_args_list[2].kwargs == {
+    assert async_client.request.call_args_list[2].kwargs == {
+        "method": EnumCrudMethod.GET,
         "route": "purchases/unique-code/UC-1",
     }

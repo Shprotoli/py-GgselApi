@@ -1,6 +1,8 @@
 import asyncio
+from unittest.mock import AsyncMock
 
 from api.v1.reviews import Reviews, AsyncReviews
+from parameters.api import EnumCrudMethod
 
 
 def test_reviews_helper(sync_client):
@@ -9,6 +11,7 @@ def test_reviews_helper(sync_client):
     payload = api._user_reviews(777, type="good", page=3, count=5, locale="en-US")
 
     assert payload == {
+        "method": EnumCrudMethod.GET,
         "route": "reviews",
         "params": {
             "product_id": 777,
@@ -46,12 +49,13 @@ def test_reviews_sync(sync_client, response_factory):
             ],
         }
     )
-    sync_client.get.return_value = response
+    sync_client.request.return_value = response
 
     api = Reviews(sync_client)
     result = api.user_reviews(777, type="good", page=3, count=5, locale="en-US")
 
-    sync_client.get.assert_called_once_with(
+    sync_client.request.assert_called_once_with(
+        method=EnumCrudMethod.GET,
         route="reviews",
         params={
             "product_id": 777,
@@ -89,12 +93,13 @@ def test_reviews_async(async_client, response_factory):
             ],
         }
     )
-    async_client.get.return_value = response
+    async_client.request = AsyncMock(return_value=response)
 
     api = AsyncReviews(async_client)
     result = asyncio.run(api.user_reviews(777, type="good", page=3, count=5, locale="en-US"))
 
-    async_client.get.assert_awaited_once_with(
+    async_client.request.assert_awaited_once_with(
+        method=EnumCrudMethod.GET,
         route="reviews",
         params={
             "product_id": 777,

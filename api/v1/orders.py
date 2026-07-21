@@ -1,4 +1,4 @@
-from tools.handlers import handler_api, async_handler_api, EnumMethodHandle, ApiResult
+from tools.handlers import handler_api, async_handler_api, ApiResult
 from parameters.globals import Lang
 from schemas.v1.last_sales_object import LastSalesObject
 from schemas.v1.info_order_object import InfoOrderObject
@@ -26,7 +26,6 @@ class Orders(OrdersBaseV1):
         :return: dataclass LastSalesObject containing a json response from the API
         """
         return handler_api(
-            EnumMethodHandle.GET,
             self.client,
             self._last_sales,
             LastSalesObject,
@@ -46,7 +45,6 @@ class Orders(OrdersBaseV1):
         :return: dataclass InfoOrderObject containing a json response from the API
         """
         return handler_api(
-            EnumMethodHandle.GET,
             self.client,
             self._order_info,
             InfoOrderObject,
@@ -64,7 +62,6 @@ class Orders(OrdersBaseV1):
         :return:
         """
         return handler_api(
-            EnumMethodHandle.GET,
             self.client,
             self._check_unique_code,
             UniqueCodeObject,
@@ -84,7 +81,6 @@ class AsyncOrders(OrdersBaseV1):
         See Orders.last_sales
         """
         return await async_handler_api(
-            EnumMethodHandle.GET,
             self.client,
             self._last_sales,
             LastSalesObject,
@@ -99,7 +95,6 @@ class AsyncOrders(OrdersBaseV1):
         See Orders.order_info
         """
         return await async_handler_api(
-            EnumMethodHandle.GET,
             self.client,
             self._order_info,
             InfoOrderObject,
@@ -112,7 +107,6 @@ class AsyncOrders(OrdersBaseV1):
         See Orders.check_unique_code
         """
         return await async_handler_api(
-            EnumMethodHandle.GET,
             self.client,
             self._check_unique_code,
             UniqueCodeObject,

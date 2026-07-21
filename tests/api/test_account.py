@@ -1,14 +1,19 @@
 import asyncio
+from unittest.mock import AsyncMock
 from datetime import datetime
 
 from api.v1.account import Account, AsyncAccount
+from parameters.api import EnumCrudMethod
 from parameters.account import CodeFilter, Type
 
 
 def test_account_helper_builds_balance_route(sync_client):
     api = Account(sync_client)
 
-    assert api._seller_balance_info() == {"route": "sellers/account/balance/info"}
+    assert api._seller_balance_info() == {
+        "method": EnumCrudMethod.GET,
+        "route": "sellers/account/balance/info"
+    }
 
 
 def test_account_helper_builds_receipts_route(sync_client):
@@ -28,6 +33,7 @@ def test_account_helper_builds_receipts_route(sync_client):
     )
 
     assert payload == {
+        "method": EnumCrudMethod.GET,
         "route": "sellers/account/receipts",
         "params": {
             "page": 2,
@@ -90,7 +96,7 @@ def test_account_sync(sync_client, response_factory):
             },
         }
     )
-    sync_client.get.side_effect = [balance_response, receipts_response]
+    sync_client.request.side_effect = [balance_response, receipts_response]
 
     api = Account(sync_client)
     balance = api.seller_balance_info()
@@ -109,10 +115,12 @@ def test_account_sync(sync_client, response_factory):
     assert receipts.content["page"] == 1
     assert receipts.content["items"][0]["owner_id"] == 7
 
-    assert sync_client.get.call_args_list[0].kwargs == {
+    assert sync_client.request.call_args_list[0].kwargs == {
+        "method": EnumCrudMethod.GET,
         "route": "sellers/account/balance/info",
     }
-    assert sync_client.get.call_args_list[1].kwargs == {
+    assert sync_client.request.call_args_list[1].kwargs == {
+        "method": EnumCrudMethod.GET,
         "route": "sellers/account/receipts",
         "params": {
             "page": 1,
@@ -175,7 +183,9 @@ def test_account_async(async_client, response_factory):
             },
         }
     )
-    async_client.get.side_effect = [balance_response, receipts_response]
+    async_client.request = AsyncMock(
+        side_effect=[balance_response, receipts_response]
+    )
 
     api = AsyncAccount(async_client)
     balance = asyncio.run(api.seller_balance_info())
@@ -196,10 +206,12 @@ def test_account_async(async_client, response_factory):
     assert receipts.content["count"] == 2
     assert receipts.content["items"][0]["account_operation_id"] == 1
 
-    assert async_client.get.call_args_list[0].kwargs == {
+    assert async_client.request.call_args_list[0].kwargs == {
+        "method": EnumCrudMethod.GET,
         "route": "sellers/account/balance/info",
     }
-    assert async_client.get.call_args_list[1].kwargs == {
+    assert async_client.request.call_args_list[1].kwargs == {
+        "method": EnumCrudMethod.GET,
         "route": "sellers/account/receipts",
         "params": {
             "page": 1,

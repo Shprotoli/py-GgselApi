@@ -1,6 +1,7 @@
 from json import dumps
 from typing import Any
 
+from parameters.api import EnumCrudMethod
 from api.category import Category, RouteApiV1
 
 
@@ -14,6 +15,7 @@ class ChatsBaseV1(Category, RouteApiV1):
         })
 
         return {
+            "method": EnumCrudMethod.POST,
             "route": "debates/v2",
             "params": params,
             "data": payload,
@@ -36,6 +38,7 @@ class ChatsBaseV1(Category, RouteApiV1):
         }
 
         return {
+            "method": EnumCrudMethod.GET,
             "route": "debates/v2",
             "params": params,
         }
@@ -57,6 +60,7 @@ class ChatsBaseV1(Category, RouteApiV1):
         }
 
         return {
+            "method": EnumCrudMethod.GET,
             "route": "debates/v2/chats",
             "params": params,
         }

@@ -1,5 +1,6 @@
 from json import dumps
 
+from parameters.api import EnumCrudMethod
 from api.category import Category, RouteApiV1
 
 
@@ -15,6 +16,7 @@ class ApiLoginBaseV1(Category, RouteApiV1):
         }
 
         return {
+            "method": EnumCrudMethod.POST,
             "route": "apilogin",
             "data": dumps(payload),
         }

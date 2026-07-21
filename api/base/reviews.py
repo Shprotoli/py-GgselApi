@@ -2,6 +2,7 @@ from typing import Any
 
 from api.category import Category, RouteApiV1
 from parameters.reviews import TypeReview
+from parameters.api import EnumCrudMethod
 from parameters.globals import Lang
 
 
@@ -25,6 +26,7 @@ class ReviewsBaseV1(Category, RouteApiV1):
         }
 
         return {
+            "method": EnumCrudMethod.GET,
             "route": "reviews",
             "params": params,
             "headers": headers,
