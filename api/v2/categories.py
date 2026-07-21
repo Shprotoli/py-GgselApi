@@ -68,7 +68,7 @@ class AsyncCategories(CategoriesBaseV2):
             locale: str | Locale = "ru"
     ) -> ApiResult:
         """
-        See v2.Categories.list_of_categories
+        See Categories.list_of_categories
         """
         return await async_handler_api(
             self.client,
@@ -88,7 +88,7 @@ class AsyncCategories(CategoriesBaseV2):
             locale: str | Locale = "ru",
     ) -> ApiResult:
         """
-        See v2.Categories.search_categories
+        See Categories.search_categories
         """
         return await async_handler_api(
             self.client,
