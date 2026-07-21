@@ -1,4 +1,5 @@
 from copy import deepcopy
+from typing import Type
 
 from api.client import GClient, SyncGClient, AsyncGClient
 # API V1 Category
@@ -175,20 +176,31 @@ class GgselApi:
         """
         return isinstance(self._client, AsyncGClient)
 
+    def _get_client_for_instance(self, instance_type: Type[Category]) -> GClient:
+        """Returns a client corresponding to the API object version."""
+        match instance_type.VERSION_ROUTE:
+            case "V1":
+                client = self._client_legacy
+            case _:
+                client = self._client
+
+        if hasattr(instance_type, "ROUTE"):
+            client._base_route = instance_type.ROUTE
+
+        return client
+
+    def _get_instance_type_by_name(self, obj_name: str) -> Type[Category]:
+        """Returns sync or async API object class depending on current mode."""
+        sync_cls, async_cls = API_OBJECTS[obj_name]
+        return async_cls if self.__async__ else sync_cls
+
     def _update_client_instance(self) -> None:
         """
         This method replaces the `client` object in all instances with the client object in `GgselApiV1`
         """
         for obj_name in filter(lambda obj: hasattr(self, obj), self._objects_instance):
             obj_instance = getattr(self, obj_name)
-            match obj_instance.VERSION_ROUTE:
-                case "V1":
-                    obj_instance.client = self._client_legacy
-                case _:
-                    obj_instance.client = self._client
-
-            if hasattr(obj_instance, "ROUTE"):
-                obj_instance.client._base_route = obj_instance.ROUTE
+            obj_instance.client = self._get_client_for_instance(obj_instance)
 
     def _update_mode_instance(self) -> None:
         """
@@ -196,17 +208,8 @@ class GgselApi:
         (determined by the current `client` mode, which can be synchronous or asynchronous)
         """
         for obj_name in filter(lambda obj: hasattr(self, obj), self._objects_instance):
-            sync_cls, async_cls = API_OBJECTS[obj_name]
-            instance_type = async_cls if self.__async__ else sync_cls
-
-            match instance_type.VERSION_ROUTE:
-                case "V1":
-                    client = self._client_legacy
-                case _:
-                    client = self._client
-
-            if hasattr(instance_type, "ROUTE"):
-                client._base_route = instance_type.ROUTE
+            instance_type = self._get_instance_type_by_name(obj_name)
+            client = self._get_client_for_instance(instance_type)
 
             setattr(self, obj_name, instance_type(client))
 
@@ -219,17 +222,8 @@ class GgselApi:
         :return: An initialized API category object that is an heir to `Category`
         """
         if not hasattr(self, instance_name):
-            sync_cls, async_cls = API_OBJECTS[instance_name]
-            instance_type = async_cls if self.__async__ else sync_cls
-
-            match instance_type.VERSION_ROUTE:
-                case "V1":
-                    client = self._client_legacy
-                case _:
-                    client = self._client
-
-            if hasattr(instance_type, "ROUTE"):
-                client._base_route = instance_type.ROUTE
+            instance_type = self._get_instance_type_by_name(instance_name)
+            client = self._get_client_for_instance(instance_type)
 
             setattr(self, instance_name, instance_type(client))
         return getattr(self, instance_name)
