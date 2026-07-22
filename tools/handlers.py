@@ -15,6 +15,7 @@ from schemas.other.response_object import (
     CompletedResponseObject,
     UnknownResponseObject,
     ResponseApiResult,
+    ErrorResponseObject,
 )
 from schemas.ggsel_object import GgselGlobalObject
 
@@ -131,27 +132,34 @@ def handler_response(response: Response | ResponseLike) -> ResponseApiResult | d
     try:
         data = response.json()
     except JSONDecodeError:
+        response_data = {
+            "status_code": response.status_code,
+            "headers": dict(response.headers),
+            "url": response.url,
+            "method": response.request.method if response.request else None,
+        }
+
         match response.status_code:
-            case status if 400 <= status < 500:
+            case 401:
                 return JSONErrorResponseObject(
-                    status_code=response.status_code,
                     text=response.text,
-                    headers=dict(response.headers),
-                    url=response.url,
-                    method=response.request.method if response.request else None
+                    **response_data
                 )
+
+            case status if 400 <= status < 500:
+                return ErrorResponseObject(
+                    text=response.text,
+                    **response_data
+                )
+
             case status if 200 <= status < 300:
                 return CompletedResponseObject(
-                    status_code=response.status_code,
-                    headers=dict(response.headers),
-                    url=response.url,
-                    method=response.request.method if response.request else None
+                    **response_data
                 )
+
             case _:
                 return UnknownResponseObject(
-                    status_code=response.status_code,
-                    url=response.url,
-                    method=response.request.method if response.request else None
+                    **response_data
                 )
     return data
 
