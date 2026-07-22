@@ -10,7 +10,12 @@ from schemas.ggsel_object import GgselObjectApi
 from schemas.v1.error_response_object import ErrorResponseObject
 from schemas.v2.error_with_entity_object import ErrorWithEntityObject
 from schemas.general_objects import UndetectedObject
-from schemas.errors.response_object import ResponseJSONErrorObject
+from schemas.errors.response_object import (
+    JSONErrorResponseObject,
+    CompletedResponseObject,
+    UnknownResponseObject,
+    ResponseApiResult,
+)
 from schemas.ggsel_object import GgselGlobalObject
 
 T = TypeVar("T")
@@ -22,6 +27,7 @@ class ResponseLike(Protocol):
 
 
 ApiResult: TypeAlias = GgselGlobalObject | ErrorResponseObject | ErrorWithEntityObject | ResponseLike
+ErrorApiResult: TypeAlias = ErrorResponseObject | ErrorWithEntityObject | UndetectedObject
 
 
 @overload
@@ -45,9 +51,58 @@ def handler_response_api(
 ) -> T | ErrorResponseObject: ...
 
 
+class ToolHandlerResponse:
+    @classmethod
+    def return_type_wrapper_is_none(
+            cls,
+            data: dict[str, Any] | list[Any],
+    ):
+        """
+        The method for handling cases when the type_wrapper argument (a type from the schemas folder) is None.
+        """
+        match data:
+            case {"errors": _}:
+                return ErrorWithEntityObject(**data)
+            case _:
+                return UndetectedObject(data=data)
+
+    @classmethod
+    def return_error(
+            cls,
+            type_wrapper: CallableABC[..., T] | None,
+            data: dict[str, Any] | list[Any],
+    ) -> ErrorApiResult:
+        version_api = "V1" if not hasattr(type_wrapper, "VERSION_API") else getattr(type_wrapper, "VERSION_API")
+
+        try:
+            match version_api:
+                case "V1" if isinstance(data, dict):
+                    return ErrorResponseObject(**data)
+                case "V2" if isinstance(data, dict):
+                    return ErrorWithEntityObject(**data)
+                case _:
+                    return UndetectedObject(data=data)
+        except TypeError:
+            return UndetectedObject(data=data)
+
+    @classmethod
+    def return_by_data(
+            cls,
+            type_wrapper: CallableABC[..., T] | None,
+            data: dict[str, Any] | list[Any],
+    ):
+        match data:
+            case list():
+                return type_wrapper(data)
+            case dict():
+                return type_wrapper(**data)
+            case _:
+                return UndetectedObject(data=data)
+
+
 def handler_response_api(
         type_wrapper: CallableABC[..., T] | None,
-        data: ResponseLike | dict[str, Any] | list[Any],
+        data: dict[str, Any],
 ) -> Any:
     """
     Universal API response handler.
@@ -55,46 +110,49 @@ def handler_response_api(
     The function accepts already-parsed payloads and maps them into the
     requested domain object when possible.
     """
-    if type_wrapper is None:
+    if not isinstance(data, dict) and not isinstance(data, list):
+        """
+        If `data` comes as an object that is not a `dict`/`list` type (it is expected to be a `dict` (or `list` type)
+        because earlier in the code, in the `handler_response` function, we get it from the JSON response of our `Response` object),
+        then `data` is already an object that can be returned.
+        """
         return data
 
+    if type_wrapper is None:
+        return ToolHandlerResponse.return_type_wrapper_is_none(data)
+
     try:
-        match data:
-            case list():
-                return type_wrapper(data)
-            case dict():
-                return type_wrapper(**data)
-            case _ if isinstance(data, ResponseLike):
-                return data
-            case _:
-                return data
+        return ToolHandlerResponse.return_by_data(type_wrapper, data)
     except TypeError:
-        version_api = "V1" if not hasattr(type_wrapper, "VERSION_API") else getattr(type_wrapper, "VERSION_API")
-
-        try:
-            match version_api:
-                case "V1":
-                    if isinstance(data, dict):
-                        return ErrorResponseObject(**data)
-                case "V2":
-                    if isinstance(data, dict):
-                        return ErrorWithEntityObject(**data)
-        except TypeError:
-            return UndetectedObject(data=data)
-        return UndetectedObject(data=data)
+        return ToolHandlerResponse.return_error(type_wrapper, data)
 
 
-def handler_response(response: Response):
+def handler_response(response: Response | ResponseLike) -> ResponseApiResult | dict[str, Any] | list[Any]:
     try:
         data = response.json()
     except JSONDecodeError:
-        return ResponseJSONErrorObject(
-            status_code=response.status_code,
-            text=response.text,
-            headers=dict(response.headers),
-            url=response.url,
-            method=response.request.method if response.request else None
-        )
+        match response.status_code:
+            case status if 400 <= status < 500:
+                return JSONErrorResponseObject(
+                    status_code=response.status_code,
+                    text=response.text,
+                    headers=dict(response.headers),
+                    url=response.url,
+                    method=response.request.method if response.request else None
+                )
+            case status if 200 <= status < 300:
+                return CompletedResponseObject(
+                    status_code=response.status_code,
+                    headers=dict(response.headers),
+                    url=response.url,
+                    method=response.request.method if response.request else None
+                )
+            case _:
+                return UnknownResponseObject(
+                    status_code=response.status_code,
+                    url=response.url,
+                    method=response.request.method if response.request else None
+                )
     return data
 
 
@@ -120,7 +178,7 @@ def handler_api(
     response = client.request(**func_api(**params))
     data = handler_response(response)
 
-    return handler_response_api(schedule_object, data=data)
+    return handler_response_api(type_wrapper=schedule_object, data=data)
 
 
 async def async_handler_api(
@@ -145,4 +203,4 @@ async def async_handler_api(
     response = await client.request(**func_api(**params))
     data = handler_response(response)
 
-    return handler_response_api(schedule_object, data=data)
+    return handler_response_api(type_wrapper=schedule_object, data=data)

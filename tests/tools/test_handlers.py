@@ -2,6 +2,7 @@ from requests import Response
 
 from schemas.v1.balance_object import BalanceObject
 from schemas.v1.error_response_object import ErrorResponseObject
+from schemas.general_objects import UndetectedObject
 from tools.handlers import handler_response_api
 
 
@@ -41,7 +42,7 @@ def test_handler_response_api_returns_response_unchanged():
 
     result = handler_response_api(None, response)
 
-    assert result is response
+    assert result == response
 
 
 def test_handler_response_api_returns_error_object_on_type_error():

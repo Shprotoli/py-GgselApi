@@ -4,13 +4,21 @@ from schemas.ggsel_object import GgselGlobalObject
 
 
 @dataclass
-class ResponseErrorObject(GgselGlobalObject):
+class UnknownResponseObject(GgselGlobalObject):
     status_code: int
     url: str
     method: str
 
 
 @dataclass
-class ResponseJSONErrorObject(ResponseErrorObject):
+class JSONErrorResponseObject(UnknownResponseObject):
     text: str
     headers: dict
+
+
+@dataclass
+class CompletedResponseObject(UnknownResponseObject):
+    headers: dict[str, str]
+
+
+ResponseApiResult = UnknownResponseObject | JSONErrorResponseObject | CompletedResponseObject

@@ -4,6 +4,7 @@ import json
 
 from api.v1.chats import Chats, AsyncChats
 from parameters.api import EnumCrudMethod
+from schemas.general_objects import UndetectedObject
 
 
 def test_chats_create_message_helper(sync_client):
@@ -29,7 +30,7 @@ def test_chats_create_message_without_file_sync(sync_client, response_factory):
         params={"id_i": 777},
         data=json.dumps({"message": "hello"}),
     )
-    assert result == {"status_code": 200}
+    assert result == UndetectedObject(data={"status_code": 200})
 
 
 def test_chats_list_messages_sync(sync_client, response_factory):
@@ -159,7 +160,7 @@ def test_chats_async(async_client, response_factory):
     messages = asyncio.run(api.list_messages(777, id_from=1, id_to=9, newer=True, count=150))
     chats = asyncio.run(api.list_chats(filter_new=True, email="buyer@example.com", id_ds="ds-1", pagesize=30, page=2))
 
-    assert created == {"status_code": 200}
+    assert created == UndetectedObject(data={"status_code": 200})
     assert messages.messages[0]["message"] == "hello"
     assert chats.items[0]["email"] == "buyer@example.com"
     assert async_client.request.await_count == 3
