@@ -57,9 +57,3 @@ class VariantEntity:
 @dataclass
 class VariantObject(GgselObjectApiV2):
     data: VariantEntity | None = None
-
-
-@dataclass
-class SuccessObject(GgselObjectApiV2):
-    success: bool | None = None
-    job_id: str | None = None

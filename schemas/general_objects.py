@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Any
 
-from schemas.ggsel_object import GgselGlobalObject
+from schemas.ggsel_object import GgselGlobalObject, GgselObjectApiV2
 
 
 @dataclass
@@ -18,3 +18,9 @@ class PaginationObject:
     page: int
     limit: int
     total_count: int
+
+
+@dataclass
+class SuccessObject(GgselObjectApiV2):
+    success: bool | None = None
+    job_id: str | None = None
