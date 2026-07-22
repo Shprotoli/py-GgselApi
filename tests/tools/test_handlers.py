@@ -17,7 +17,7 @@ def test_handler_response_api_wraps_dict():
         {
             "retval": 0,
             "retdesc": "OK",
-            "other": [],
+            "errors": [],
             "content": {
                 "amount_t_lock": 1,
                 "amount_t_free": 2,

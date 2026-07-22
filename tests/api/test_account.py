@@ -53,7 +53,7 @@ def test_account_sync(sync_client, response_factory):
         {
             "retval": 0,
             "retdesc": "OK",
-            "other": [],
+            "errors": [],
             "content": {
                 "amount_t_lock": 1,
                 "amount_t_free": 2,
@@ -65,7 +65,7 @@ def test_account_sync(sync_client, response_factory):
         {
             "retval": 0,
             "retdesc": "OK",
-            "other": [],
+            "errors": [],
             "content": {
                 "page": 1,
                 "count": 2,
@@ -140,7 +140,7 @@ def test_account_async(async_client, response_factory):
         {
             "retval": 0,
             "retdesc": "OK",
-            "other": [],
+            "errors": [],
             "content": {
                 "amount_t_lock": 1,
                 "amount_t_free": 2,
@@ -152,7 +152,7 @@ def test_account_async(async_client, response_factory):
         {
             "retval": 0,
             "retdesc": "OK",
-            "other": [],
+            "errors": [],
             "content": {
                 "page": 1,
                 "count": 2,

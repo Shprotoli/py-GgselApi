@@ -17,7 +17,7 @@ class JSONErrorResponseObject(UnknownResponseObject):
 
 
 @dataclass
-class ErrorResponseObject(UnknownResponseObject):
+class ErrorsResponseObject(UnknownResponseObject):
     # Status code is 4xx
     text: str
     headers: dict[str, str]
@@ -29,4 +29,4 @@ class CompletedResponseObject(UnknownResponseObject):
     headers: dict[str, str]
 
 
-ResponseApiResult = UnknownResponseObject | JSONErrorResponseObject | CompletedResponseObject | ErrorResponseObject
+ResponseApiResult = UnknownResponseObject | JSONErrorResponseObject | CompletedResponseObject | ErrorsResponseObject

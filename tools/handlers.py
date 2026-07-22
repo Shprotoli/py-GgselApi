@@ -15,7 +15,7 @@ from schemas.other.response_object import (
     CompletedResponseObject,
     UnknownResponseObject,
     ResponseApiResult,
-    ErrorResponseObject,
+    ErrorsResponseObject,
 )
 from schemas.ggsel_object import GgselGlobalObject
 
@@ -147,7 +147,7 @@ def handler_response(response: Response | ResponseLike) -> ResponseApiResult | d
                 )
 
             case status if 400 <= status < 500:
-                return ErrorResponseObject(
+                return ErrorsResponseObject(
                     text=response.text,
                     **response_data
                 )
