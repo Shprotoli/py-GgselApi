@@ -10,3 +10,11 @@ class UndetectedObject(GgselGlobalObject):
     This object is used when the API result is unexpected
     """
     data: dict[str, Any] | None = None
+
+
+@dataclass
+class PaginationObject:
+    total_pages: int
+    page: int
+    limit: int
+    total_count: int
