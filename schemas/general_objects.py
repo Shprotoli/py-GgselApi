@@ -9,7 +9,7 @@ class UndetectedObject(GgselGlobalObject):
     """
     This object is used when the API result is unexpected
     """
-    data: dict[str, Any] | None = None
+    data: Any | None = None
 
 
 @dataclass
