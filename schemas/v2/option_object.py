@@ -6,7 +6,7 @@ from parameters.options import DiscountType, ImpactType
 
 
 @dataclass
-class VariantEntity:
+class OptionVariantEntity:
     id: int
     title_ru: str
     title_en: str
@@ -33,17 +33,16 @@ class OptionEntity:
     is_price_modifier_hidden: bool
     position: int
     has_splitted_products: bool
-    variants: list[VariantEntity] = None
+    variants: list[OptionVariantEntity] | None = None
 
 
 @dataclass
-class OptionObject(GgselObjectApiV2):
+class OptionObject:
     data: OptionEntity | None = None
-    pagination: PaginationObject | None = None
 
 
 @dataclass
-class OptionValueEntity:
+class VariantEntity:
     id: int
     title_ru: str
     title_en: str
@@ -56,8 +55,8 @@ class OptionValueEntity:
 
 
 @dataclass
-class OptionValueObject(GgselObjectApiV2):
-    data: OptionValueEntity | None = None
+class VariantObject(GgselObjectApiV2):
+    data: VariantEntity | None = None
 
 
 @dataclass

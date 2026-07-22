@@ -124,7 +124,7 @@ def test_v1_set_token_updates_v2_client(sync_client):
     ("attribute", "expected_type"),
     [
         ("categories", CategoriesV2),
-        ("option", OptionV2),
+        ("options", OptionV2),
     ],
 )
 def test_v2_lazy_init_all_categories(

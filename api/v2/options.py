@@ -1,6 +1,7 @@
 from api.base.options import OptionBaseV2
 from tools.handlers import handler_api, async_handler_api, ApiResult
-from schemas.v2.option_object import OptionObject, SuccessObject, OptionValueObject
+from schemas.v2.option_object import OptionObject, SuccessObject, VariantObject
+from schemas.v2.list_of import ListOfOption
 from parameters.globals import Locale
 from parameters.options import OptionParametr, OptionListType, OptionValue, OptionValueListType
 
@@ -74,7 +75,7 @@ class Option(OptionBaseV2):
         return handler_api(
             self.client,
             self._list_active_offer_options,
-            OptionObject,
+            ListOfOption,
             offer_id=offer_id,
             locale=locale,
         )
@@ -126,7 +127,7 @@ class Option(OptionBaseV2):
         return handler_api(
             self.client,
             self._create_or_update_variants,
-            OptionValueObject,
+            VariantObject,
             offer_id=offer_id,
             locale=locale,
             option_id=option_id,
@@ -251,7 +252,7 @@ class AsyncOption(OptionBaseV2):
         return await async_handler_api(
             self.client,
             self._create_or_update_variants,
-            OptionValueObject,
+            VariantObject,
             offer_id=offer_id,
             locale=locale,
             option_id=option_id,
