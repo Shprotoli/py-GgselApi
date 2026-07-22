@@ -10,7 +10,7 @@ from schemas.ggsel_object import GgselObjectApi
 from schemas.v1.error_response_object import ErrorResponseObject
 from schemas.v2.error_with_entity_object import ErrorWithEntityObject
 from schemas.general_objects import UndetectedObject
-from schemas.errors.response_object import (
+from schemas.other.response_object import (
     JSONErrorResponseObject,
     CompletedResponseObject,
     UnknownResponseObject,
@@ -61,7 +61,7 @@ class ToolHandlerResponse:
         The method for handling cases when the type_wrapper argument (a type from the schemas folder) is None.
         """
         match data:
-            case {"errors": _}:
+            case {"other": _}:
                 return ErrorWithEntityObject(**data)
             case _:
                 return UndetectedObject(data=data)
