@@ -96,7 +96,7 @@ class OptionValue:
     discount_type: str
     impact_type: str
     is_default: bool
-    status: str
+    status: StatusVariantType | str
     position: int
 
 
@@ -119,7 +119,7 @@ def generate_option_value(
         discount_type: str | DiscountType = DiscountType.FIXED,
         impact_type: str | ImpactType = ImpactType.DECREASE,
         is_default: bool = False,
-        status: str | StatusVariantType = StatusVariantType.ACTIVE,
+        status: StatusVariantType | str = StatusVariantType.ACTIVE,
         position: int = 0,
 ) -> OptionValue:
     return OptionValue(

@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 from schemas.ggsel_object import GgselObjectApiV2
 from schemas.general_objects import PaginationObject
-from parameters.option import DiscountType, ImpactType
+from parameters.options import DiscountType, ImpactType
 
 
 @dataclass

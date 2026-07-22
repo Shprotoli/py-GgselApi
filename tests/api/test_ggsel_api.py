@@ -15,7 +15,7 @@ from api.v1.reviews import Reviews
 
 # V2
 from api.v2.categories import Categories as CategoriesV2
-from api.v2.option import Option as OptionV2
+from api.v2.options import Option as OptionV2
 
 
 # ==========================================================

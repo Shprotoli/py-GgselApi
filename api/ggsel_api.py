@@ -37,7 +37,7 @@ from api.v2.categories import (
     Categories as CategoriesV2,
     AsyncCategories as AsyncCategoriesV2,
 )
-from api.v2.option import (
+from api.v2.options import (
     Option as OptionV2,
     AsyncOption as AsyncOptionV2,
 )

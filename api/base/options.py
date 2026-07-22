@@ -4,7 +4,7 @@ from typing import Any
 from api.category import Category, RouteApiV2
 from parameters.api import EnumCrudMethod
 from parameters.globals import Locale
-from parameters.option import OptionList, OptionParametr, OptionListType, OptionValue, OptionValueList, \
+from parameters.options import OptionList, OptionParametr, OptionListType, OptionValue, OptionValueList, \
     OptionValueListType
 
 
