@@ -1,4 +1,4 @@
-from copy import deepcopy
+from copy import copy
 from typing import Type
 
 from api.client import GClient, SyncGClient, AsyncGClient
@@ -124,19 +124,21 @@ class GgselApi:
         self.__async__ = self.is_async()
 
     def _generate_clients(self, client: GClient) -> tuple[GClient, GClient]:
-        client_legacy = client
-
-        client_ = deepcopy(client)
+        client_legacy_ = client
+        client_ = copy(client)
 
         if hasattr(client_, "client"):
-            client_.client = type(client_.client)(
-                headers=client_.client.headers
+            client_.client = type(client.client)(
+                headers=client.client.headers
             )
 
-        if "token" in client_.params:
-            client_.params.pop("token")
+        if hasattr(client_, "params"):
+            client_.params = client.params.copy()
 
-        return client_legacy, client_
+            if "token" in client_.params:
+                client_.params.pop("token")
+
+        return client_legacy_, client_
 
     @property
     def client_legacy(self) -> GClient:
