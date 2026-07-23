@@ -1,10 +1,10 @@
 from json import dumps
 from typing import Any
 
-from api.category import Category, RouteApiV1
-from parameters.globals import Lang, Currency
+from api.category import Category, RouteApiV1, RouteApiV2
+from parameters.globals import Lang, Currency, Locale
 from parameters.api import EnumCrudMethod
-from parameters.products import OrderDir, OrderCol
+from parameters.products import OrderDir, OrderCol, StatusProduct, ProductList, ProductParametr, ProductListType
 
 
 class ProductsBaseV1(Category, RouteApiV1):
@@ -70,4 +70,164 @@ class ProductsBaseV1(Category, RouteApiV1):
             "method": EnumCrudMethod.POST,
             "route": "seller-goods",
             "data": dumps(payload),
+        }
+
+
+class ProductsBaseV2(Category, RouteApiV2):
+    def _list_products(
+            self,
+            offer_id: int,
+            status: StatusProduct | str,
+            sort_column: str,
+            sort_direction: OrderDir | str,
+            locale: Locale | str,
+    ) -> dict[str, Any]:
+        params = {
+            "status": status,
+            "sort_column": sort_column,
+            "sort_direction": sort_direction,
+        }
+        headers = {
+            "locale": locale,
+        }
+
+        return {
+            "method": EnumCrudMethod.GET,
+            "route": f"offers/{offer_id}/products",
+            "params": params,
+            "headers": headers,
+        }
+
+    def _create_products(
+            self,
+            offer_id: int,
+            locale: Locale | str,
+            body: ProductListType | ProductParametr,
+    ):
+        params = {
+            "offer_id": offer_id,
+        }
+        headers = {
+            "locale": locale,
+        }
+
+        if isinstance(body, ProductList):
+            body = body.asdict()
+        elif isinstance(body, ProductParametr):
+            body = ProductList([body]).asdict()
+
+        return {
+            "method": EnumCrudMethod.POST,
+            "route": f"offers/{offer_id}/products",
+            "params": params,
+            "headers": headers,
+            "data": dumps(body),
+        }
+
+    def _archive_products(
+            self,
+            offer_id: int,
+            locale: Locale | str,
+            product_ids: list[int] | int,
+            delete_all: bool,
+    ):
+        params = {
+            "offer_id": offer_id,
+        }
+        headers = {
+            "locale": locale,
+        }
+        payloads = {
+            "product_ids": product_ids,
+            "delete_all": str(delete_all).lower(),
+        }
+
+        return {
+            "method": EnumCrudMethod.DELETE,
+            "route": f"offers/{offer_id}/products",
+            "params": params,
+            "headers": headers,
+            "data": dumps(payloads),
+        }
+
+    def _list_splitted_products(
+            self,
+            offer_id: int,
+            variant_id: int,
+            status: StatusProduct | str,
+            sort_column: str,
+            sort_direction: OrderDir | str,
+            locale: Locale | str,
+    ):
+        params = {
+            "status": status,
+            "sort_column": sort_column,
+            "sort_direction": sort_direction,
+        }
+        headers = {
+            "locale": locale,
+        }
+
+        return {
+            "method": EnumCrudMethod.GET,
+            "route": f"offers/{offer_id}/variants/{variant_id}/splitted_products",
+            "params": params,
+            "headers": headers,
+        }
+
+    def _create_splitted_products(
+            self,
+            offer_id: int,
+            variant_id: int,
+            locale: Locale | str,
+            body: ProductListType | ProductParametr,
+    ):
+        params = {
+            "offer_id": offer_id,
+            "variant_id": variant_id,
+        }
+        headers = {
+            "locale": locale,
+        }
+
+        if isinstance(body, ProductList):
+            body = body.asdict()
+        elif isinstance(body, ProductParametr):
+            body = ProductList([body]).asdict()
+
+        return {
+            "method": EnumCrudMethod.POST,
+            "route": f"offers/{offer_id}/variants/{variant_id}/splitted_products",
+            "params": params,
+            "headers": headers,
+            "data": dumps(body),
+        }
+
+    def _archive_splitted_products(
+            self,
+            offer_id: int,
+            variant_id: int,
+            locale: Locale | str,
+            product_ids: list[int] | int | None,
+            delete_all: str,
+    ):
+        params = {
+            "offer_id": offer_id,
+            "variant_id": variant_id,
+        }
+        headers = {
+            "locale": locale,
+        }
+        payloads = {
+            "product_ids": product_ids,
+            "delete_all": str(delete_all).lower(),
+        }
+        print(payloads)
+
+        return {
+            "method": EnumCrudMethod.DELETE,
+            "route": f"offers/{offer_id}/variants/{variant_id}/splitted_products",
+            "params": params,
+            "headers": headers,
+            "data": dumps(payloads),
         }

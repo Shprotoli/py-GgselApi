@@ -3,7 +3,7 @@ from typing import Callable
 from typing import Any, Protocol, TypeAlias, TypeVar, overload, runtime_checkable
 
 from requests import Response
-from requests.exceptions import JSONDecodeError
+from json import JSONDecodeError
 
 from api.client import GClient
 from schemas.ggsel_object import GgselObjectApi

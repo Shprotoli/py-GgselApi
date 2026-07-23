@@ -41,6 +41,10 @@ from api.v2.options import (
     Option as OptionV2,
     AsyncOption as AsyncOptionV2,
 )
+from api.v2.products import (
+    Products as ProductsV2,
+    AsyncProducts as AsyncProductsV2,
+)
 
 API_V1_OBJECTS = {
     "_v1_api_login_instance": (ApiLoginV1, AsyncApiLoginV1),
@@ -54,7 +58,8 @@ API_V1_OBJECTS = {
 
 API_V2_OBJECTS = {
     "_v2_categories_instance": (CategoriesV2, AsyncCategoriesV2),
-    "_v2_option_instance": (OptionV2, AsyncOptionV2),
+    "_v2_options_instance": (OptionV2, AsyncOptionV2),
+    "_v2_products_instance": (ProductsV2, AsyncProductsV2),
 }
 
 API_OBJECTS: dict[str, tuple[type[Category], type[Category]]] = {
@@ -99,8 +104,12 @@ class CategoriesApiV2(CategoriesApiV1):
         return self._get_api_instance("_v2_categories_instance")
 
     @property
-    def option(self) -> OptionV2 | AsyncOptionV2:
-        return self._get_api_instance("_v2_option_instance")
+    def options(self) -> OptionV2 | AsyncOptionV2:
+        return self._get_api_instance("_v2_options_instance")
+
+    @property
+    def products(self) -> ProductsV2 | AsyncProductsV2:
+        return self._get_api_instance("_v2_products_instance")
 
 
 class GgselApi:

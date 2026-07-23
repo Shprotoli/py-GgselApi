@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 from enum import StrEnum
 
 
@@ -30,3 +30,24 @@ class Variant:
             "rate": self.rate,
             "type": self.type,
         }
+
+
+class StatusProduct(StrEnum):
+    IN_STOCK = "in_stock"
+    SOLD = "sold"
+
+
+@dataclass
+class ProductParametr:
+    value: str
+
+
+@dataclass
+class ProductList:
+    products: list[ProductParametr | dict]
+
+    def asdict(self):
+        return asdict(self)
+
+
+ProductListType = ProductList | dict[str, list[ProductParametr, ...]]
