@@ -1,6 +1,7 @@
 from api.base.options import OptionBaseV2
 from tools.handlers import handler_api, async_handler_api, ApiResult
-from schemas.v2.option_object import OptionObject, SuccessObject, VariantObject
+from schemas.v2.option_object import OptionObject, VariantObject
+from schemas.general_objects import SuccessObject
 from schemas.v2.list_of import ListOfOption
 from parameters.globals import Locale
 from parameters.options import OptionParametr, OptionListType, OptionValue, OptionValueListType
@@ -83,7 +84,7 @@ class Option(OptionBaseV2):
     def archive_options(
             self,
             offer_id: int,
-            options_ids: int | list[int],
+            options_ids: int | list[int] | None = None,
             locale: Locale | str = "ru",
             delete_all: bool = False,
     ) -> ApiResult:
@@ -138,7 +139,7 @@ class Option(OptionBaseV2):
             self,
             offer_id: int,
             option_id: int,
-            option_variant_ids: list[int] | int | None,
+            option_variant_ids: list[int] | int | None = None,
             locale: Locale | str = "ru",
             delete_all: bool = False,
     ):
@@ -222,7 +223,7 @@ class AsyncOption(OptionBaseV2):
     async def archive_options(
             self,
             offer_id: int,
-            options_ids: int | list[int, ...],
+            options_ids: int | list[int, ...] | None = None,
             locale: Locale | str = "ru",
             delete_all: bool = False,
     ) -> ApiResult:
@@ -263,7 +264,7 @@ class AsyncOption(OptionBaseV2):
             self,
             offer_id: int,
             option_id: int,
-            option_variant_ids: list[int] | int,
+            option_variant_ids: list[int] | int | None = None,
             locale: Locale | str = "ru",
             delete_all: bool = False,
     ):
