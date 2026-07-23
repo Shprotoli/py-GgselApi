@@ -103,7 +103,7 @@ class ProductsBaseV2(Category, RouteApiV2):
             offer_id: int,
             locale: Locale | str,
             body: ProductListType | ProductParametr,
-    ):
+    ) -> dict[str, Any]:
         params = {
             "offer_id": offer_id,
         }
@@ -130,7 +130,7 @@ class ProductsBaseV2(Category, RouteApiV2):
             locale: Locale | str,
             product_ids: list[int] | int,
             delete_all: bool,
-    ):
+    ) -> dict[str, Any]:
         params = {
             "offer_id": offer_id,
         }
@@ -158,7 +158,7 @@ class ProductsBaseV2(Category, RouteApiV2):
             sort_column: str,
             sort_direction: OrderDir | str,
             locale: Locale | str,
-    ):
+    ) -> dict[str, Any]:
         params = {
             "status": status,
             "sort_column": sort_column,
@@ -181,7 +181,7 @@ class ProductsBaseV2(Category, RouteApiV2):
             variant_id: int,
             locale: Locale | str,
             body: ProductListType | ProductParametr,
-    ):
+    ) -> dict[str, Any]:
         params = {
             "offer_id": offer_id,
             "variant_id": variant_id,
@@ -210,7 +210,7 @@ class ProductsBaseV2(Category, RouteApiV2):
             locale: Locale | str,
             product_ids: list[int] | int | None,
             delete_all: str,
-    ):
+    ) -> dict[str, Any]:
         params = {
             "offer_id": offer_id,
             "variant_id": variant_id,

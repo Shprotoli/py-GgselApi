@@ -41,7 +41,7 @@ class Products(ProductsBaseV2):
             offer_id: int,
             body: ProductListType | ProductParametr,
             locale: Locale | str = "ru",
-    ):
+    ) -> ApiResult:
         """
         Source docs: https://seller.ggsel.com/docs/v2/create-products
         Using this method, you can add content to a product
@@ -65,7 +65,7 @@ class Products(ProductsBaseV2):
             product_ids: list[int] | int | None = None,
             locale: Locale | str = "ru",
             delete_all: bool = False,
-    ):
+    ) -> ApiResult:
         """
         Source docs: https://seller.ggsel.com/docs/v2/archive-products
 
@@ -94,7 +94,7 @@ class Products(ProductsBaseV2):
             sort_column: str = "created_at",
             sort_direction: OrderDir | str = OrderDir.DESC,
             locale: Locale | str = "ru",
-    ):
+    ) -> ApiResult:
         """
         Source docs: https://seller.ggsel.com/docs/v2/archive-products
         This method returns the product content for splitted products by product ID and variant ID
@@ -124,7 +124,7 @@ class Products(ProductsBaseV2):
             variant_id: int,
             body: ProductListType | ProductParametr,
             locale: Locale | str = "ru",
-    ):
+    ) -> ApiResult:
         """
         Source docs: https://seller.ggsel.com/docs/v2/create-splitted-products
         This method adds the product content to a specific variant using the product ID and variant ID.
@@ -151,7 +151,7 @@ class Products(ProductsBaseV2):
             product_ids: list[int] | int | None = None,
             locale: Locale | str = "ru",
             delete_all: bool = False,
-    ):
+    ) -> ApiResult:
         """
         Source docs: https://seller.ggsel.com/docs/v2/archive-splitted-products
         This method removes a product (or products) by lot ID (`offer_id`), variant ID (`variant_id`), and product ID (`products_ids`)
@@ -204,7 +204,7 @@ class AsyncProducts(ProductsBaseV2):
             offer_id: int,
             body: ProductListType | ProductParametr,
             locale: Locale | str = "ru",
-    ):
+    ) -> ApiResult:
         """
         See Products.create_products
         """
@@ -223,7 +223,7 @@ class AsyncProducts(ProductsBaseV2):
             product_ids: list[int] | int | None = None,
             locale: Locale | str = "ru",
             delete_all: bool = False,
-    ):
+    ) -> ApiResult:
         """
         See Products.archive_products
         """
@@ -245,7 +245,7 @@ class AsyncProducts(ProductsBaseV2):
             sort_column: str = "created_at",
             sort_direction: OrderDir | str = OrderDir.DESC,
             locale: Locale | str = "ru",
-    ):
+    ) -> ApiResult:
         """
         See Products.list_splitted_products
         """
@@ -267,7 +267,7 @@ class AsyncProducts(ProductsBaseV2):
             variant_id: int,
             body: ProductListType | ProductParametr,
             locale: Locale | str = "ru",
-    ):
+    ) -> ApiResult:
         """
         See Products.create_splitted_products
         """
@@ -288,7 +288,7 @@ class AsyncProducts(ProductsBaseV2):
             product_ids: list[int] | int | None = None,
             locale: Locale | str = "ru",
             delete_all: bool = False,
-    ):
+    ) -> ApiResult:
         """
         See Products.archive_splitted_products
         """
