@@ -1,6 +1,12 @@
 from dataclasses import dataclass
+from typing import Any, Protocol, runtime_checkable
 
 from schemas.ggsel_object import GgselGlobalObject
+
+
+@runtime_checkable
+class ResponseLike(Protocol):
+    def json(self) -> Any: ...
 
 
 @dataclass

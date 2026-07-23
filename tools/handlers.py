@@ -16,18 +16,13 @@ from schemas.other.response_object import (
     UnknownResponseObject,
     ResponseApiResult,
     ErrorsResponseObject,
+    ResponseLike,
 )
 from schemas.ggsel_object import GgselGlobalObject
 
 T = TypeVar("T")
 
-
-@runtime_checkable
-class ResponseLike(Protocol):
-    def json(self) -> Any: ...
-
-
-ApiResult: TypeAlias = GgselGlobalObject | ErrorResponseObject | ErrorWithEntityObject | ResponseLike
+ApiResult: TypeAlias = GgselGlobalObject | ErrorResponseObject | ErrorWithEntityObject
 ErrorApiResult: TypeAlias = ErrorResponseObject | ErrorWithEntityObject | UndetectedObject
 
 
