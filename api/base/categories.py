@@ -19,7 +19,7 @@ class CategoriesBaseV1(Category, RouteApiV1):
             "category_id": category_id,
         }
         headers = {
-            "locale": str(lang),
+            "lang": str(lang),
         }
 
         return {
