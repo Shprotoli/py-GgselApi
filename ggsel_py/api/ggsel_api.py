@@ -208,7 +208,7 @@ class GgselApiV1(GgselApi, CategoriesApiV1):
     def __init__(self, token: str = "", client: GClient | None = None):
         super().__init__(client)
 
-        if not token:
+        if token:
             self._client.set_token(token)
         self._client._base_route = "api_sellers/api"
 
@@ -259,11 +259,11 @@ class GgselApiMaster(GgselApi, CategoriesApiV2, CategoriesApiV1):
 
     @GgselApi.client.setter
     def client(self, new_client: GClient) -> None:
-        token = getattr(self._client, "token", None)
+        token = self._client_legacy.params.get("token", "")
 
         self._client_legacy, self._client = self._generate_clients(new_client)
         if token:
-            self._client.set_token(token)
+            self._client_legacy.set_token(token)
 
         GgselApi.client.fset(self, new_client)
         self.__obj_api_v1.client = self._client_legacy
@@ -271,7 +271,6 @@ class GgselApiMaster(GgselApi, CategoriesApiV2, CategoriesApiV1):
 
     def _generate_clients(self, client: GClient) -> tuple[GClient, GClient]:
         client_legacy_ = copy(client)
-
         client_ = copy(client)
 
         client_legacy_._base_route = "api_sellers/api"
