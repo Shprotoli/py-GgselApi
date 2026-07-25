@@ -9,7 +9,7 @@ from schemas.v1.messages_object import MessagesObject
 from schemas.v1.offer_list_object import OfferListObject
 from schemas.v1.offer_object import OfferObject
 from schemas.v1.offer_search_object import OfferSearchObject
-from schemas.v1.receipts_object import ReceiptsObject
+from ggsel_py.schemas.v1.receipts_object import ReceiptsObject
 from schemas.v1.reviews_object import ReviewsObject
 from schemas.v1.seller_goods_list_object import SellerGoodsListObject
 from schemas.v1.token_object import TokenObject

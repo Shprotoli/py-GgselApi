@@ -1,6 +1,5 @@
 from collections.abc import Callable as CallableABC
-from typing import Callable
-from typing import Any, Protocol, TypeAlias, TypeVar, overload, runtime_checkable
+from typing import Callable, Any, TypeAlias, TypeVar, overload
 
 from requests import Response
 from json import JSONDecodeError
