@@ -1,7 +1,7 @@
 import pytest
 
 from ggsel_py.api.ggsel_api import (
-    GgselApi,
+    GgselApiMaster,
     GgselApiV1,
     GgselApiV2,
 )
@@ -10,6 +10,7 @@ from ggsel_py.api.client import SyncGClient, AsyncGClient
 
 class FakeSyncClient(SyncGClient):
     def __init__(self):
+        self.headers = {}
         self.params = {}
         self.token = None
         self._base_route = None
@@ -20,6 +21,7 @@ class FakeSyncClient(SyncGClient):
 
 class FakeAsyncClient(AsyncGClient):
     def __init__(self):
+        self.headers = {}
         self.params = {}
         self.token = None
         self._base_route = None
@@ -30,7 +32,7 @@ class FakeAsyncClient(AsyncGClient):
 
 class FakeV1Sync:
     VERSION_ROUTE = "V1"
-    ROUTE = "/api/v1"
+    ROUTE = "api_sellers/api"
 
     def __init__(self, client):
         self.client = client
@@ -42,7 +44,7 @@ class FakeV1Async(FakeV1Sync):
 
 class FakeV2Sync:
     VERSION_ROUTE = "V2"
-    ROUTE = "/api/v2"
+    ROUTE = "api_sellers/v2"
 
     def __init__(self, client):
         self.client = client
@@ -69,7 +71,7 @@ def patched_objects(monkeypatch):
 
 @pytest.fixture
 def api(patched_objects):
-    api = GgselApi()
+    api = GgselApiMaster()
     api._objects_instance = tuple(patched_objects.keys())
 
     return api
@@ -81,7 +83,7 @@ def api(patched_objects):
 
 
 def test_init_generates_two_clients():
-    api = GgselApi()
+    api = GgselApiMaster()
 
     assert api.client is not api.client_legacy
     assert isinstance(api.client, SyncGClient)
@@ -96,8 +98,9 @@ def test_set_client_recreates_clients(api):
     api.client = new_client
 
     assert api.client is not old_client
-    assert api.client_legacy is new_client
-    assert api.client is not new_client
+    assert api.client_legacy is not old_client
+    assert api.client is new_client
+    assert api.client_legacy is not new_client
 
 
 # -------------------------------------------------------
@@ -142,7 +145,6 @@ def test_update_client_instance_updates_v1_and_v2(api):
     v2 = api._get_api_instance("_fake_v2")
 
     new_client = SyncGClient()
-
     api.client = new_client
 
     assert v1.client is api.client_legacy
@@ -157,8 +159,8 @@ def test_update_client_instance_sets_routes(api):
 
     api._update_client_instance()
 
-    assert api.client_legacy._base_route == "/api/v1"
-    assert api.client._base_route == "/api/v2"
+    assert api.client_legacy._base_route == "api_sellers/api"
+    assert api.client._base_route == "api_sellers/v2"
 
 
 # -------------------------------------------------------
@@ -244,18 +246,12 @@ def test_update_client_instance_without_instances(api):
 # -------------------------------------------------------
 
 
-def test_api_v2_creates_v1_api():
-    api = GgselApiV2()
-
-    assert isinstance(api.api_v1, GgselApiV1)
-
-
-def test_api_v2_client_change_updates_v1():
-    api = GgselApiV2()
+def test_api_master_client_change_updates():
+    api = GgselApiMaster()
 
     client = SyncGClient()
 
     api.client = client
 
     assert api.api_v1.client is not None
-    assert api.api_v1.client_legacy is not None
+    assert api.api_v2.client is not None
