@@ -19,7 +19,7 @@ class OrdersBaseV1(Category, RouteApiV1):
             "top": top,
         }
         headers = {
-            "locale": locale,
+            "locale": str(locale),
         }
 
         return {
@@ -29,9 +29,13 @@ class OrdersBaseV1(Category, RouteApiV1):
             "headers": headers
         }
 
-    def _order_info(self, invoice_id: int, locale: str | Lang = Lang.RU) -> dict[str, Any]:
+    def _order_info(
+            self,
+            invoice_id: int,
+            locale: str | Lang = Lang.RU
+    ) -> dict[str, Any]:
         headers = {
-            "locale": locale,
+            "locale": str(locale),
         }
 
         return {
@@ -40,7 +44,10 @@ class OrdersBaseV1(Category, RouteApiV1):
             "headers": headers,
         }
 
-    def _check_unique_code(self, unique_code: str) -> dict[str, Any]:
+    def _check_unique_code(
+            self,
+            unique_code: str
+    ) -> dict[str, Any]:
         return {
             "method": EnumCrudMethod.GET,
             "route": f"purchases/unique-code/{unique_code}",

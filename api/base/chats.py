@@ -6,7 +6,11 @@ from api.category import Category, RouteApiV1
 
 
 class ChatsBaseV1(Category, RouteApiV1):
-    def _create_message_without_file(self, id_i: int, message: str) -> dict[str, Any]:
+    def _create_message_without_file(
+            self,
+            id_i: int,
+            message: str
+    ) -> dict[str, Any]:
         params = {
             "id_i": id_i,
         }

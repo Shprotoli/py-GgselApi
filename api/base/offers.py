@@ -37,7 +37,7 @@ class OffersBaseV2(Category, RouteApiV2):
             "updated_at_from": updated_at_from,
         }
         headers = {
-            "locale": locale,
+            "locale": str(locale),
         }
 
         return {
@@ -53,7 +53,7 @@ class OffersBaseV2(Category, RouteApiV2):
             locale: Locale | str,
     ) -> dict[str, Any]:
         headers = {
-            "locale": locale,
+            "locale": str(locale),
         }
 
         return {
@@ -69,7 +69,7 @@ class OffersBaseV2(Category, RouteApiV2):
             body: dict,
     ):
         headers = {
-            "locale": locale,
+            "locale": str(locale),
         }
 
         return {
@@ -85,7 +85,7 @@ class OffersBaseV2(Category, RouteApiV2):
             body: dict,
     ):
         headers = {
-            "locale": locale,
+            "locale": str(locale),
         }
 
         return {
@@ -102,7 +102,7 @@ class OffersBaseV2(Category, RouteApiV2):
             offer_ids: list[int] | int,
     ) -> dict[str, Any]:
         headers = {
-            "locale": locale,
+            "locale": str(locale),
         }
         payload = {
             "offer_ids": offer_ids

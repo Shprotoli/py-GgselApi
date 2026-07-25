@@ -53,7 +53,7 @@ class Chats(ChatsBaseV1):
             id_i=id_i,
             id_from=id_from,
             id_to=id_to,
-            newer=newer,
+            newer=int(newer),
             count=count
         )
 
@@ -82,7 +82,7 @@ class Chats(ChatsBaseV1):
             self.client,
             self._list_chats,
             ChatsObject,
-            filter_new=filter_new,
+            filter_new=int(filter_new),
             email=email,
             id_ds=id_ds,
             pagesize=pagesize,

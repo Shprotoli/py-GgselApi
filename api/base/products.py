@@ -25,8 +25,8 @@ class ProductsBaseV1(Category, RouteApiV1):
             "count": count,
         }
         headers = {
-            "lang": lang,
-            "locale": locale,
+            "lang": str(lang),
+            "locale": str(locale),
         }
 
         return {
@@ -88,7 +88,7 @@ class ProductsBaseV2(Category, RouteApiV2):
             "sort_direction": sort_direction,
         }
         headers = {
-            "locale": locale,
+            "locale": str(locale),
         }
 
         return {
@@ -108,7 +108,7 @@ class ProductsBaseV2(Category, RouteApiV2):
             "offer_id": offer_id,
         }
         headers = {
-            "locale": locale,
+            "locale": str(locale),
         }
 
         if isinstance(body, ProductList):
@@ -135,7 +135,7 @@ class ProductsBaseV2(Category, RouteApiV2):
             "offer_id": offer_id,
         }
         headers = {
-            "locale": locale,
+            "locale": str(locale),
         }
         payloads = {
             "product_ids": product_ids,
@@ -165,7 +165,7 @@ class ProductsBaseV2(Category, RouteApiV2):
             "sort_direction": sort_direction,
         }
         headers = {
-            "locale": locale,
+            "locale": str(locale),
         }
 
         return {
@@ -187,7 +187,7 @@ class ProductsBaseV2(Category, RouteApiV2):
             "variant_id": variant_id,
         }
         headers = {
-            "locale": locale,
+            "locale": str(locale),
         }
 
         if isinstance(body, ProductList):
@@ -216,13 +216,12 @@ class ProductsBaseV2(Category, RouteApiV2):
             "variant_id": variant_id,
         }
         headers = {
-            "locale": locale,
+            "locale": str(locale),
         }
         payloads = {
             "product_ids": product_ids,
             "delete_all": str(delete_all).lower(),
         }
-        print(payloads)
 
         return {
             "method": EnumCrudMethod.DELETE,

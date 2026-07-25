@@ -20,7 +20,7 @@ class OptionBaseV2(Category, RouteApiV2):
             "id": id,
         }
         headers = {
-            "locale": locale,
+            "locale": str(locale),
         }
 
         return {
@@ -40,7 +40,7 @@ class OptionBaseV2(Category, RouteApiV2):
             "offer_id": offer_id,
         }
         headers = {
-            "locale": locale,
+            "locale": str(locale),
         }
 
         if isinstance(body, OptionList):
@@ -65,7 +65,7 @@ class OptionBaseV2(Category, RouteApiV2):
             "offer_id": offer_id,
         }
         headers = {
-            "locale": locale,
+            "locale": str(locale),
         }
 
         return {
@@ -86,7 +86,7 @@ class OptionBaseV2(Category, RouteApiV2):
             "offer_id": offer_id,
         }
         headers = {
-            "locale": locale,
+            "locale": str(locale),
         }
         payloads = {
             "options_ids": options_ids,
@@ -113,7 +113,7 @@ class OptionBaseV2(Category, RouteApiV2):
             "option_id": option_id,
         }
         headers = {
-            "locale": locale,
+            "locale": str(locale),
         }
 
         if isinstance(body, OptionValueList):
@@ -142,7 +142,7 @@ class OptionBaseV2(Category, RouteApiV2):
             "option_id": option_id,
         }
         headers = {
-            "locale": locale,
+            "locale": str(locale),
         }
         payloads = {
             "option_variant_ids": option_variant_ids,

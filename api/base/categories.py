@@ -19,7 +19,7 @@ class CategoriesBaseV1(Category, RouteApiV1):
             "category_id": category_id,
         }
         headers = {
-            "lang": lang,
+            "locale": str(lang),
         }
 
         return {
@@ -44,7 +44,7 @@ class CategoriesBaseV2(Category, RouteApiV2):
             "limit": limit,
         }
         headers = {
-            "locale": locale,
+            "locale": str(locale),
         }
 
         return {
@@ -67,7 +67,7 @@ class CategoriesBaseV2(Category, RouteApiV2):
             "q": q,
         }
         headers = {
-            "locale": locale,
+            "locale": str(locale),
         }
 
         return {
