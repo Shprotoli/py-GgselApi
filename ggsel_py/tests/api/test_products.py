@@ -10,8 +10,8 @@ from ggsel_py.parameters.products import OrderCol, OrderDir
 def test_products_list_helper_handles_scalar_and_sequence(sync_client):
     api = Products(sync_client)
 
-    scalar_payload = api._products_list(15, page=2, count=3, lang="en-US", locale="ru-RU")
-    list_payload = api._products_list([1, "2"], page=4, count=5, lang="en-US", locale="ru-RU")
+    scalar_payload = api._all_products(15, page=2, count=3, lang="en-US", locale="ru-RU")
+    list_payload = api._all_products([1, "2"], page=4, count=5, lang="en-US", locale="ru-RU")
 
     assert scalar_payload == {
         "method": EnumCrudMethod.GET,
@@ -85,9 +85,9 @@ def test_products_sync(sync_client, response_factory):
     ]
 
     api = Products(sync_client)
-    product_list = api.products_list([1, 2], page=1, count=10, lang="en-US", locale="ru-RU")
+    product_list = api.all_products([1, 2], page=1, count=10, lang="en-US", locale="ru-RU")
     product_info = api.product_info("product-1")
-    seller_goods = api.products_seller(
+    seller_goods = api.all_products_for_seller(
         99,
         order_col=OrderCol.ORDER_COL,
         order_dir=OrderDir.ASC,
@@ -188,10 +188,10 @@ def test_products_async(async_client, response_factory):
     )
 
     api = AsyncProducts(async_client)
-    product_list = asyncio.run(api.products_list([1, 2], page=1, count=10, lang="en-US", locale="ru-RU"))
+    product_list = asyncio.run(api.all_products([1, 2], page=1, count=10, lang="en-US", locale="ru-RU"))
     product_info = asyncio.run(api.product_info("product-1"))
     seller_goods = asyncio.run(
-        api.products_seller(
+        api.all_products_for_seller(
             99,
             order_col=OrderCol.ORDER_COL,
             order_dir=OrderDir.ASC,

@@ -8,7 +8,7 @@ from ggsel_py.parameters.products import OrderDir, OrderCol, StatusProduct, Prod
 
 
 class ProductsBaseV1(Category, RouteApiV1):
-    def _products_list(
+    def _all_products(
             self,
             ids: list[int | str],
             page: int = 1,
@@ -42,7 +42,7 @@ class ProductsBaseV1(Category, RouteApiV1):
             "route": f"products/{product_id}/data",
         }
 
-    def _products_seller(
+    def _all_products_for_seller(
             self,
             id_seller: int,
             order_col: str | OrderCol = OrderCol.ORDER_COL,

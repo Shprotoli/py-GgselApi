@@ -33,9 +33,9 @@ class Products(ProductsBaseV1):
         return data
     """
 
-    def products_list(
+    def all_products(
             self,
-            ids: list[int | str],
+            ids: list[int | str] | str | int,
             page: int = 1,
             count: int = 10,
             lang: str | Lang = Lang.RU,
@@ -43,7 +43,7 @@ class Products(ProductsBaseV1):
     ) -> ApiResult:
         """
         Source docs: https://seller.ggsel.com/docs/return-all-products
-        The method gets a list of products based on the specified parameters
+        The method gets a list of products by the specified ids in the `ids` argument
 
         :param ids: Comma separated product IDs
         :param page: Page
@@ -54,7 +54,7 @@ class Products(ProductsBaseV1):
         """
         return handler_api(
             self.client,
-            self._products_list,
+            self._all_products,
             OfferListObject,
             ids=ids,
             page=page,
@@ -78,9 +78,9 @@ class Products(ProductsBaseV1):
             product_id=product_id
         )
 
-    def products_seller(
+    def all_products_for_seller(
             self,
-            id_seller: int,
+            id_seller: int | None = None,
             order_col: str | OrderCol = OrderCol.ORDER_COL,
             order_dir: str | OrderDir = OrderDir.ASC,
             rows: int = 100,
@@ -113,7 +113,7 @@ class Products(ProductsBaseV1):
         """
         return handler_api(
             self.client,
-            self._products_seller,
+            self._all_products_for_seller,
             SellerGoodsListObject,
             id_seller=id_seller,
             order_col=order_col,
@@ -128,9 +128,9 @@ class Products(ProductsBaseV1):
 
 
 class AsyncProducts(ProductsBaseV1):
-    async def products_list(
+    async def all_products(
             self,
-            ids: list[int | str],
+            ids: list[int | str] | str | int,
             page: int = 1,
             count: int = 10,
             lang: str | Lang = Lang.RU,
@@ -141,7 +141,7 @@ class AsyncProducts(ProductsBaseV1):
         """
         return await async_handler_api(
             self.client,
-            self._products_list,
+            self._all_products,
             OfferListObject,
             ids=ids,
             page=page,
@@ -161,9 +161,9 @@ class AsyncProducts(ProductsBaseV1):
             product_id=product_id
         )
 
-    async def products_seller(
+    async def all_products_for_seller(
             self,
-            id_seller: int,
+            id_seller: int | None = None,
             order_col: str | OrderCol = OrderCol.ORDER_COL,
             order_dir: str | OrderDir = OrderDir.ASC,
             rows: int = 100,
@@ -178,7 +178,7 @@ class AsyncProducts(ProductsBaseV1):
         """
         return await async_handler_api(
             self.client,
-            self._products_seller,
+            self._all_products_for_seller,
             SellerGoodsListObject,
             id_seller=id_seller,
             order_col=order_col,
