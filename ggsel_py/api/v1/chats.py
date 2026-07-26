@@ -140,7 +140,7 @@ class AsyncChats(ChatsBaseV1):
             self.client,
             self._list_chats,
             ChatsObject,
-            filter_new=filter_new,
+            filter_new=int(filter_new),
             email=email,
             id_ds=id_ds,
             pagesize=pagesize,
