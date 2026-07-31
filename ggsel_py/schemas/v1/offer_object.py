@@ -139,24 +139,24 @@ class OfferProduct:
     show_rest: int
     num_in_stock: int
     num_in_lock: int
-    prices: OfferPrices
-    payment_methods: list[OfferPaymentMethod]
+    prices: OfferPrices | dict
+    payment_methods: list[OfferPaymentMethod | dict]
     prices_unit: OfferPricesUnit
     unique_code_verification: dict
-    preview_imgs: list[OfferPreviewImage]
-    preview_videos: list[OfferPreviewVideo]
+    preview_imgs: list[OfferPreviewImage | str]
+    preview_videos: list[OfferPreviewVideo | str]
     type: str
     text: str
     file: str
-    category_id: int
-    breadcrumbs: list[OfferBreadcrumb]
+    category_id: int | str
+    breadcrumbs: list[OfferBreadcrumb | dict]
     discounts: list[dict]
     units: list[dict]
     present: dict
     gift_commiss: str
-    options: list[OfferOption]
+    options: list[OfferOption | dict]
     options_check: int
-    statistics: OfferStatistics
+    statistics: OfferStatistics | dict
     seller: OfferSeller
     sale_info: OfferSaleInfo
 
@@ -164,4 +164,4 @@ class OfferProduct:
 @dataclass
 class OfferObject(GgselObject):
     retdesc: str
-    product: OfferProduct
+    product: OfferProduct | dict

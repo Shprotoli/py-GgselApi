@@ -14,6 +14,7 @@ class UnknownResponseObject(GgselGlobalObject):
     status_code: int
     url: str
     method: str
+    headers: dict
 
 
 @dataclass

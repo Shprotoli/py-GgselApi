@@ -50,8 +50,8 @@ class InfoOrderContent:
     amount: int
     currency_type: str
     invoice_state: int
-    purchase_date: datetime
-    date_pay: datetime
+    purchase_date: str | datetime
+    date_pay: str | datetime
     agent_id: int
     agent_percent: int
     agent_fee: int
@@ -62,8 +62,8 @@ class InfoOrderContent:
     bonus_code: str
     feedback: InfoOrderFeedback
     unique_code_state: InfoOrderUniqueCodeState
-    options: list[InfoOrderOption]
-    buyer_info: InfoOrderBuyerInfo
+    options: list[InfoOrderOption | dict]
+    buyer_info: InfoOrderBuyerInfo | dict
     owner: int
     day_lock: int
     lock_state: str
@@ -74,4 +74,4 @@ class InfoOrderContent:
 @dataclass
 class InfoOrderObject(GgselObject):
     retdesc: str
-    content: InfoOrderContent
+    content: InfoOrderContent | dict
