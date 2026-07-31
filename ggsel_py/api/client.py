@@ -1,9 +1,30 @@
 from abc import ABC
 from typing import Any
+from asyncio import Semaphore
 
+from aiolimiter import AsyncLimiter
 from httpx import Response as AsyncResponse, AsyncClient
 import requests
 from requests import Response
+
+LIMIT_ASYNC_REQUESTS = 10
+LIMIT_REQUESTS_PER_SECOND = 5
+
+
+class ApiLimiter:
+    _semaphore = Semaphore(LIMIT_ASYNC_REQUESTS)
+    _limiter = AsyncLimiter(LIMIT_REQUESTS_PER_SECOND, 1)
+
+    @classmethod
+    def configure(cls, limit_async_requests: int, limit_requests_per_second: int):
+        cls._semaphore = Semaphore(limit_async_requests)
+        cls._limiter = AsyncLimiter(limit_requests_per_second, 1)
+
+    @classmethod
+    async def run(cls, coro):
+        async with cls._semaphore:
+            async with cls._limiter:
+                return await coro
 
 
 class GClient(ABC):
@@ -76,9 +97,14 @@ class AsyncGClient(GClient):
             domain: str = "seller.ggsel.com",
             base_route: str = "api_sellers",
             timeout: float = 15.0,
+
+            limit_async_requests: int = 10,
+            limit_requests_per_second: int = 5,
             **kwargs,
     ):
         super().__init__(protocol, domain, base_route, **kwargs)
+
+        ApiLimiter.configure(limit_async_requests, limit_requests_per_second)
         self._httpx_client = AsyncClient(
             headers=self.headers,
             timeout=timeout,
@@ -86,13 +112,13 @@ class AsyncGClient(GClient):
 
     async def request(self, route: str, method: str, **kwargs: Any) -> AsyncResponse:
         self._httpx_client.base_url = self.base_url
-        return await self._httpx_client.request(
+        return await ApiLimiter.run(self._httpx_client.request(
             method,
             route,
             headers=self._build_headers(kwargs),
             params=self._build_params(kwargs),
             data=kwargs.get("data"),
-        )
+        ))
 
     async def get(self, route: str, **kwargs: Any) -> AsyncResponse:
         return await self.request(route, "GET", **kwargs)
