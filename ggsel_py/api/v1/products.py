@@ -63,7 +63,7 @@ class Products(ProductsBaseV1):
             locale=locale
         )
 
-    def product_info(self, product_id: str) -> ApiResult:
+    def product_info(self, product_id: str | int) -> ApiResult:
         """
         Source docs: https://seller.ggsel.com/docs/return-product-info
         This method receives information about the product, and you must be the creator of the product.
