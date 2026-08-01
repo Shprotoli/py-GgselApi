@@ -1,14 +1,16 @@
 from abc import ABC
 from typing import Any
-from asyncio import Semaphore
+from asyncio import Semaphore, sleep
 
 from aiolimiter import AsyncLimiter
 from httpx import Response as AsyncResponse, AsyncClient
 import requests
 from requests import Response
 
-LIMIT_ASYNC_REQUESTS = 10
-LIMIT_REQUESTS_PER_SECOND = 5
+LIMIT_ASYNC_REQUESTS = 15
+LIMIT_REQUESTS_PER_SECOND = 50
+
+STATUS_CODE_ERROR = (503, 429)
 
 
 class ApiLimiter:
@@ -16,15 +18,29 @@ class ApiLimiter:
     _limiter = AsyncLimiter(LIMIT_REQUESTS_PER_SECOND, 1)
 
     @classmethod
-    def configure(cls, limit_async_requests: int, limit_requests_per_second: int):
+    def configure(
+            cls,
+            limit_async_requests: int = LIMIT_ASYNC_REQUESTS,
+            limit_requests_per_second: int = LIMIT_ASYNC_REQUESTS
+    ):
         cls._semaphore = Semaphore(limit_async_requests)
         cls._limiter = AsyncLimiter(limit_requests_per_second, 1)
 
     @classmethod
-    async def run(cls, coro):
-        async with cls._semaphore:
-            async with cls._limiter:
-                return await coro
+    async def run(cls, coro_factory, retries=3):
+        result = None
+
+        for attempt in range(retries):
+            async with cls._semaphore:
+                async with cls._limiter:
+                    result = await coro_factory()
+
+                    if result.status_code not in STATUS_CODE_ERROR:
+                        return result
+
+                    await sleep(attempt)
+
+        return result
 
 
 class GClient(ABC):
@@ -112,13 +128,16 @@ class AsyncGClient(GClient):
 
     async def request(self, route: str, method: str, **kwargs: Any) -> AsyncResponse:
         self._httpx_client.base_url = self.base_url
-        return await ApiLimiter.run(self._httpx_client.request(
-            method,
-            route,
-            headers=self._build_headers(kwargs),
-            params=self._build_params(kwargs),
-            data=kwargs.get("data"),
-        ))
+
+        return await ApiLimiter.run(
+            lambda: self._httpx_client.request(
+                method,
+                route,
+                headers=self._build_headers(kwargs),
+                params=self._build_params(kwargs),
+                data=kwargs.get("data"),
+            )
+        )
 
     async def get(self, route: str, **kwargs: Any) -> AsyncResponse:
         return await self.request(route, "GET", **kwargs)
