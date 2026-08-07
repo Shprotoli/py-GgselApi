@@ -87,7 +87,6 @@ class SyncGClient(GClient):
         super().__init__(protocol, domain, base_route, **kwargs)
 
     def request(self, route: str, method: str, **kwargs: Any) -> Response:
-        print(self.base_url, route, self._build_headers(kwargs))
         return requests.request(
             method,
             f"{self.base_url}/{route}",

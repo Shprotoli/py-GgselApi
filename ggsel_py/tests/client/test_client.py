@@ -13,7 +13,7 @@ def test_sync_client_request_merges_headers_and_params():
 
     with patch("ggsel_py.api.client.requests.request", return_value=response) as request_mock:
         result = client.get(
-            "api/categories",
+            "categories",
             headers={"lang": "en-US"},
             params={"page": 2},
             data={"hello": "world"},
