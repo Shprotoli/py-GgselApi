@@ -8,7 +8,7 @@ import requests
 from requests import Response
 
 LIMIT_ASYNC_REQUESTS = 15
-LIMIT_REQUESTS_PER_SECOND = 50
+LIMIT_REQUESTS_PER_SECOND = 15
 
 STATUS_CODE_ERROR = (503, 429)
 
@@ -81,12 +81,13 @@ class SyncGClient(GClient):
             self,
             protocol: str = "https",
             domain: str = "seller.ggsel.com",
-            base_route: str = "api_sellers",
+            base_route: str = "api_sellers/api",
             **kwargs,
     ):
         super().__init__(protocol, domain, base_route, **kwargs)
 
     def request(self, route: str, method: str, **kwargs: Any) -> Response:
+        print(self.base_url, route, self._build_headers(kwargs))
         return requests.request(
             method,
             f"{self.base_url}/{route}",
@@ -111,7 +112,7 @@ class AsyncGClient(GClient):
             self,
             protocol: str = "https",
             domain: str = "seller.ggsel.com",
-            base_route: str = "api_sellers",
+            base_route: str = "api_sellers/api",
             timeout: float = 15.0,
 
             limit_async_requests: int = 10,
