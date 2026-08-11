@@ -9,7 +9,7 @@ from ggsel_py.api.base.orders import OrdersBaseV1
 class Orders(OrdersBaseV1):
     def last_sales(
             self,
-            seller_id: int,
+            seller_id: int | None = None,
             group: bool = True,
             top: int = 10,
             locale: str | Lang = Lang.RU,
@@ -72,7 +72,7 @@ class Orders(OrdersBaseV1):
 class AsyncOrders(OrdersBaseV1):
     async def last_sales(
             self,
-            seller_id: int,
+            seller_id: int | None = None,
             group: bool = True,
             top: int = 10,
             locale: str | Lang = Lang.RU,
