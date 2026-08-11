@@ -21,7 +21,7 @@ class ApiLimiter:
     def configure(
             cls,
             limit_async_requests: int = LIMIT_ASYNC_REQUESTS,
-            limit_requests_per_second: int = LIMIT_ASYNC_REQUESTS
+            limit_requests_per_second: int = LIMIT_REQUESTS_PER_SECOND
     ):
         cls._semaphore = Semaphore(limit_async_requests)
         cls._limiter = AsyncLimiter(limit_requests_per_second, 1)
