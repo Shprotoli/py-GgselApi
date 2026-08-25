@@ -6,10 +6,10 @@ from ggsel_py.schemas.ggsel_object import GgselObject
 @dataclass
 class UniqueCodeState:
     state: int
-    date_check: str
-    date_delivery: str
-    date_confirmed: str
-    date_refuted: str
+    date_check: str | None
+    date_delivery: str | None
+    date_confirmed: str | None
+    date_refuted: str | None
 
 
 @dataclass
