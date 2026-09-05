@@ -22,4 +22,4 @@ class GgselChatObject(GgselGlobalObject):
     pass
 
 
-GgselObjectApi = GgselObject | GgselObjectApiV2
+GgselObjectApi = type[GgselObject | GgselObjectApiV2]
