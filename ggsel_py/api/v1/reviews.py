@@ -1,4 +1,4 @@
-from ggsel_py.tools.handlers import handler_api, async_handler_api, ApiResult
+from ggsel_py.tools.handlers import request_and_parse, async_request_and_parse, ApiResult
 from ggsel_py.parameters.reviews import TypeReview
 from ggsel_py.parameters.globals import Lang
 from ggsel_py.schemas.v1.reviews_object import ReviewsObject
@@ -25,7 +25,7 @@ class Reviews(ReviewsBaseV1):
         :param locale: API Response Language
         :return:
         """
-        return handler_api(
+        return request_and_parse(
             self.client,
             self._user_reviews,
             ReviewsObject,
@@ -49,7 +49,7 @@ class AsyncReviews(ReviewsBaseV1):
         """
         See Reviews.user_reviews
         """
-        return await async_handler_api(
+        return await async_request_and_parse(
             self.client,
             self._user_reviews,
             ReviewsObject,

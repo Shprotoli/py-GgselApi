@@ -1,5 +1,5 @@
 # A class file that handles requests from the `Categories` category of the GGSell API
-from ggsel_py.tools.handlers import handler_api, async_handler_api, ApiResult
+from ggsel_py.tools.handlers import request_and_parse, async_request_and_parse, ApiResult
 from ggsel_py.parameters.globals import Lang
 from ggsel_py.schemas.v1.categories_object import CategoriesObject
 from ggsel_py.api.base.categories import CategoriesBaseV1
@@ -24,7 +24,7 @@ class Categories(CategoriesBaseV1):
         :param lang: The language in which the categories will be returned
         :return: dataclass CategoriesObject containing a json response from the API
         """
-        return handler_api(
+        return request_and_parse(
             self.client,
             self._all_categories,
             CategoriesObject,
@@ -46,7 +46,7 @@ class AsyncCategories(CategoriesBaseV1):
         """
         See Categories.all_categories
         """
-        return await async_handler_api(
+        return await async_request_and_parse(
             self.client,
             self._all_categories,
             CategoriesObject,

@@ -1,5 +1,5 @@
 # A class file that handles requests from the `Products` category of the GGSell API
-from ggsel_py.tools.handlers import handler_api, async_handler_api, ApiResult
+from ggsel_py.tools.handlers import request_and_parse, async_request_and_parse, ApiResult
 from ggsel_py.parameters.products import OrderDir, OrderCol
 from ggsel_py.parameters.globals import Lang, Currency
 from ggsel_py.schemas.v1.offer_list_object import OfferListObject
@@ -52,7 +52,7 @@ class Products(ProductsBaseV1):
         :param locale: Localization of goods
         :return: dataclass OfferListObject containing a json response from the API
         """
-        return handler_api(
+        return request_and_parse(
             self.client,
             self._all_products,
             OfferListObject,
@@ -71,7 +71,7 @@ class Products(ProductsBaseV1):
         :param product_id: Your product ID
         :return: dataclass OfferObject containing a json response from the API
         """
-        return handler_api(
+        return request_and_parse(
             self.client,
             self._product_info,
             OfferObject,
@@ -111,7 +111,7 @@ class Products(ProductsBaseV1):
         :param owner_id: [OBSOLETE] Owner ID (may differ from the seller)
         :return:
         """
-        return handler_api(
+        return request_and_parse(
             self.client,
             self._all_products_for_seller,
             SellerGoodsListObject,
@@ -139,7 +139,7 @@ class AsyncProducts(ProductsBaseV1):
         """
         See Products.products_list
         """
-        return await async_handler_api(
+        return await async_request_and_parse(
             self.client,
             self._all_products,
             OfferListObject,
@@ -154,7 +154,7 @@ class AsyncProducts(ProductsBaseV1):
         """
         See Products.product_info
         """
-        return await async_handler_api(
+        return await async_request_and_parse(
             self.client,
             self._product_info,
             OfferObject,
@@ -176,7 +176,7 @@ class AsyncProducts(ProductsBaseV1):
         """
         See Products.products_seller
         """
-        return await async_handler_api(
+        return await async_request_and_parse(
             self.client,
             self._all_products_for_seller,
             SellerGoodsListObject,

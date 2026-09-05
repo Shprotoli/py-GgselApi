@@ -26,21 +26,21 @@ ErrorApiResult: TypeAlias = ErrorResponseObject | ErrorWithEntityObject | Undete
 
 
 @overload
-def handler_response_api(
+def parse_api_payload(
         type_wrapper: None,
         data: ResponseLike,
 ) -> ResponseLike: ...
 
 
 @overload
-def handler_response_api(
+def parse_api_payload(
         type_wrapper: CallableABC[..., T],
         data: list[Any],
 ) -> T: ...
 
 
 @overload
-def handler_response_api(
+def parse_api_payload(
         type_wrapper: CallableABC[..., T],
         data: dict[str, Any],
 ) -> T | ErrorResponseObject: ...
@@ -48,7 +48,7 @@ def handler_response_api(
 
 class ToolHandlerResponse:
     @classmethod
-    def return_type_wrapper_is_none(
+    def handle_untyped_payload(
             cls,
             data: dict[str, Any] | list[Any],
     ):
@@ -62,7 +62,7 @@ class ToolHandlerResponse:
                 return UndetectedObject(data=data)
 
     @classmethod
-    def return_error(
+    def parse_error_response(
             cls,
             type_wrapper: CallableABC[..., T] | None,
             data: dict[str, Any] | list[Any],
@@ -81,7 +81,7 @@ class ToolHandlerResponse:
             return UndetectedObject(data=data)
 
     @classmethod
-    def return_by_data(
+    def build_response_object(
             cls,
             type_wrapper: CallableABC[..., T] | None,
             data: dict[str, Any] | list[Any],
@@ -95,7 +95,7 @@ class ToolHandlerResponse:
                 return UndetectedObject(data=data)
 
 
-def handler_response_api(
+def parse_api_payload(
         type_wrapper: CallableABC[..., T] | None,
         data: dict[str, Any],
 ) -> Any:
@@ -114,15 +114,15 @@ def handler_response_api(
         return data
 
     if type_wrapper is None:
-        return ToolHandlerResponse.return_type_wrapper_is_none(data)
+        return ToolHandlerResponse.handle_untyped_payload(data)
 
     try:
-        return ToolHandlerResponse.return_by_data(type_wrapper, data)
+        return ToolHandlerResponse.build_response_object(type_wrapper, data)
     except TypeError:
-        return ToolHandlerResponse.return_error(type_wrapper, data)
+        return ToolHandlerResponse.parse_error_response(type_wrapper, data)
 
 
-def handler_response(response: Response | ResponseLike) -> ResponseApiResult | dict[str, Any] | list[Any]:
+def parse_http_response(response: Response | ResponseLike) -> ResponseApiResult | dict[str, Any] | list[Any]:
     try:
         data = response.json()
     except JSONDecodeError:
@@ -158,7 +158,7 @@ def handler_response(response: Response | ResponseLike) -> ResponseApiResult | d
     return data
 
 
-def handler_api(
+def request_and_parse(
         client: GClient,
         func_api: Callable[..., dict],
         schedule_object: GgselObjectApi,
@@ -166,10 +166,10 @@ def handler_api(
 ) -> ApiResult:
     """
     This function makes a request to the API using the passed client
-    and passes the response to the API response handler - "handler_response_api", after which it returns the result
+    and passes the response to the API response handler - "parse_api_payload", after which it returns the result
 
     Example Code:
-    async_handler_api(self.client, self._search_categories, ListOfCategories, page=page, limit=limit, q=q, locale=locale)
+    request_and_parse(self.client, self._search_categories, ListOfCategories, page=page, limit=limit, q=q, locale=locale)
 
     :param client: The client for making requests
     :param func_api: A class method that inherits from `Category`
@@ -178,12 +178,12 @@ def handler_api(
     :return:
     """
     response = client.request(**func_api(**params))
-    data = handler_response(response)
+    data = parse_http_response(response)
 
-    return handler_response_api(type_wrapper=schedule_object, data=data)
+    return parse_api_payload(type_wrapper=schedule_object, data=data)
 
 
-async def async_handler_api(
+async def async_request_and_parse(
         client: GClient,
         func_api: Callable[..., dict],
         schedule_object: GgselObjectApi,
@@ -191,10 +191,10 @@ async def async_handler_api(
 ) -> ApiResult:
     """
     This function makes a async request to the API using the passed client
-    and passes the response to the API response handler - "handler_response_api", after which it returns the result
+    and passes the response to the API response handler - "parse_api_payload", after which it returns the result
 
     Example Code:
-    async_handler_api(self.client, self._search_categories, ListOfCategories, page=page, limit=limit, q=q, locale=locale)
+    async_request_and_parse(self.client, self._search_categories, ListOfCategories, page=page, limit=limit, q=q, locale=locale)
 
     :param client: The client for making requests
     :param func_api: A class method that inherits from `Category`
@@ -203,6 +203,6 @@ async def async_handler_api(
     :return:
     """
     response = await client.request(**func_api(**params))
-    data = handler_response(response)
+    data = parse_http_response(response)
 
-    return handler_response_api(type_wrapper=schedule_object, data=data)
+    return parse_api_payload(type_wrapper=schedule_object, data=data)

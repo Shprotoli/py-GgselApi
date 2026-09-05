@@ -1,7 +1,7 @@
 # A class file that handles requests from the `Account` category of the GGSell API
 from datetime import datetime
 
-from ggsel_py.tools.handlers import handler_api, async_handler_api, ApiResult
+from ggsel_py.tools.handlers import request_and_parse, async_request_and_parse, ApiResult
 from ggsel_py.parameters.account import Type, CodeFilter
 from ggsel_py.schemas.v1.balance_object import BalanceObject
 from ggsel_py.schemas.v1.receipts_object import ReceiptsObject
@@ -16,7 +16,7 @@ class Account(AccountBaseV1):
 
         :return: dataclass BalanceObject containing a json response from the API
         """
-        return handler_api(
+        return request_and_parse(
             self.client,
             self._seller_balance_info,
             BalanceObject
@@ -49,7 +49,7 @@ class Account(AccountBaseV1):
         :param finish: {Format date/time: ISO 8601} Operations no later than the specified set date
         :return: dataclass ReceiptsObject containing a json response from the API
         """
-        return handler_api(
+        return request_and_parse(
             self.client,
             self._seller_receipts,
             ReceiptsObject,
@@ -69,7 +69,7 @@ class AsyncAccount(AccountBaseV1):
         """
         See Account.seller_balance_info
         """
-        return await async_handler_api(
+        return await async_request_and_parse(
             self.client,
             self._seller_balance_info,
             BalanceObject
@@ -89,7 +89,7 @@ class AsyncAccount(AccountBaseV1):
         """
         See Account.seller_receipts
         """
-        return await async_handler_api(
+        return await async_request_and_parse(
             self.client,
             self._seller_receipts,
             ReceiptsObject,

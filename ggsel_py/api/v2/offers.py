@@ -6,7 +6,7 @@ from ggsel_py.parameters.offers import StatusOffer, SortOffer, DeliveryStatus
 from ggsel_py.schemas.v2.list_of import ListOfOffers
 from ggsel_py.schemas.v2.offer_object import OfferObject, OfferEntity
 from ggsel_py.schemas.general_objects import SuccessObject
-from ggsel_py.tools.handlers import async_handler_api, handler_api, ApiResult
+from ggsel_py.tools.handlers import async_request_and_parse, request_and_parse, ApiResult
 
 
 class Offers(OffersBaseV2):
@@ -35,7 +35,7 @@ class Offers(OffersBaseV2):
         :param status: Product status (active, poused, draft)
         :param locale: Localization response information
         """
-        return handler_api(
+        return request_and_parse(
             self.client,
             self._list_offers,
             ListOfOffers,
@@ -61,7 +61,7 @@ class Offers(OffersBaseV2):
         :param id: Product ID
         :param locale: Localization response information
         """
-        return handler_api(
+        return request_and_parse(
             self.client,
             self._get_offer,
             OfferObject,
@@ -84,7 +84,7 @@ class Offers(OffersBaseV2):
                      Example of a car sale change: body={ "is_autoselling": True }
         :param locale: Localization response information
         """
-        return handler_api(
+        return request_and_parse(
             self.client,
             self._patch_offer,
             OfferObject,
@@ -105,7 +105,7 @@ class Offers(OffersBaseV2):
         :param body: A dictionary with information for creating a product
         :param locale: Localization response information
         """
-        return handler_api(
+        return request_and_parse(
             self.client,
             self._create_offer,
             OfferObject,
@@ -125,7 +125,7 @@ class Offers(OffersBaseV2):
         :param offer_ids: Product IDs for the action
         :param locale: Localization response information
         """
-        return handler_api(
+        return request_and_parse(
             self.client,
             self._batch_activate_offers,
             SuccessObject,
@@ -145,7 +145,7 @@ class Offers(OffersBaseV2):
         :param offer_ids: Product IDs for the action
         :param locale: Localization response information
         """
-        return handler_api(
+        return request_and_parse(
             self.client,
             self._batch_pause_offers,
             SuccessObject,
@@ -165,7 +165,7 @@ class Offers(OffersBaseV2):
         :param offer_ids: Product IDs for the action
         :param locale: Localization response information
         """
-        return handler_api(
+        return request_and_parse(
             self.client,
             self._batch_delete_offers,
             SuccessObject,
@@ -189,7 +189,7 @@ class AsyncOffers(OffersBaseV2):
         """
         See Offers.list_offers
         """
-        return await async_handler_api(
+        return await async_request_and_parse(
             self.client,
             self._list_offers,
             ListOfOffers,
@@ -211,7 +211,7 @@ class AsyncOffers(OffersBaseV2):
         """
         See Offers.get_offer
         """
-        return await async_handler_api(
+        return await async_request_and_parse(
             self.client,
             self._get_offer,
             OfferObject,
@@ -228,7 +228,7 @@ class AsyncOffers(OffersBaseV2):
         """
         See Offers.patch_offer
         """
-        return await async_handler_api(
+        return await async_request_and_parse(
             self.client,
             self._patch_offer,
             OfferObject,
@@ -245,7 +245,7 @@ class AsyncOffers(OffersBaseV2):
         """
         See Offers.create_offer
         """
-        return await async_handler_api(
+        return await async_request_and_parse(
             self.client,
             self._create_offer,
             OfferObject,
@@ -261,7 +261,7 @@ class AsyncOffers(OffersBaseV2):
         """
         See Offers.batch_activate_offers
         """
-        return await async_handler_api(
+        return await async_request_and_parse(
             self.client,
             self._batch_activate_offers,
             SuccessObject,
@@ -277,7 +277,7 @@ class AsyncOffers(OffersBaseV2):
         """
         See Offers.batch_pause_offers
         """
-        return await async_handler_api(
+        return await async_request_and_parse(
             self.client,
             self._batch_pause_offers,
             SuccessObject,
@@ -293,7 +293,7 @@ class AsyncOffers(OffersBaseV2):
         """
         See Offers.batch_delete_offers
         """
-        return await async_handler_api(
+        return await async_request_and_parse(
             self.client,
             self._batch_delete_offers,
             SuccessObject,

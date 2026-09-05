@@ -1,5 +1,5 @@
 from ggsel_py.api.base.options import OptionBaseV2
-from ggsel_py.tools.handlers import handler_api, async_handler_api, ApiResult
+from ggsel_py.tools.handlers import request_and_parse, async_request_and_parse, ApiResult
 from ggsel_py.schemas.v2.option_object import OptionObject, VariantObject
 from ggsel_py.schemas.general_objects import SuccessObject
 from ggsel_py.schemas.v2.list_of import ListOfOption
@@ -26,7 +26,7 @@ class Option(OptionBaseV2):
         :param id: ID of the parameter (not the option!) of the product
         :param locale: Response language
         """
-        return handler_api(
+        return request_and_parse(
             self.client,
             self._view_option,
             OptionObject,
@@ -51,7 +51,7 @@ class Option(OptionBaseV2):
                      You can also set the option type using the enum - `OptionVariant`
         :param locale: Response language
         """
-        return handler_api(
+        return request_and_parse(
             self.client,
             self._create_many,
             OptionObject,
@@ -73,7 +73,7 @@ class Option(OptionBaseV2):
         :param offer_id: Product ID
         :param locale: Response language
         """
-        return handler_api(
+        return request_and_parse(
             self.client,
             self._list_active_offer_options,
             ListOfOption,
@@ -97,7 +97,7 @@ class Option(OptionBaseV2):
         :param locale: Response language
         :param delete_all: Delete all options
         """
-        return handler_api(
+        return request_and_parse(
             self.client,
             self._archive_options,
             SuccessObject,
@@ -125,7 +125,7 @@ class Option(OptionBaseV2):
                      You can also set the option settings using the enum - `ImpactType` and `DiscountType`
         :param locale: Response language
         """
-        return handler_api(
+        return request_and_parse(
             self.client,
             self._create_or_update_variants,
             VariantObject,
@@ -155,7 +155,7 @@ class Option(OptionBaseV2):
         :param delete_all: `True` or `False` to remove all variants from option.
                            Only works if option_variant_ids is set to `None`
         """
-        return handler_api(
+        return request_and_parse(
             self.client,
             self._archive_option_variants_asynchronously,
             SuccessObject,
@@ -177,7 +177,7 @@ class AsyncOption(OptionBaseV2):
         """
         See Option.view_option
         """
-        return await async_handler_api(
+        return await async_request_and_parse(
             self.client,
             self._view_option,
             OptionObject,
@@ -195,7 +195,7 @@ class AsyncOption(OptionBaseV2):
         """
         See Option.create_many
         """
-        return await async_handler_api(
+        return await async_request_and_parse(
             self.client,
             self._create_many,
             OptionObject,
@@ -212,7 +212,7 @@ class AsyncOption(OptionBaseV2):
         """
         See Option.list_active_offer_options
         """
-        return await async_handler_api(
+        return await async_request_and_parse(
             self.client,
             self._list_active_offer_options,
             OptionObject,
@@ -230,7 +230,7 @@ class AsyncOption(OptionBaseV2):
         """
         See Option.archive_options
         """
-        return await async_handler_api(
+        return await async_request_and_parse(
             self.client,
             self._archive_options,
             SuccessObject,
@@ -250,7 +250,7 @@ class AsyncOption(OptionBaseV2):
         """
         See Option.create_or_update_variants
         """
-        return await async_handler_api(
+        return await async_request_and_parse(
             self.client,
             self._create_or_update_variants,
             VariantObject,
@@ -271,7 +271,7 @@ class AsyncOption(OptionBaseV2):
         """
         See Option.archive_option_variants_asynchronously
         """
-        return await async_handler_api(
+        return await async_request_and_parse(
             self.client,
             self._archive_option_variants_asynchronously,
             SuccessObject,

@@ -1,5 +1,5 @@
 from ggsel_py.parameters.globals import Locale
-from ggsel_py.tools.handlers import async_handler_api, handler_api, ApiResult
+from ggsel_py.tools.handlers import async_request_and_parse, request_and_parse, ApiResult
 from ggsel_py.api.base.products import ProductsBaseV2
 from ggsel_py.parameters.products import StatusProduct, OrderDir, ProductParametr, ProductListType
 from ggsel_py.schemas.v2.list_of import ListOfProducts
@@ -25,7 +25,7 @@ class Products(ProductsBaseV2):
         :param sort_direction: Direction sort
         :param locale: Localization response
         """
-        return handler_api(
+        return request_and_parse(
             self.client,
             self._list_products,
             ListOfProducts,
@@ -50,7 +50,7 @@ class Products(ProductsBaseV2):
         :param body: The content of the product you want to add
         :param locale: Localization response
         """
-        return handler_api(
+        return request_and_parse(
             self.client,
             self._create_products,
             None,
@@ -76,7 +76,7 @@ class Products(ProductsBaseV2):
         :param delete_all: Should I delete all the products - True or False.
                            If you want to delete all products, you should not pass anything (or pass `None`) in the `product_ids` field
         """
-        return handler_api(
+        return request_and_parse(
             self.client,
             self._archive_products,
             SuccessObject,
@@ -106,7 +106,7 @@ class Products(ProductsBaseV2):
         :param sort_direction: Direction sort
         :param locale: Localization response
         """
-        return handler_api(
+        return request_and_parse(
             self.client,
             self._list_splitted_products,
             ListOfProducts,
@@ -134,7 +134,7 @@ class Products(ProductsBaseV2):
         :param body: The content of the product you want to add
         :param locale: Localization response
         """
-        return handler_api(
+        return request_and_parse(
             self.client,
             self._create_splitted_products,
             None,
@@ -164,7 +164,7 @@ class Products(ProductsBaseV2):
         :param delete_all: Should I delete all the products - True or False.
                            If you want to delete all products, you should not pass anything (or pass `None`) in the `product_ids` field
         """
-        return handler_api(
+        return request_and_parse(
             self.client,
             self._archive_splitted_products,
             SuccessObject,
@@ -188,7 +188,7 @@ class AsyncProducts(ProductsBaseV2):
         """
         See Products.list_products
         """
-        return await async_handler_api(
+        return await async_request_and_parse(
             self.client,
             self._list_products,
             ListOfProducts,
@@ -208,7 +208,7 @@ class AsyncProducts(ProductsBaseV2):
         """
         See Products.create_products
         """
-        return await async_handler_api(
+        return await async_request_and_parse(
             self.client,
             self._create_products,
             None,
@@ -227,7 +227,7 @@ class AsyncProducts(ProductsBaseV2):
         """
         See Products.archive_products
         """
-        return await async_handler_api(
+        return await async_request_and_parse(
             self.client,
             self._archive_products,
             SuccessObject,
@@ -249,7 +249,7 @@ class AsyncProducts(ProductsBaseV2):
         """
         See Products.list_splitted_products
         """
-        return await async_handler_api(
+        return await async_request_and_parse(
             self.client,
             self._list_splitted_products,
             ListOfProducts,
@@ -271,7 +271,7 @@ class AsyncProducts(ProductsBaseV2):
         """
         See Products.create_splitted_products
         """
-        return await async_handler_api(
+        return await async_request_and_parse(
             self.client,
             self._create_splitted_products,
             None,
@@ -292,7 +292,7 @@ class AsyncProducts(ProductsBaseV2):
         """
         See Products.archive_splitted_products
         """
-        return await async_handler_api(
+        return await async_request_and_parse(
             self.client,
             self._archive_splitted_products,
             SuccessObject,

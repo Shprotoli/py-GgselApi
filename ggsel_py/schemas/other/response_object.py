@@ -14,26 +14,25 @@ class UnknownResponseObject(GgselGlobalObject):
     status_code: int
     url: str
     method: str
-    headers: dict
-
-
-@dataclass
-class JSONErrorResponseObject(UnknownResponseObject):
-    text: str
-    headers: dict
-
-
-@dataclass
-class ErrorsResponseObject(UnknownResponseObject):
-    # Status code is 4xx
-    text: str
     headers: dict[str, str]
 
 
 @dataclass
 class CompletedResponseObject(UnknownResponseObject):
     # Status code is 2xx
-    headers: dict[str, str]
+    pass
+
+
+@dataclass
+class ErrorsResponseObject(UnknownResponseObject):
+    # Status code is 4xx
+    text: str
+
+
+@dataclass
+class JSONErrorResponseObject(ErrorsResponseObject):
+    # Status code is 401
+    pass
 
 
 ResponseApiResult = UnknownResponseObject | JSONErrorResponseObject | CompletedResponseObject | ErrorsResponseObject

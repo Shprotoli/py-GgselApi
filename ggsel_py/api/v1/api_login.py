@@ -1,5 +1,5 @@
 # A class file that handles requests from the `ApiLogin` category of the GGSell API
-from ggsel_py.tools.handlers import handler_api, async_handler_api, ApiResult
+from ggsel_py.tools.handlers import request_and_parse, async_request_and_parse, ApiResult
 from ggsel_py.schemas.v1.token_object import TokenObject
 from ggsel_py.api.base.api_login import ApiLoginBaseV1
 
@@ -56,7 +56,7 @@ class ApiLogin(ApiLoginBaseV1):
                 ```
         :return: dataclass TokenObject containing a json response from the API
         """
-        return handler_api(
+        return request_and_parse(
             self.client,
             self._api_login,
             TokenObject,
@@ -71,7 +71,7 @@ class AsyncApiLogin(ApiLoginBaseV1):
         """
         See ApiLoginBase.api_login
         """
-        return await async_handler_api(
+        return await async_request_and_parse(
             self.client,
             self._api_login,
             TokenObject,

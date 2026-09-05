@@ -1,5 +1,5 @@
 # A class file that handles requests from the `Chats` category of the GGSell API
-from ggsel_py.tools.handlers import handler_api, async_handler_api, ApiResult
+from ggsel_py.tools.handlers import request_and_parse, async_request_and_parse, ApiResult
 from ggsel_py.schemas.v1.messages_object import MessagesObject
 from ggsel_py.schemas.v1.chats_object import ChatsObject
 from ggsel_py.api.base.chats import ChatsBaseV1
@@ -17,7 +17,7 @@ class Chats(ChatsBaseV1):
                     1) 200 - The message has been sent
                     2) 400/422 - Invalid argument (see .text or .json)
         """
-        return handler_api(
+        return request_and_parse(
             self.client,
             self._create_message_without_file,
             None,
@@ -46,7 +46,7 @@ class Chats(ChatsBaseV1):
         :param count: {count <= 100} Number of messages
         :return: dataclass MessagesObject containing a json response from the API
         """
-        return handler_api(
+        return request_and_parse(
             self.client,
             self._list_messages,
             MessagesObject,
@@ -78,7 +78,7 @@ class Chats(ChatsBaseV1):
         :param page: Chats page
         :return:
         """
-        return handler_api(
+        return request_and_parse(
             self.client,
             self._list_chats,
             ChatsObject,
@@ -95,7 +95,7 @@ class AsyncChats(ChatsBaseV1):
         """
         See Chats.create_message_without_file
         """
-        return await async_handler_api(
+        return await async_request_and_parse(
             self.client,
             self._create_message_without_file,
             None,
@@ -114,7 +114,7 @@ class AsyncChats(ChatsBaseV1):
         """
         See Chats.list_messages
         """
-        return await async_handler_api(
+        return await async_request_and_parse(
             self.client,
             self._list_messages,
             MessagesObject,
@@ -136,7 +136,7 @@ class AsyncChats(ChatsBaseV1):
         """
         See Chats.list_chats
         """
-        return await async_handler_api(
+        return await async_request_and_parse(
             self.client,
             self._list_chats,
             ChatsObject,

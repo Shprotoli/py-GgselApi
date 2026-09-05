@@ -2,8 +2,7 @@ from requests import Response
 
 from ggsel_py.schemas.v1.balance_object import BalanceObject
 from ggsel_py.schemas.v1.error_response_object import ErrorResponseObject
-from ggsel_py.schemas.general_objects import UndetectedObject
-from ggsel_py.tools.handlers import handler_response_api
+from ggsel_py.tools.handlers import parse_api_payload
 
 
 class ListWrapper:
@@ -12,7 +11,7 @@ class ListWrapper:
 
 
 def test_handler_response_api_wraps_dict():
-    result = handler_response_api(
+    result = parse_api_payload(
         BalanceObject,
         {
             "retval": 0,
@@ -31,7 +30,7 @@ def test_handler_response_api_wraps_dict():
 
 
 def test_handler_response_api_wraps_list():
-    result = handler_response_api(ListWrapper, [1, 2, 3])
+    result = parse_api_payload(ListWrapper, [1, 2, 3])
 
     assert isinstance(result, ListWrapper)
     assert result.items == [1, 2, 3]
@@ -40,13 +39,13 @@ def test_handler_response_api_wraps_list():
 def test_handler_response_api_returns_response_unchanged():
     response = Response()
 
-    result = handler_response_api(None, response)
+    result = parse_api_payload(None, response)
 
     assert result == response
 
 
 def test_handler_response_api_returns_error_object_on_type_error():
-    result = handler_response_api(
+    result = parse_api_payload(
         BalanceObject,
         {
             "retval": 1,

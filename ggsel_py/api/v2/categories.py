@@ -1,5 +1,5 @@
 from ggsel_py.parameters.globals import Locale
-from ggsel_py.tools.handlers import async_handler_api, handler_api, ApiResult
+from ggsel_py.tools.handlers import async_request_and_parse, request_and_parse, ApiResult
 from ggsel_py.api.base.categories import CategoriesBaseV2
 from ggsel_py.schemas.v2.list_of import ListOfCategories
 
@@ -22,7 +22,7 @@ class Categories(CategoriesBaseV2):
         :param limit: Count category
         :param locale: Localization response information
         """
-        return handler_api(
+        return request_and_parse(
             self.client,
             self._list_of_categories,
             ListOfCategories,
@@ -48,7 +48,7 @@ class Categories(CategoriesBaseV2):
         :param limit: Count category
         :param locale: Localization response information
         """
-        return handler_api(
+        return request_and_parse(
             self.client,
             self._search_categories,
             ListOfCategories,
@@ -70,7 +70,7 @@ class AsyncCategories(CategoriesBaseV2):
         """
         See Categories.list_of_categories
         """
-        return await async_handler_api(
+        return await async_request_and_parse(
             self.client,
             self._list_of_categories,
             ListOfCategories,
@@ -90,7 +90,7 @@ class AsyncCategories(CategoriesBaseV2):
         """
         See Categories.search_categories
         """
-        return await async_handler_api(
+        return await async_request_and_parse(
             self.client,
             self._search_categories,
             ListOfCategories,
