@@ -91,8 +91,8 @@ class ToolHandlerResponse:
                 return type_wrapper(data)
             case dict():
                 return type_wrapper(**data)
-            case _:
-                return UndetectedObject(data=data)
+            # case _:
+            #     return UndetectedObject(data=data)
 
 
 def parse_api_payload(
