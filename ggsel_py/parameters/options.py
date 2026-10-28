@@ -141,3 +141,15 @@ class VisibilityItem:
     """Visibility of one option or variant for `batch_update_*_visibility`"""
     id: int
     status: VisibilityStatus | str
+
+
+class VisibilityStatus(StrEnum):
+    ACTIVE = "active"
+    HIDDEN = "hidden"
+
+
+@dataclass
+class VisibilityItem:
+    """Visibility of one option or variant for `batch_update_*_visibility`"""
+    id: int
+    status: VisibilityStatus | str
