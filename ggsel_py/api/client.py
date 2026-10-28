@@ -35,10 +35,11 @@ class ApiLimiter:
                 async with cls._limiter:
                     result = await coro_factory()
 
-                    if result.status_code not in STATUS_CODE_ERROR:
-                        return result
+            if result.status_code not in STATUS_CODE_ERROR:
+                return result
 
-                    await sleep(attempt)
+            # The pause happens outside the semaphore so that it does not hold a slot of other requests
+            await sleep(attempt)
 
         return result
 
@@ -69,6 +70,9 @@ class GClient(ABC):
     def base_url(self) -> str:
         return f"{self.protocol}://{self.domain}/{self._base_route}"
 
+    def build_url(self, route: str) -> str:
+        return f"{self.base_url}/{route}"
+
     def _build_headers(self, kwargs: dict[str, Any]) -> dict[str, Any]:
         return {**self.headers, **kwargs.pop("headers", {})}
 
@@ -82,18 +86,20 @@ class SyncGClient(GClient):
             protocol: str = "https",
             domain: str = "seller.ggsel.com",
             base_route: str = "api_sellers/api",
+            timeout: float = 10,
             **kwargs,
     ):
         super().__init__(protocol, domain, base_route, **kwargs)
+        self.timeout = timeout
 
     def request(self, route: str, method: str, **kwargs: Any) -> Response:
         return requests.request(
             method,
-            f"{self.base_url}/{route}",
+            self.build_url(route),
             headers=self._build_headers(kwargs),
             params=self._build_params(kwargs),
             data=kwargs.get("data"),
-            timeout=10,
+            timeout=self.timeout,
         )
 
     def get(self, route: str, **kwargs: Any) -> Response:
@@ -121,21 +127,24 @@ class AsyncGClient(GClient):
         super().__init__(protocol, domain, base_route, **kwargs)
 
         ApiLimiter.configure(limit_async_requests, limit_requests_per_second)
-        self._httpx_client = AsyncClient(
-            headers=self.headers,
-            timeout=timeout,
-        )
+        # The connection pool may be shared by copies of this client (see `GgselApiMaster`),
+        # so the URL and headers are passed with each request instead of being stored in the pool
+        self._httpx_client = AsyncClient(timeout=timeout)
 
     async def request(self, route: str, method: str, **kwargs: Any) -> AsyncResponse:
-        self._httpx_client.base_url = self.base_url
+        # Everything is calculated once: `_build_*` consume `kwargs`, and retries must send the same request
+        url = self.build_url(route)
+        headers = self._build_headers(kwargs)
+        params = self._build_params(kwargs)
+        data = kwargs.get("data")
 
         return await ApiLimiter.run(
             lambda: self._httpx_client.request(
                 method,
-                route,
-                headers=self._build_headers(kwargs),
-                params=self._build_params(kwargs),
-                data=kwargs.get("data"),
+                url,
+                headers=headers,
+                params=params,
+                data=data,
             )
         )
 

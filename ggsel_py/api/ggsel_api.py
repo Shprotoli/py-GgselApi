@@ -32,7 +32,7 @@ from ggsel_py.api.v1.reviews import (
     Reviews as ReviewsV1,
     AsyncReviews as AsyncReviewsV1,
 )
-from ggsel_py.api.category import Category
+from ggsel_py.api.category import Category, RouteApiV1, RouteApiV2
 # API V2 Category
 from ggsel_py.api.v2.categories import (
     Categories as CategoriesV2,
@@ -273,20 +273,18 @@ class GgselApiMaster(GgselApi, CategoriesApiV2, CategoriesApiV1):
         client_legacy_ = copy(client)
         client_ = copy(client)
 
-        client_legacy_._base_route = "api_sellers/api"
-        client._base_route = "api_sellers/v2"
+        client_legacy_._base_route = RouteApiV1.ROUTE
+        client_._base_route = RouteApiV2.ROUTE
+        # The client passed in is used as the V2 client by the `client` setter
+        client._base_route = RouteApiV2.ROUTE
 
+        # V1 is authorized by the `token` parameter, V2 by the `Authorization` header
         client_legacy_.headers = client.headers.copy()
+        client_legacy_.headers.pop("Authorization", None)
         client_.headers = client.headers.copy()
 
-        client_legacy_.headers.pop("Authorization", None)
-
-        if hasattr(client_, "client"):
-            client_.client = type(client.client)(
-                headers=client.client.headers.copy()
-            )
-
         if hasattr(client_, "params"):
+            client_legacy_.params = client.params.copy()
             client_.params = client.params.copy()
             client_.params.pop("token", None)
 
@@ -304,21 +302,6 @@ class GgselApiMaster(GgselApi, CategoriesApiV2, CategoriesApiV1):
             case _:
                 # todo: Create exception for this case
                 raise Exception("No match version")
-
-    def _get_client_for_instance(self, instance_type: Type[Category]) -> GClient:
-        """
-        Returns a client corresponding to the API object version.
-        """
-        match instance_type.VERSION_ROUTE:
-            case "V1":
-                client = self._client_legacy
-            case _:
-                client = self._client
-
-        if hasattr(instance_type, "ROUTE"):
-            client._base_route = instance_type.ROUTE
-
-        return client
 
     def _update_client_instance(self) -> None:
         """
