@@ -1,4 +1,5 @@
 from abc import ABC
+from http import HTTPStatus
 from typing import Any
 from asyncio import Semaphore, sleep
 
@@ -7,10 +8,13 @@ from httpx import Response as AsyncResponse, AsyncClient
 import requests
 from requests import Response
 
+from ggsel_py.parameters.api import EnumCrudMethod, TOKEN_PARAM
+
 LIMIT_ASYNC_REQUESTS = 15
 LIMIT_REQUESTS_PER_SECOND = 15
 
-STATUS_CODE_ERROR = (503, 429)
+# Responses after which the request is repeated
+STATUS_CODE_ERROR = (HTTPStatus.SERVICE_UNAVAILABLE, HTTPStatus.TOO_MANY_REQUESTS)
 
 
 class ApiLimiter:
@@ -64,7 +68,7 @@ class GClient(ABC):
         self.params: dict[str, Any] = {**kwargs.pop("params", {})}
 
     def set_token(self, token: str) -> None:
-        self.params["token"] = token
+        self.params[TOKEN_PARAM] = token
 
     @property
     def base_url(self) -> str:
@@ -103,13 +107,13 @@ class SyncGClient(GClient):
         )
 
     def get(self, route: str, **kwargs: Any) -> Response:
-        return self.request(route, "get", **kwargs)
+        return self.request(route, EnumCrudMethod.GET, **kwargs)
 
     def post(self, route: str, **kwargs: Any) -> Response:
-        return self.request(route, "post", **kwargs)
+        return self.request(route, EnumCrudMethod.POST, **kwargs)
 
     def put(self, route: str, **kwargs: Any) -> Response:
-        return self.request(route, "put", **kwargs)
+        return self.request(route, EnumCrudMethod.PUT, **kwargs)
 
 
 class AsyncGClient(GClient):
@@ -149,13 +153,13 @@ class AsyncGClient(GClient):
         )
 
     async def get(self, route: str, **kwargs: Any) -> AsyncResponse:
-        return await self.request(route, "GET", **kwargs)
+        return await self.request(route, EnumCrudMethod.GET, **kwargs)
 
     async def post(self, route: str, **kwargs: Any) -> AsyncResponse:
-        return await self.request(route, "POST", **kwargs)
+        return await self.request(route, EnumCrudMethod.POST, **kwargs)
 
     async def put(self, route: str, **kwargs: Any) -> AsyncResponse:
-        return await self.request(route, "PUT", **kwargs)
+        return await self.request(route, EnumCrudMethod.PUT, **kwargs)
 
     async def __aenter__(self):
         return self

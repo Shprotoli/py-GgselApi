@@ -1,101 +1,60 @@
+# Requests of the `Category` group of the GGSel API V2
+from ggsel_py.api.category import (
+    Category, AsyncCategory, RouteApiV2, RequestSpec, build_request, endpoint, locale_header,
+)
+from ggsel_py.parameters.api import EnumCrudMethod
 from ggsel_py.parameters.globals import Locale
-from ggsel_py.tools.handlers import async_request_and_parse, request_and_parse, ApiResult
-from ggsel_py.api.base.categories import CategoriesBaseV2
 from ggsel_py.schemas.v2.list_of import ListOfCategories
 
 
-class Categories(CategoriesBaseV2):
+class CategoriesEndpointsV2(Category, RouteApiV2):
+    @endpoint(ListOfCategories)
     def list_of_categories(
             self,
             parent_id: int,
             page: int = 1,
             limit: int = 10,
             locale: str | Locale = "ru"
-    ) -> ApiResult:
+    ) -> RequestSpec:
         """
         Source docs: https://seller.ggsel.com/docs/v2/list-of-categories
         This method returns information about the category.
         This includes the name, the category's commission rate, and more...
-
-        :param parent_id: ID category
-        :param page: Count page category
-        :param limit: Count category
-        :param locale: Localization response information
         """
-        return request_and_parse(
-            self.client,
-            self._list_of_categories,
-            ListOfCategories,
-            parent_id=parent_id,
-            page=page,
-            limit=limit,
-            locale=locale
-        )
+        params = {
+            "parent_id": parent_id,
+            "page": page,
+            "limit": limit,
+        }
 
+        return build_request(EnumCrudMethod.GET, "categories", params=params, headers=locale_header(locale))
+
+    @endpoint(ListOfCategories)
     def search_categories(
             self,
             q: str,
             page: int = 1,
             limit: int = 10,
             locale: str | Locale = "ru",
-    ) -> ApiResult:
+    ) -> RequestSpec:
         """
         Source docs: https://seller.ggsel.com/docs/v2/search-categories
         This method works like a "search" on GGSel by category
 
         :param q: Your request
-        :param page: Count page category
-        :param limit: Count category
-        :param locale: Localization response information
         """
-        return request_and_parse(
-            self.client,
-            self._search_categories,
-            ListOfCategories,
-            page=page,
-            limit=limit,
-            q=q,
-            locale=locale
-        )
+        params = {
+            "page": page,
+            "limit": limit,
+            "q": q,
+        }
+
+        return build_request(EnumCrudMethod.GET, "categories/search", params=params, headers=locale_header(locale))
 
 
-class AsyncCategories(CategoriesBaseV2):
-    async def list_of_categories(
-            self,
-            parent_id: int,
-            page: int = 1,
-            limit: int = 10,
-            locale: str | Locale = "ru"
-    ) -> ApiResult:
-        """
-        See Categories.list_of_categories
-        """
-        return await async_request_and_parse(
-            self.client,
-            self._list_of_categories,
-            ListOfCategories,
-            parent_id=parent_id,
-            page=page,
-            limit=limit,
-            locale=locale
-        )
+class Categories(CategoriesEndpointsV2):
+    pass
 
-    async def search_categories(
-            self,
-            q: str,
-            page: int = 1,
-            limit: int = 10,
-            locale: str | Locale = "ru",
-    ) -> ApiResult:
-        """
-        See Categories.search_categories
-        """
-        return await async_request_and_parse(
-            self.client,
-            self._search_categories,
-            ListOfCategories,
-            page=page,
-            limit=limit,
-            q=q,
-            locale=locale
-        )
+
+class AsyncCategories(AsyncCategory, CategoriesEndpointsV2):
+    pass

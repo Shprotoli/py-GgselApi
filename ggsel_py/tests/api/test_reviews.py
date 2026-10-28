@@ -8,7 +8,7 @@ from ggsel_py.parameters.api import EnumCrudMethod
 def test_reviews_helper(sync_client):
     api = Reviews(sync_client)
 
-    payload = api._user_reviews(777, type="good", page=3, count=5, locale="en-US")
+    payload = type(api).user_reviews.build(api, 777, type="good", page=3, count=5, locale="en-US")
 
     assert payload == {
         "method": EnumCrudMethod.GET,

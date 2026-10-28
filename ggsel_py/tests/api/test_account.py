@@ -10,7 +10,7 @@ from ggsel_py.parameters.account import CodeFilter, Type
 def test_account_helper_builds_balance_route(sync_client):
     api = Account(sync_client)
 
-    assert api._seller_balance_info() == {
+    assert type(api).seller_balance_info.build(api, ) == {
         "method": EnumCrudMethod.GET,
         "route": "sellers/account/balance/info"
     }
@@ -21,7 +21,7 @@ def test_account_helper_builds_receipts_route(sync_client):
     start = datetime(2024, 1, 1, 3, 0, 0)
     finish = datetime(2024, 1, 2, 3, 0, 0)
 
-    payload = api._seller_receipts(
+    payload = type(api).seller_receipts.build(api, 
         page=2,
         count=50,
         currency="RUB",

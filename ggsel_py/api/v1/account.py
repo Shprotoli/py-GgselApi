@@ -1,27 +1,23 @@
-# A class file that handles requests from the `Account` category of the GGSell API
+# Requests of the `Account` category of the GGSel API
 from datetime import datetime
 
-from ggsel_py.tools.handlers import request_and_parse, async_request_and_parse, ApiResult
+from ggsel_py.api.category import Category, AsyncCategory, RouteApiV1, RequestSpec, build_request, endpoint
 from ggsel_py.parameters.account import Type, CodeFilter
+from ggsel_py.parameters.api import EnumCrudMethod
 from ggsel_py.schemas.v1.balance_object import BalanceObject
 from ggsel_py.schemas.v1.receipts_object import ReceiptsObject
-from ggsel_py.api.base.account import AccountBaseV1
+from ggsel_py.tools.formated import format_dt
 
 
-class Account(AccountBaseV1):
-    def seller_balance_info(self) -> ApiResult:
+class AccountEndpointsV1(Category, RouteApiV1):
+    @endpoint(BalanceObject)
+    def seller_balance_info(self) -> RequestSpec:
         """
         Source docs: https://seller.ggsel.com/docs/return-seller-balance-info
-        This function makes a request to retrieve the user's balance.
-
-        :return: dataclass BalanceObject containing a json response from the API
         """
-        return request_and_parse(
-            self.client,
-            self._seller_balance_info,
-            BalanceObject
-        )
+        return build_request(EnumCrudMethod.GET, "sellers/account/balance/info")
 
+    @endpoint(ReceiptsObject)
     def seller_receipts(
             self,
             page: int = 1,
@@ -32,7 +28,7 @@ class Account(AccountBaseV1):
             allow_type: str | Type = "",
             start: str | datetime = "",
             finish: str | datetime = "",
-    ) -> ApiResult:
+    ) -> RequestSpec:
         """
         Source docs: https://seller.ggsel.com/docs/return-seller-receipts
         This function retrieves a list of financial transactions from the page `https://seller.ggsel.com/finance`
@@ -47,58 +43,24 @@ class Account(AccountBaseV1):
                            but accepts multiple types
         :param start: {Format date/time: ISO 8601} Operations not earlier than a specified date
         :param finish: {Format date/time: ISO 8601} Operations no later than the specified set date
-        :return: dataclass ReceiptsObject containing a json response from the API
         """
-        return request_and_parse(
-            self.client,
-            self._seller_receipts,
-            ReceiptsObject,
-            page=page,
-            count=count,
-            currency=currency,
-            type=type,
-            code_filter=code_filter,
-            allow_type=allow_type,
-            start=start,
-            finish=finish
-        )
+        params = {
+            "page": page,
+            "count": count,
+            "currency": currency,
+            "type": type,
+            "code_filter": code_filter,
+            "allow_type": allow_type,
+            "start": format_dt(start),
+            "finish": format_dt(finish),
+        }
+
+        return build_request(EnumCrudMethod.GET, "sellers/account/receipts", params=params)
 
 
-class AsyncAccount(AccountBaseV1):
-    async def seller_balance_info(self) -> ApiResult:
-        """
-        See Account.seller_balance_info
-        """
-        return await async_request_and_parse(
-            self.client,
-            self._seller_balance_info,
-            BalanceObject
-        )
+class Account(AccountEndpointsV1):
+    pass
 
-    async def seller_receipts(
-            self,
-            page: int = 1,
-            count: int = 100,
-            currency: str = "",
-            type: str | Type = "",
-            code_filter: str | CodeFilter = "",
-            allow_type: str | Type = "",
-            start: str | datetime = "",
-            finish: str | datetime = "",
-    ) -> ApiResult:
-        """
-        See Account.seller_receipts
-        """
-        return await async_request_and_parse(
-            self.client,
-            self._seller_receipts,
-            ReceiptsObject,
-            page=page,
-            count=count,
-            currency=currency,
-            type=type,
-            code_filter=code_filter,
-            allow_type=allow_type,
-            start=start,
-            finish=finish
-        )
+
+class AsyncAccount(AsyncCategory, AccountEndpointsV1):
+    pass

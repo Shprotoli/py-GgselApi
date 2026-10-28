@@ -1,11 +1,12 @@
-# A class file that handles requests from the `ApiLogin` category of the GGSell API
-from ggsel_py.tools.handlers import request_and_parse, async_request_and_parse, ApiResult
+# Requests of the `ApiLogin` category of the GGSel API
+from ggsel_py.api.category import Category, AsyncCategory, RouteApiV1, RequestSpec, build_request, endpoint
+from ggsel_py.parameters.api import EnumCrudMethod
 from ggsel_py.schemas.v1.token_object import TokenObject
-from ggsel_py.api.base.api_login import ApiLoginBaseV1
 
 
-class ApiLogin(ApiLoginBaseV1):
-    def api_login(self, seller_id: int, timestamp: int, sign: str) -> ApiResult:
+class ApiLoginEndpointsV1(Category, RouteApiV1):
+    @endpoint(TokenObject)
+    def api_login(self, seller_id: int, timestamp: int | str, sign: str) -> RequestSpec:
         """
         Source docs: https://seller.ggsel.com/docs/return-seller-token
         This function allows you to generate a token using the API key that was obtained on the page `https://seller.ggsel.com/settings`.
@@ -44,38 +45,20 @@ class ApiLogin(ApiLoginBaseV1):
 
         :param seller_id: Your seller ID, which can be viewed in your GGSel profile
         :param timestamp: Unix Time Stamp
-        :param sign: Your SHA256(API-key + timestamp), this like:
-                ```python
-                from time import time
-                from hashlib import sha256
-
-                API_KEY = "..."
-
-                timestamp = str(int(time() * 1000))
-                sign = sha256((API_KEY + timestamp).encode()).hexdigest()
-                ```
-        :return: dataclass TokenObject containing a json response from the API
+        :param sign: Your SHA256(API-key + timestamp)
         """
-        return request_and_parse(
-            self.client,
-            self._api_login,
-            TokenObject,
-            seller_id=seller_id,
-            timestamp=timestamp,
-            sign=sign
-        )
+        payload = {
+            "seller_id": seller_id,
+            "timestamp": str(timestamp),
+            "sign": sign,
+        }
+
+        return build_request(EnumCrudMethod.POST, "apilogin", payload=payload)
 
 
-class AsyncApiLogin(ApiLoginBaseV1):
-    async def api_login(self, seller_id: int, timestamp: str | int, sign: str) -> ApiResult:
-        """
-        See ApiLoginBase.api_login
-        """
-        return await async_request_and_parse(
-            self.client,
-            self._api_login,
-            TokenObject,
-            seller_id=seller_id,
-            timestamp=timestamp,
-            sign=sign
-        )
+class ApiLogin(ApiLoginEndpointsV1):
+    pass
+
+
+class AsyncApiLogin(AsyncCategory, ApiLoginEndpointsV1):
+    pass

@@ -8,7 +8,7 @@ from ggsel_py.api.v1.api_login import ApiLogin, AsyncApiLogin
 def test_api_login_helper_builds_json_payload(sync_client):
     api = ApiLogin(sync_client)
 
-    payload = api._api_login(42, 1234567890, "sign-value")
+    payload = type(api).api_login.build(api, 42, 1234567890, "sign-value")
 
     assert payload["route"] == "apilogin"
     assert json.loads(payload["data"]) == {

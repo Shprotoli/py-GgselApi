@@ -10,7 +10,7 @@ from ggsel_py.schemas.general_objects import UndetectedObject
 def test_chats_create_message_helper(sync_client):
     api = Chats(sync_client)
 
-    payload = api._create_message_without_file(777, "hello")
+    payload = type(api).create_message_without_file.build(api, 777, "hello")
 
     assert payload["route"] == "debates/v2"
     assert payload["params"] == {"id_i": 777}

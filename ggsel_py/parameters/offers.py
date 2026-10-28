@@ -24,6 +24,12 @@ class DeliveryStatus(StrEnum):
     MANUAL = "manual"
 
 
+class BatchAction(StrEnum):
+    ACTIVATE = "activate"
+    PAUSE = "pause"
+    DELETE = "delete"
+
+
 def generate_offer(
         title_ru: Optional[str] = None,
         title_en: Optional[str] = None,

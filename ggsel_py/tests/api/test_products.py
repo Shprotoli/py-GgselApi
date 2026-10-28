@@ -10,8 +10,8 @@ from ggsel_py.parameters.products import OrderCol, OrderDir
 def test_products_list_helper_handles_scalar_and_sequence(sync_client):
     api = Products(sync_client)
 
-    scalar_payload = api._all_products(15, page=2, count=3, lang="en-US", locale="ru-RU")
-    list_payload = api._all_products([1, "2"], page=4, count=5, lang="en-US", locale="ru-RU")
+    scalar_payload = type(api).all_products.build(api, 15, page=2, count=3, lang="en-US", locale="ru-RU")
+    list_payload = type(api).all_products.build(api, [1, "2"], page=4, count=5, lang="en-US", locale="ru-RU")
 
     assert scalar_payload == {
         "method": EnumCrudMethod.GET,
