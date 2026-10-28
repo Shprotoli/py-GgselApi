@@ -1,6 +1,5 @@
 from copy import copy
 from abc import ABC
-from typing import Type
 
 from ggsel_py.api.client import GClient, SyncGClient, AsyncGClient
 # API V1 Category
@@ -173,7 +172,7 @@ class GgselApi(ABC):
         """
         return isinstance(self._client, AsyncGClient)
 
-    def _get_instance_type_by_name(self, obj_name: str) -> Type[Category]:
+    def _get_instance_type_by_name(self, obj_name: str) -> type[Category]:
         """Returns sync or async API object class depending on current mode."""
         sync_cls, async_cls = API_OBJECTS[obj_name]
         return async_cls if self.__async__ else sync_cls
@@ -182,19 +181,19 @@ class GgselApi(ABC):
         """
         This method replaces the `client` object in all instances with the client object
         """
-        for obj_name in filter(lambda obj: hasattr(self, obj), self._objects_instance):
+        for obj_name in self._created_instances():
             obj_instance = getattr(self, obj_name)
-            obj_instance.client = self._client
+            obj_instance.client = self._client_for(type(obj_instance))
 
     def _update_mode_instance(self) -> None:
         """
         This method updates the object type to the current mode type
         (determined by the current `client` mode, which can be synchronous or asynchronous)
         """
-        for obj_name in filter(lambda obj: hasattr(self, obj), self._objects_instance):
+        for obj_name in self._created_instances():
             instance_type = self._get_instance_type_by_name(obj_name)
 
-            setattr(self, obj_name, instance_type(self._client))
+            setattr(self, obj_name, instance_type(self._client_for(instance_type)))
 
     def _get_api_instance(self, instance_name: str) -> Category:
         """
@@ -207,13 +206,20 @@ class GgselApi(ABC):
         if not hasattr(self, instance_name):
             instance_type = self._get_instance_type_by_name(instance_name)
 
-            setattr(self, instance_name, instance_type(self._client))
+            setattr(self, instance_name, instance_type(self._client_for(instance_type)))
         return getattr(self, instance_name)
+
+    def _created_instances(self) -> list[str]:
+        """Names of the category instances that have already been created (they are created lazily)"""
+        return [obj_name for obj_name in self._objects_instance if hasattr(self, obj_name)]
+
+    def _client_for(self, instance_type: type[Category]) -> GClient:
+        """The client that the categories of `instance_type` should use"""
+        return self._client
 
 
 class GgselApiV1(GgselApi, CategoriesApiV1):
     _objects_instance: tuple[str, ...] = tuple(API_V1_OBJECTS.keys())
-    __slots__ = ["_client", "__async__", *_objects_instance]
 
     def __init__(self, token: str = "", client: GClient | None = None):
         super().__init__(client)
@@ -225,7 +231,6 @@ class GgselApiV1(GgselApi, CategoriesApiV1):
 
 class GgselApiV2(GgselApi, CategoriesApiV2):
     _objects_instance: tuple[str, ...] = tuple(API_V2_OBJECTS.keys())
-    __slots__ = ["_client", "__async__", *_objects_instance]
 
     def __init__(self, api_key: str = "", client: GClient | None = None):
         super().__init__(client)
@@ -237,7 +242,6 @@ class GgselApiV2(GgselApi, CategoriesApiV2):
 
 class GgselApiMaster(GgselApi, CategoriesApiV2, CategoriesApiV1):
     _objects_instance: tuple[str, ...] = tuple(API_OBJECTS.keys())
-    __slots__ = ["_client", "__async__", "__obj_api_v1", "__obj_api_v2"]
 
     def __init__(self, api_key: str = "", token: str = "", client: GClient | None = None):
         super().__init__(client)
@@ -312,31 +316,5 @@ class GgselApiMaster(GgselApi, CategoriesApiV2, CategoriesApiV1):
             case _:
                 raise ValueError(f"Unknown API version: {version_api!r}")
 
-    def _update_client_instance(self) -> None:
-        """
-        See docks in GgselApi._update_client_instance
-        """
-        for obj_name in filter(lambda obj: hasattr(self, obj), self._objects_instance):
-            obj_instance = getattr(self, obj_name)
-            obj_instance.client = self._get_client_by_version(obj_instance.VERSION_ROUTE)
-
-    def _update_mode_instance(self) -> None:
-        """
-        See docks in GgselApi._update_mode_instance
-        """
-        for obj_name in filter(lambda obj: hasattr(self, obj), self._objects_instance):
-            instance_type = self._get_instance_type_by_name(obj_name)
-
-            client = self._get_client_by_version(instance_type.VERSION_ROUTE)
-            setattr(self, obj_name, instance_type(client))
-
-    def _get_api_instance(self, instance_name: str) -> Category:
-        """
-        See docks in GgselApi._get_api_instance
-        """
-        if not hasattr(self, instance_name):
-            instance_type = self._get_instance_type_by_name(instance_name)
-
-            client = self._get_client_by_version(instance_type.VERSION_ROUTE)
-            setattr(self, instance_name, instance_type(client))
-        return getattr(self, instance_name)
+    def _client_for(self, instance_type: type[Category]) -> GClient:
+        return self._get_client_by_version(instance_type.VERSION_ROUTE)
