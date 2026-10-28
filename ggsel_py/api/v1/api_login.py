@@ -36,7 +36,7 @@ class ApiLogin(ApiLoginBaseV1):
         sign = sha256((API_KEY + timestamp).encode()).hexdigest()
 
         api_obj = GgselApiV1()
-        api_login_category = api_obj.ApiLogin
+        api_login_category = api_obj.api_login
         TOKEN = api_login_category.api_login(ID_SELLER, int(timestamp), sign).token
 
         api_obj.set_token(TOKEN)

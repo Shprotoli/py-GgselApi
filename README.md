@@ -29,8 +29,8 @@ You can find all the available API methods in the official GGSel API documentati
 To call a specific method from the documentation, you can follow these steps: First, create an API instance (`GgselApiV1`), then select a category (API instance argument), and finally call the desired method (the method names are almost identical to those in the documentation).
 
 ```python
-from api.ggsel_api import GgselApiV1
-from schemas.v1.balance_object import BalanceObject
+from ggsel_py.api.ggsel_api import GgselApiV1
+from ggsel_py.schemas.v1.balance_object import BalanceObject
 
 TOKEN = "YOUR TOKEN"  # Method for get token — https://seller.ggsel.com/docs/return-seller-token
 

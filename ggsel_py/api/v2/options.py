@@ -215,7 +215,7 @@ class AsyncOption(OptionBaseV2):
         return await async_request_and_parse(
             self.client,
             self._list_active_offer_options,
-            OptionObject,
+            ListOfOption,
             offer_id=offer_id,
             locale=locale,
         )
