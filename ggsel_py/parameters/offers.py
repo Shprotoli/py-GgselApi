@@ -1,6 +1,7 @@
 from enum import StrEnum
-from typing import Optional, Dict, Any
+from typing import Any
 
+from ggsel_py.parameters.common import drop_none
 from ggsel_py.parameters.globals import Currency
 
 
@@ -24,29 +25,39 @@ class DeliveryStatus(StrEnum):
     MANUAL = "manual"
 
 
+class BatchAction(StrEnum):
+    ACTIVATE = "activate"
+    PAUSE = "pause"
+    DELETE = "delete"
+
+
 def generate_offer(
-        title_ru: Optional[str] = None,
-        title_en: Optional[str] = None,
-        description_ru: Optional[str] = None,
-        description_en: Optional[str] = None,
-        instructions_ru: Optional[str] = None,
-        instructions_en: Optional[str] = None,
-        cover_image_ru: Optional[str] = None,
-        cover_image_en: Optional[str] = None,
-        price: Optional[float] = None,
-        currency: Optional[Currency] = None,
-        is_autoselling: Optional[bool] = None,
-        category_id: Optional[int] = None,
-        min_quantity: Optional[int] = None,
-        max_quantity: Optional[int] = None,
-        quantity: Optional[int] = None,
-        is_unlimited_quantity: Optional[bool] = None,
-        post_payment_url: Optional[str] = None,
-        delivery: Optional[DeliveryStatus] = None,
-        pre_payment_settings: Optional[Dict[str, Any]] = None,
-        notification_settings: Optional[Dict[str, Any]] = None,
-) -> Dict[str, Any]:
-    data = {
+        title_ru: str | None = None,
+        title_en: str | None = None,
+        description_ru: str | None = None,
+        description_en: str | None = None,
+        instructions_ru: str | None = None,
+        instructions_en: str | None = None,
+        cover_image_ru: str | None = None,
+        cover_image_en: str | None = None,
+        price: float | None = None,
+        currency: Currency | None = None,
+        is_autoselling: bool | None = None,
+        category_id: int | None = None,
+        min_quantity: int | None = None,
+        max_quantity: int | None = None,
+        quantity: int | None = None,
+        is_unlimited_quantity: bool | None = None,
+        post_payment_url: str | None = None,
+        delivery: DeliveryStatus | None = None,
+        pre_payment_settings: dict[str, Any] | None = None,
+        notification_settings: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """
+    Builds the body for `create_offer`/`patch_offer`. Fields that are `None` are left out,
+    including the fields inside `pre_payment_settings` and `notification_settings`.
+    """
+    data = drop_none({
         "title_ru": title_ru,
         "title_en": title_en,
         "description_ru": description_ru,
@@ -65,21 +76,92 @@ def generate_offer(
         "is_unlimited_quantity": is_unlimited_quantity,
         "post_payment_url": post_payment_url,
         "delivery": delivery,
-    }
-
-    data = {k: v for k, v in data.items() if v is not None}
+    })
 
     if pre_payment_settings is not None:
-        data["pre_payment_settings"] = {
-            k: v for k, v in pre_payment_settings.items() if v is not None
-        }
+        data["pre_payment_settings"] = drop_none(pre_payment_settings)
 
     if notification_settings is not None:
-        data["notification_settings"] = {
-            k: v for k, v in notification_settings.items() if v is not None
-        }
+        data["notification_settings"] = drop_none(notification_settings)
 
     return data
+
+
+def generate_product_offer(
+        title_ru: str | None = None,
+        title_en: str | None = None,
+        description_ru: str | None = None,
+        description_en: str | None = None,
+        instructions_ru: str | None = None,
+        instructions_en: str | None = None,
+        cover_image_ru: str | None = None,
+        cover_image_en: str | None = None,
+        price: float | None = None,
+        currency: Currency | None = Currency.RUB,
+        is_autoselling: bool | None = None,
+        category_id: int | None = None,
+        min_quantity: int | None = None,
+        max_quantity: int | None = None,
+        quantity: int | None = None,
+        is_unlimited_quantity: bool | None = None,
+        post_payment_url: str | None = None,
+        delivery: DeliveryStatus | None = None,
+        pre_payment_settings: dict[str, Any] | None = None,
+        notification_settings: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """The same as `generate_offer`, but the currency is RUB by default"""
+    return generate_offer(
+        title_ru=title_ru,
+        title_en=title_en,
+        description_ru=description_ru,
+        description_en=description_en,
+        instructions_ru=instructions_ru,
+        instructions_en=instructions_en,
+        cover_image_ru=cover_image_ru,
+        cover_image_en=cover_image_en,
+        price=price,
+        currency=currency,
+        is_autoselling=is_autoselling,
+        category_id=category_id,
+        min_quantity=min_quantity,
+        max_quantity=max_quantity,
+        quantity=quantity,
+        is_unlimited_quantity=is_unlimited_quantity,
+        post_payment_url=post_payment_url,
+        delivery=delivery,
+        pre_payment_settings=pre_payment_settings,
+        notification_settings=notification_settings,
+    )
+
+
+def _offer_template(
+        title_ru: str,
+        title_en: str,
+        description_ru: str,
+        description_en: str,
+        price: float,
+        category_id: int,
+        currency: Currency | str,
+        cover_image_ru: str | None,
+        fields_before_category: dict[str, Any] | None = None,
+        **fields: Any,
+) -> dict[str, Any]:
+    """
+    The fields shared by all `*_template` functions; unlike `generate_offer`, `None` values are kept.
+    `fields` are added at the end, `fields_before_category` keep the historical order of the JSON body.
+    """
+    return {
+        "title_ru": title_ru,
+        "title_en": title_en,
+        "description_ru": description_ru,
+        "description_en": description_en,
+        "cover_image_ru": cover_image_ru,
+        "price": price,
+        "currency": currency,
+        **(fields_before_category or {}),
+        "category_id": category_id,
+        **fields,
+    }
 
 
 def regular_offer_template(
@@ -91,19 +173,12 @@ def regular_offer_template(
         category_id: int,
         currency: Currency | str = Currency.RUB,
         quantity: int = 999,
-        cover_image_ru: str = None,
-):
-    return {
-        "title_ru": title_ru,
-        "title_en": title_en,
-        "description_ru": description_ru,
-        "description_en": description_en,
-        "cover_image_ru": cover_image_ru,
-        "price": price,
-        "currency": currency,
-        "category_id": category_id,
-        "quantity": quantity,
-    }
+        cover_image_ru: str | None = None,
+) -> dict[str, Any]:
+    return _offer_template(
+        title_ru, title_en, description_ru, description_en, price, category_id, currency, cover_image_ru,
+        quantity=quantity,
+    )
 
 
 def autoselling_offer_template(
@@ -114,19 +189,12 @@ def autoselling_offer_template(
         price: float,
         category_id: int,
         currency: Currency | str = Currency.RUB,
-        cover_image_ru: str = None,
-):
-    return {
-        "title_ru": title_ru,
-        "title_en": title_en,
-        "description_ru": description_ru,
-        "description_en": description_en,
-        "cover_image_ru": cover_image_ru,
-        "price": price,
-        "currency": currency,
-        "is_autoselling": True,
-        "category_id": category_id,
-    }
+        cover_image_ru: str | None = None,
+) -> dict[str, Any]:
+    return _offer_template(
+        title_ru, title_en, description_ru, description_en, price, category_id, currency, cover_image_ru,
+        fields_before_category={"is_autoselling": True},
+    )
 
 
 def unlimited_quantity_template(
@@ -137,19 +205,12 @@ def unlimited_quantity_template(
         price: float,
         category_id: int,
         currency: Currency | str = Currency.RUB,
-        cover_image_ru: str = None,
-):
-    return {
-        "title_ru": title_ru,
-        "title_en": title_en,
-        "description_ru": description_ru,
-        "description_en": description_en,
-        "cover_image_ru": cover_image_ru,
-        "price": price,
-        "currency": currency,
-        "category_id": category_id,
-        "is_unlimited_quantity": True,
-    }
+        cover_image_ru: str | None = None,
+) -> dict[str, Any]:
+    return _offer_template(
+        title_ru, title_en, description_ru, description_en, price, category_id, currency, cover_image_ru,
+        is_unlimited_quantity=True,
+    )
 
 
 def offer_with_email_notifications_template(
@@ -161,23 +222,16 @@ def offer_with_email_notifications_template(
         price: float,
         category_id: int,
         currency: Currency | str = Currency.RUB,
-        cover_image_ru: str = None,
-):
-    return {
-        "title_ru": title_ru,
-        "title_en": title_en,
-        "description_ru": description_ru,
-        "description_en": description_en,
-        "cover_image_ru": cover_image_ru,
-        "price": price,
-        "currency": currency,
-        "category_id": category_id,
-        "notification_settings": {
+        cover_image_ru: str | None = None,
+) -> dict[str, Any]:
+    return _offer_template(
+        title_ru, title_en, description_ru, description_en, price, category_id, currency, cover_image_ru,
+        notification_settings={
             "type": "email",
             "email": email,
             "is_default": True,
         },
-    }
+    )
 
 
 def offer_with_http_notification_template(
@@ -190,24 +244,17 @@ def offer_with_http_notification_template(
         price: float,
         category_id: int,
         currency: Currency | str = Currency.RUB,
-        cover_image_ru: str = None,
-):
-    return {
-        "title_ru": title_ru,
-        "title_en": title_en,
-        "description_ru": description_ru,
-        "description_en": description_en,
-        "cover_image_ru": cover_image_ru,
-        "price": price,
-        "currency": currency,
-        "category_id": category_id,
-        "notification_settings": {
+        cover_image_ru: str | None = None,
+) -> dict[str, Any]:
+    return _offer_template(
+        title_ru, title_en, description_ru, description_en, price, category_id, currency, cover_image_ru,
+        notification_settings={
             "type": "url",
             "http_method": http_method,
             "url": url,
             "is_default": True,
         },
-    }
+    )
 
 
 def offer_with_pre_and_post_payment_template(
@@ -221,82 +268,13 @@ def offer_with_pre_and_post_payment_template(
         category_id: int,
         allow_payment: bool = True,
         currency: Currency | str = Currency.RUB,
-        cover_image_ru: str = None,
-):
-    return {
-        "title_ru": title_ru,
-        "title_en": title_en,
-        "description_ru": description_ru,
-        "description_en": description_en,
-        "cover_image_ru": cover_image_ru,
-        "price": price,
-        "currency": currency,
-        "category_id": category_id,
-        "post_payment_url": post_payment_url,
-        "pre_payment_settings": {
+        cover_image_ru: str | None = None,
+) -> dict[str, Any]:
+    return _offer_template(
+        title_ru, title_en, description_ru, description_en, price, category_id, currency, cover_image_ru,
+        post_payment_url=post_payment_url,
+        pre_payment_settings={
             "url": pre_payment_url,
             "allow_payment": allow_payment,
         },
-    }
-
-
-def generate_product_offer(
-        title_ru: Optional[str] = None,
-        title_en: Optional[str] = None,
-        description_ru: Optional[str] = None,
-        description_en: Optional[str] = None,
-        instructions_ru: Optional[str] = None,
-        instructions_en: Optional[str] = None,
-        cover_image_ru: Optional[str] = None,
-        cover_image_en: Optional[str] = None,
-        price: Optional[float] = None,
-        currency: Optional[Currency] = Currency.RUB,
-        is_autoselling: Optional[bool] = None,
-        category_id: Optional[int] = None,
-        min_quantity: Optional[int] = None,
-        max_quantity: Optional[int] = None,
-        quantity: Optional[int] = None,
-        is_unlimited_quantity: Optional[bool] = None,
-        post_payment_url: Optional[str] = None,
-        delivery: Optional[DeliveryStatus] = None,
-        pre_payment_settings: Optional[Dict[str, Any]] = None,
-        notification_settings: Optional[Dict[str, Any]] = None,
-) -> Dict[str, Any]:
-    data = {
-        "title_ru": title_ru,
-        "title_en": title_en,
-        "description_ru": description_ru,
-        "description_en": description_en,
-        "instructions_ru": instructions_ru,
-        "instructions_en": instructions_en,
-        "cover_image_ru": cover_image_ru,
-        "cover_image_en": cover_image_en,
-        "price": price,
-        "currency": currency,
-        "is_autoselling": is_autoselling,
-        "category_id": category_id,
-        "min_quantity": min_quantity,
-        "max_quantity": max_quantity,
-        "quantity": quantity,
-        "is_unlimited_quantity": is_unlimited_quantity,
-        "post_payment_url": post_payment_url,
-        "delivery": delivery,
-    }
-
-    data = {k: v for k, v in data.items() if v is not None}
-
-    if pre_payment_settings is not None:
-        data["pre_payment_settings"] = {
-            k: v
-            for k, v in pre_payment_settings.items()
-            if v is not None
-        }
-
-    if notification_settings is not None:
-        data["notification_settings"] = {
-            k: v
-            for k, v in notification_settings.items()
-            if v is not None
-        }
-
-    return data
+    )

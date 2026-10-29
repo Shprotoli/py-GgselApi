@@ -8,7 +8,7 @@ from ggsel_py.parameters.api import EnumCrudMethod
 def test_categories_helper_builds_route(sync_client):
     api = Categories(sync_client)
 
-    payload = api._all_categories(page=2, count=25, category_id="12", lang="en-US")
+    payload = type(api).all_categories.build(api, page=2, count=25, category_id="12", lang="en-US")
 
     assert payload == {
         "method": EnumCrudMethod.GET,
@@ -80,3 +80,11 @@ def test_categories_async(async_client, response_factory):
     )
     assert result.retdesc == "OK"
     assert result.category[0]["cnt"] == 5
+
+
+def test_v2_search_categories_uses_search_route(sync_client):
+    from ggsel_py.api.v2.categories import Categories as CategoriesV2
+
+    api = CategoriesV2(sync_client)
+
+    assert type(api).search_categories.build(api, q="steam")["route"] == "categories/search"

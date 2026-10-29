@@ -1,15 +1,21 @@
+# Requests of the `Offers` group of the GGSel API V2
 from datetime import datetime
 
-from ggsel_py.api.base.offers import OffersBaseV2
+from ggsel_py.api.category import (
+    Category, AsyncCategory, RouteApiV2, RequestSpec, build_request, endpoint, locale_header,
+)
+from ggsel_py.parameters.api import EnumCrudMethod
 from ggsel_py.parameters.globals import Locale
-from ggsel_py.parameters.offers import StatusOffer, SortOffer, DeliveryStatus
+from ggsel_py.parameters.offers import StatusOffer, SortOffer, DeliveryStatus, BatchAction
+from ggsel_py.schemas.general_objects import SuccessObject
 from ggsel_py.schemas.v2.list_of import ListOfOffers
 from ggsel_py.schemas.v2.offer_object import OfferObject, OfferEntity
-from ggsel_py.schemas.general_objects import SuccessObject
-from ggsel_py.tools.handlers import async_request_and_parse, request_and_parse, ApiResult
 
 
-class Offers(OffersBaseV2):
+class OffersEndpointsV2(Category, RouteApiV2):
+    BatchAction = BatchAction
+
+    @endpoint(ListOfOffers)
     def list_offers(
             self,
             search: str,
@@ -20,7 +26,7 @@ class Offers(OffersBaseV2):
             sort: SortOffer | str = SortOffer.PRICE_DESC,
             status: StatusOffer | str = StatusOffer.ACTIVE,
             locale: Locale | str = "ru",
-    ) -> ApiResult:
+    ) -> RequestSpec:
         """
         Source docs: https://seller.ggsel.com/docs/v2/list-offers
         This method returns a list of your products based on the request parameters.
@@ -29,274 +35,108 @@ class Offers(OffersBaseV2):
         :param search: The line of the part of the title of your product
         :param delivery: The type of delivery that is specified in the product
         :param updated_at_from: The time when the product was updated, no later than which to search
-        :param page: Search Page
-        :param limit: Limiting the number of products per page
-        :param sort: Type of search sorting
-        :param status: Product status (active, poused, draft)
-        :param locale: Localization response information
         """
-        return request_and_parse(
-            self.client,
-            self._list_offers,
-            ListOfOffers,
-            status=status,
-            page=page,
-            limit=limit,
-            search=search,
-            sort=sort,
-            delivery=delivery,
-            updated_at_from=updated_at_from,
-            locale=locale
-        )
+        params = {
+            "page": page,
+            "limit": limit,
+            "search": search,
+            "status": status,
+            "sort": sort,
+            "delivery": delivery,
+            "updated_at_from": updated_at_from,
+        }
 
+        return build_request(EnumCrudMethod.GET, "offers", params=params, headers=locale_header(locale))
+
+    @endpoint(OfferObject)
     def get_offer(
             self,
             id: int,
             locale: Locale | str = "ru",
-    ) -> ApiResult:
+    ) -> RequestSpec:
         """
         Source docs: https://seller.ggsel.com/docs/v2/get-offer
-        This method returns information about a product by its ID
-
-        :param id: Product ID
-        :param locale: Localization response information
         """
-        return request_and_parse(
-            self.client,
-            self._get_offer,
-            OfferObject,
-            id=id,
-            locale=locale
-        )
+        return build_request(EnumCrudMethod.GET, f"offers/{id}", headers=locale_header(locale))
 
+    @endpoint(OfferObject)
     def patch_offer(
             self,
             id: int,
             body: OfferEntity | dict,
             locale: Locale | str = "ru",
-    ) -> ApiResult:
+    ) -> RequestSpec:
         """
         Source docs: https://seller.ggsel.com/docs/v2/patch-offer
-        Using this method, you can change the parameters of your product by its ID
+        Changes the parameters of your product by its ID
 
-        :param id: Product ID
         :param body: A dictionary that lists the values to be replaced
                      Example of a car sale change: body={ "is_autoselling": True }
-        :param locale: Localization response information
         """
-        return request_and_parse(
-            self.client,
-            self._patch_offer,
-            OfferObject,
-            id=id,
-            locale=locale,
-            body=body,
-        )
+        return build_request(EnumCrudMethod.PATCH, f"offers/{id}", headers=locale_header(locale), payload=body)
 
+    @endpoint(OfferObject)
     def create_offer(
             self,
             body: dict,
             locale: Locale | str = "ru",
-    ):
+    ) -> RequestSpec:
         """
         Source docs: https://seller.ggsel.com/docs/v2/create-offer
-        This method allows you to create a product using a dictionary.
-
-        :param body: A dictionary with information for creating a product
-        :param locale: Localization response information
+        Creates a product from a dictionary (see the templates in `ggsel_py.parameters.offers`)
         """
-        return request_and_parse(
-            self.client,
-            self._create_offer,
-            OfferObject,
-            locale=locale,
-            body=body,
+        return build_request(EnumCrudMethod.POST, "offers", headers=locale_header(locale), payload=body)
+
+    def _batch_action(
+            self,
+            action: BatchAction,
+            offer_ids: list[int] | int,
+            locale: Locale | str,
+    ) -> RequestSpec:
+        return build_request(
+            EnumCrudMethod.POST,
+            f"offers/batch_{action}",
+            headers=locale_header(locale),
+            payload={"offer_ids": offer_ids},
         )
 
+    @endpoint(SuccessObject)
     def batch_activate_offers(
             self,
             offer_ids: list[int] | int,
             locale: Locale | str = "ru",
-    ) -> ApiResult:
+    ) -> RequestSpec:
         """
         Source docs: https://seller.ggsel.com/docs/v2/batch-activate-offers
-        This method activate a product (or products) by its (or their) ID
-
-        :param offer_ids: Product IDs for the action
-        :param locale: Localization response information
         """
-        return request_and_parse(
-            self.client,
-            self._batch_activate_offers,
-            SuccessObject,
-            offer_ids=offer_ids,
-            locale=locale,
-        )
+        return self._batch_action(BatchAction.ACTIVATE, offer_ids, locale)
 
+    @endpoint(SuccessObject)
     def batch_pause_offers(
             self,
             offer_ids: list[int] | int,
             locale: Locale | str = "ru",
-    ) -> ApiResult:
+    ) -> RequestSpec:
         """
         Source docs: https://seller.ggsel.com/docs/v2/batch-pause-offers
-        This method paused a product (or products) by its (or their) ID
-
-        :param offer_ids: Product IDs for the action
-        :param locale: Localization response information
         """
-        return request_and_parse(
-            self.client,
-            self._batch_pause_offers,
-            SuccessObject,
-            offer_ids=offer_ids,
-            locale=locale,
-        )
+        return self._batch_action(BatchAction.PAUSE, offer_ids, locale)
 
+    @endpoint(SuccessObject)
     def batch_delete_offers(
             self,
             offer_ids: list[int] | int,
             locale: Locale | str = "ru",
-    ) -> ApiResult:
+    ) -> RequestSpec:
         """
         Source docs: https://seller.ggsel.com/docs/v2/batch-delete-offers
-        This method deletes a product (or products) by its (or their) ID
-
-        :param offer_ids: Product IDs for the action
-        :param locale: Localization response information
         """
-        return request_and_parse(
-            self.client,
-            self._batch_delete_offers,
-            SuccessObject,
-            offer_ids=offer_ids,
-            locale=locale,
-        )
+        return self._batch_action(BatchAction.DELETE, offer_ids, locale)
 
 
-class AsyncOffers(OffersBaseV2):
-    async def list_offers(
-            self,
-            search: str,
-            delivery: DeliveryStatus | str,
-            updated_at_from: datetime,
-            page: int = 1,
-            limit: int = 100,
-            sort: SortOffer | str = SortOffer.PRICE_DESC,
-            status: StatusOffer | str = StatusOffer.ACTIVE,
-            locale: Locale | str = "ru",
-    ) -> ApiResult:
-        """
-        See Offers.list_offers
-        """
-        return await async_request_and_parse(
-            self.client,
-            self._list_offers,
-            ListOfOffers,
-            status=status,
-            page=page,
-            limit=limit,
-            search=search,
-            sort=sort,
-            delivery=delivery,
-            updated_at_from=updated_at_from,
-            locale=locale
-        )
+class Offers(OffersEndpointsV2):
+    pass
 
-    async def get_offer(
-            self,
-            id: int,
-            locale: Locale | str = "ru",
-    ) -> ApiResult:
-        """
-        See Offers.get_offer
-        """
-        return await async_request_and_parse(
-            self.client,
-            self._get_offer,
-            OfferObject,
-            id=id,
-            locale=locale
-        )
 
-    async def patch_offer(
-            self,
-            id: int,
-            body: OfferEntity | dict,
-            locale: Locale | str = "ru",
-    ) -> ApiResult:
-        """
-        See Offers.patch_offer
-        """
-        return await async_request_and_parse(
-            self.client,
-            self._patch_offer,
-            OfferObject,
-            id=id,
-            locale=locale,
-            body=body,
-        )
-
-    async def create_offer(
-            self,
-            body: dict,
-            locale: Locale | str = "ru",
-    ):
-        """
-        See Offers.create_offer
-        """
-        return await async_request_and_parse(
-            self.client,
-            self._create_offer,
-            OfferObject,
-            locale=locale,
-            body=body,
-        )
-
-    async def batch_activate_offers(
-            self,
-            offer_ids: list[int] | int,
-            locale: Locale | str = "ru",
-    ) -> ApiResult:
-        """
-        See Offers.batch_activate_offers
-        """
-        return await async_request_and_parse(
-            self.client,
-            self._batch_activate_offers,
-            SuccessObject,
-            offer_ids=offer_ids,
-            locale=locale,
-        )
-
-    async def batch_pause_offers(
-            self,
-            offer_ids: list[int] | int,
-            locale: Locale | str = "ru",
-    ) -> ApiResult:
-        """
-        See Offers.batch_pause_offers
-        """
-        return await async_request_and_parse(
-            self.client,
-            self._batch_pause_offers,
-            SuccessObject,
-            offer_ids=offer_ids,
-            locale=locale,
-        )
-
-    async def batch_delete_offers(
-            self,
-            offer_ids: list[int] | int,
-            locale: Locale | str = "ru",
-    ) -> ApiResult:
-        """
-        See Offers.batch_delete_offers
-        """
-        return await async_request_and_parse(
-            self.client,
-            self._batch_delete_offers,
-            SuccessObject,
-            offer_ids=offer_ids,
-            locale=locale,
-        )
+class AsyncOffers(AsyncCategory, OffersEndpointsV2):
+    pass

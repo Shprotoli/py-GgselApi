@@ -1,5 +1,7 @@
 from enum import Enum, StrEnum
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass
+
+from ggsel_py.parameters.common import AsDictMixin
 
 
 class OptionVariant(Enum):
@@ -42,14 +44,11 @@ class OptionParametr:
 
 
 @dataclass
-class OptionList:
+class OptionList(AsDictMixin):
     options: list[OptionParametr | dict]
 
-    def asdict(self):
-        return asdict(self)
 
-
-OptionListType = OptionList | dict[str, list[OptionParametr, ...]]
+OptionListType = OptionList | dict[str, list[OptionParametr]]
 
 
 def generate_option(
@@ -101,11 +100,8 @@ class OptionValue:
 
 
 @dataclass
-class OptionValueList:
+class OptionValueList(AsDictMixin):
     variants: list[OptionValue | dict]
-
-    def asdict(self):
-        return asdict(self)
 
 
 OptionValueListType = OptionValueList | dict[str, list[OptionValue]]
@@ -133,3 +129,27 @@ def generate_option_value(
         status=status,
         position=position,
     )
+
+
+class VisibilityStatus(StrEnum):
+    ACTIVE = "active"
+    HIDDEN = "hidden"
+
+
+@dataclass
+class VisibilityItem:
+    """Visibility of one option or variant for `batch_update_*_visibility`"""
+    id: int
+    status: VisibilityStatus | str
+
+
+class VisibilityStatus(StrEnum):
+    ACTIVE = "active"
+    HIDDEN = "hidden"
+
+
+@dataclass
+class VisibilityItem:
+    """Visibility of one option or variant for `batch_update_*_visibility`"""
+    id: int
+    status: VisibilityStatus | str

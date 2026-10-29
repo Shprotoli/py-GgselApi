@@ -1,5 +1,7 @@
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass
 from enum import StrEnum
+
+from ggsel_py.parameters.common import AsDictMixin
 
 
 class Type(StrEnum):
@@ -24,7 +26,7 @@ class Variant:
     rate: int
     type: str | Type
 
-    def as_dict(self):
+    def as_dict(self) -> dict:
         return {
             "variant_id": self.variant_id,
             "rate": self.rate,
@@ -43,11 +45,8 @@ class ProductParametr:
 
 
 @dataclass
-class ProductList:
+class ProductList(AsDictMixin):
     products: list[ProductParametr | dict]
 
-    def asdict(self):
-        return asdict(self)
 
-
-ProductListType = ProductList | dict[str, list[ProductParametr, ...]]
+ProductListType = ProductList | dict[str, list[ProductParametr]]
