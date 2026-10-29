@@ -19,5 +19,5 @@ def test_create_message_without_file(send_message_enabled, api_v1, describe_resu
     result = api_v1.chats.create_message_without_file(ORDER_ID, message)
 
     # On success the API returns 200 without JSON
-    assert isinstance(result, CompletedResponseObject), describe_result(result)
-    assert result.status_code == 200
+    if not isinstance(result, CompletedResponseObject) or result.status_code != 200:
+        pytest.fail(describe_result(result))

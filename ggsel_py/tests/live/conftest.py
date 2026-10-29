@@ -6,7 +6,7 @@ import asyncio
 import os
 from hashlib import sha256
 from pathlib import Path
-from time import time
+from time import sleep, time
 
 import pytest
 
@@ -17,6 +17,11 @@ from ggsel_py.schemas.other.response_object import UnknownResponseObject
 from ggsel_py.schemas.v1.token_object import TokenObject
 
 ENV_FILE = Path(__file__).resolve().parents[3] / ".env.test"
+
+# V1 `categories` answers in about 20 seconds
+TIMEOUT = 60
+# Pause after each test: requests one right after another get 429 Too Many Requests
+PAUSE_BETWEEN_TESTS = 1
 
 
 def load_env_file(path: Path) -> None:
@@ -62,9 +67,11 @@ def describe(result) -> str:
 
 def check_result(result, schema):
     """Checks that the response was parsed into `schema` (and not into an error object)"""
-    assert isinstance(result, schema), f"expected {schema.__name__}, got {describe(result)}"
-    if isinstance(result, GgselObject):
-        assert result.retval == 0, f"retval={result.retval}: {describe(result)}"
+    # `pytest.fail` instead of `assert`: pytest would print the repr of the response, and its URL contains the token
+    if not isinstance(result, schema):
+        pytest.fail(f"expected {schema.__name__}, got {describe(result)}")
+    if isinstance(result, GgselObject) and result.retval != 0:
+        pytest.fail(f"retval={result.retval}: {describe(result)}")
     return result
 
 
@@ -76,6 +83,12 @@ def expect():
 @pytest.fixture(scope="session")
 def describe_result():
     return describe
+
+
+@pytest.fixture(autouse=True)
+def pause_between_tests():
+    yield
+    sleep(PAUSE_BETWEEN_TESTS)
 
 
 @pytest.fixture(scope="session")
@@ -125,12 +138,12 @@ def send_message_enabled() -> None:
 
 @pytest.fixture
 def api_v1(token) -> GgselApiV1:
-    return GgselApiMaster(token=token, client=SyncGClient()).api_v1
+    return GgselApiMaster(token=token, client=SyncGClient(timeout=TIMEOUT)).api_v1
 
 
 @pytest.fixture
 def api_v2(api_key) -> GgselApiV2:
-    return GgselApiMaster(api_key=api_key, client=SyncGClient()).api_v2
+    return GgselApiMaster(api_key=api_key, client=SyncGClient(timeout=TIMEOUT)).api_v2
 
 
 def run_async(coro_func, api_key: str = "", token: str = ""):
@@ -140,7 +153,7 @@ def run_async(coro_func, api_key: str = "", token: str = ""):
     """
 
     async def main():
-        client = AsyncGClient()
+        client = AsyncGClient(timeout=TIMEOUT)
         async with client:
             return await coro_func(GgselApiMaster(api_key=api_key, token=token, client=client))
 
